@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
 Route::get('/', function () {
     return view('welcome');
 });
@@ -20,5 +19,13 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+
+
+//
+Route::get('/', function () {return view('home');})->middleware(['auth']);
+Route::get('/ext', function () {return view('homecustomer');})->middleware(['auth']);
+Route::get('/int', function () {return view('homeemployee');})->middleware(['auth']);
+
 
 require __DIR__.'/auth.php';
