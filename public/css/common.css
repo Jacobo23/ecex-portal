@@ -1,0 +1,41 @@
+.separtor
+{
+	border-bottom: 2px solid rgb(19, 19, 19);
+    margin: 30px 0px;
+    box-shadow: 0px 6px 4px -6px rgba(0,0,0,0.78);
+}
+.selectMenu
+{
+	text-decoration: none;
+    display: inline-block;
+	background-color: #ffffff;
+	font-size: 20px;
+    color: black;
+    width: 100%;
+}
+.selectMenu i
+{
+    float: left;
+    margin-right: 20px;
+}
+.selectMenu:hover
+{
+	background-color: #e2e0e0;
+	text-decoration: none;
+    color: black;
+}
+.controlDiv
+{
+    display: inline-block;
+}
+.controlDiv .form-check
+{
+    margin-top: 37px;
+}
+.container-fluid
+{
+    background: rgb(0,52,112);
+    background: radial-gradient(circle, rgba(0,52,112,1) 52%, rgba(0,25,55,1) 100%);
+}
+
+

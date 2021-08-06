@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,12 +21,12 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-
-
+//HOME
+Route::get('/', [UserController::class, 'redirectUser'])->middleware(['auth']);
+Route::get('/int', function () {return view('intern.home');})->middleware(['auth']);
+Route::get('/ext', function () {return view('customer.home');})->middleware(['auth']);
 //
-Route::get('/', function () {return view('home');})->middleware(['auth']);
-Route::get('/ext', function () {return view('homecustomer');})->middleware(['auth']);
-Route::get('/int', function () {return view('homeemployee');})->middleware(['auth']);
-
+Route::resource('/int/entradas', 'IncomeController')->middleware('auth');
+Route::resource('/clientes', 'CustomerController')->middleware('auth');
 
 require __DIR__.'/auth.php';
