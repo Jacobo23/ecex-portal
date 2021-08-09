@@ -26,7 +26,12 @@ Route::get('/', [UserController::class, 'redirectUser'])->middleware(['auth']);
 Route::get('/int', function () {return view('intern.home');})->middleware(['auth']);
 Route::get('/ext', function () {return view('customer.home');})->middleware(['auth']);
 //
+//Route::get('/uploadfile','UploadFileController@index');
+Route::post('/upload_pakinglist/','UploadFileController@uploadPakinglist');
+Route::post('/upload_img_entrada/','UploadFileController@uploadImgEntrada');
+//Route::get('/view_income_img/','UploadFileController@viewIncomeImg');
+//
 Route::resource('/int/entradas', 'IncomeController')->middleware('auth');
-Route::resource('/clientes', 'CustomerController')->middleware('auth');
+Route::resource('/ext/clientes', 'CustomerController')->middleware('auth');
 
 require __DIR__.'/auth.php';

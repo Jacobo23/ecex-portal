@@ -150,14 +150,56 @@
     </form>
 
     <div class="row">
-        <div class="col-lg-3 controlDiv">
-            <label class="form-label">Packing list</label>
-            <input class="form-control" type="file" id="txtPacking">
+
+        <div class="col-lg-2 controlDiv" >
+
+            <button type="button" class="btn btn-secondary" onclick="$('#txtPacking').click()">Packing list <i class="far fa-file-alt"></i></button>
+            <br>
+            <div style="display:none">
+                <form id="packingForm" action="/upload_pakinglist" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <input type="file" id="txtPacking" name="file" onchange="subirPacking()">
+                    <input type="text" id="fileNumEntrada" name="fileNumEntrada">
+                </form>
+            </div>
+            @php
+            $packinglist_path='/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf';
+            if (Storage::exists($packinglist_path)) {
+            echo "<br>";
+            echo "<div>";
+            echo "    <h5>Archivo:</h5>";
+            echo "    <p><strong>Tamaño: </strong> ". Storage::size($packinglist_path)/1000000 ." Mb</p>";
+            echo "</div>";
+            }@endphp
         </div>
-        <div class="col-lg-3 controlDiv">
-            <label class="form-label">Imagenes</label>
-            <input class="form-control" type="file" id="txtImagenes" multiple>
+
+        <div class="col-lg-4 controlDiv" style="border: 1px solid black;">
+            <button type="button" class="btn btn-secondary" onclick="$('#txtImagenes').click()">Imagenes <i class="far fa-images"></i></button>
+            <br>
+            <div style="display:none">
+                <form id="IncomeImgForm" action="/upload_img_entrada/" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <input class="form-control" type="file" onchange="subirImagenes()" id="txtImagenes" name="filenames[]" multiple>
+                    <input type="text" id="fileNumEntradaImg" name="fileNumEntradaImg">
+                </form>
+            </div>
+
+            @php
+            $income_imgs_paths='/entradas/'.$numero_de_entrada.'/images/';
+            $income_imgs = Storage::files($income_imgs_paths);
+            foreach ($income_imgs as $income_img) 
+            {
+                //echo "<div class='divFile'>";
+                //echo asset('storage/entradas/202100010/images/1628238110_1.jpg');
+                //echo public_path();
+                //echo "<img src=\"{{ url('storage/app/entradas/202100010/images/1628238110_1.jpg') }}\"/>";
+                //echo "<img src='../storage/app/entradas/202100010/images/1628238110_1.jpg'>";
+                echo "<img src='".asset('/storage/imagen_test.jpg')."'>";
+                //echo "</div>";
+            }
+            @endphp
         </div>
+
     </div>   
 
     <div class="row" style="margin-top:20px;">
@@ -321,7 +363,30 @@
 @endsection
 @section('scripts')
 <script>
-
+function subirPacking()
+{
+    let NumEntrada = $("#txtNumEntrada").val();
+    if(NumEntrada.length != 9)
+    {
+        showModal("Alerta!","Primero guarde la entrada.");
+        return;
+    }
+    
+    $("#fileNumEntrada").val(NumEntrada);
+    $("#packingForm").submit();
+}
+function subirImagenes()
+{
+    let NumEntrada = $("#txtNumEntrada").val();
+    if(NumEntrada.length != 9)
+    {
+        showModal("Alerta!","Primero guarde la entrada.");
+        return;
+    }
+    
+    $("#fileNumEntradaImg").val(NumEntrada);
+    $("#IncomeImgForm").submit();
+}
 function guardarEntrada()
 {
     //validaciones
