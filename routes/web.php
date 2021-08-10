@@ -26,10 +26,11 @@ Route::get('/', [UserController::class, 'redirectUser'])->middleware(['auth']);
 Route::get('/int', function () {return view('intern.home');})->middleware(['auth']);
 Route::get('/ext', function () {return view('customer.home');})->middleware(['auth']);
 //
-//Route::get('/uploadfile','UploadFileController@index');
 Route::post('/upload_pakinglist/','UploadFileController@uploadPakinglist');
+Route::get('int/entradas/{entrada}/download_packing/','UploadFileController@downloadPacking');
+Route::post('/delete_pakinglist/','UploadFileController@deletePacking');
 Route::post('/upload_img_entrada/','UploadFileController@uploadImgEntrada');
-//Route::get('/view_income_img/','UploadFileController@viewIncomeImg');
+Route::post('/delete_img_entrada/','UploadFileController@deleteImgEntrada');
 //
 Route::resource('/int/entradas', 'IncomeController')->middleware('auth');
 Route::resource('/ext/clientes', 'CustomerController')->middleware('auth');

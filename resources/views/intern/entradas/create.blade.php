@@ -161,19 +161,26 @@
                     <input type="file" id="txtPacking" name="file" onchange="subirPacking()">
                     <input type="text" id="fileNumEntrada" name="fileNumEntrada">
                 </form>
+                <form id="packingDeleteForm" action="/delete_pakinglist/" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <input type="text" id="fileDeleteNumEntrada" name="fileDeleteNumEntrada">
+                </form>
             </div>
             @php
-            $packinglist_path='/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf';
+            $packinglist_path='/public/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf';
             if (Storage::exists($packinglist_path)) {
             echo "<br>";
-            echo "<div>";
-            echo "    <h5>Archivo:</h5>";
-            echo "    <p><strong>Tamaño: </strong> ". Storage::size($packinglist_path)/1000000 ." Mb</p>";
+            echo "<div class='img_card col-lg-12' style='padding:10px'>";
+
+            echo "    <div class='img_card_top'>";
+            echo "        <h6><b>Packing list</b><button onclick='deletePacking()'><i class='fas fa-times'></i></button></h6>"; 
+            echo "    </div>";
+            echo "    <p><strong>Tamaño: </strong> ". round(Storage::size($packinglist_path)/1000000,2,PHP_ROUND_HALF_UP ) ." Mb</p>";
             echo "</div>";
             }@endphp
         </div>
 
-        <div class="col-lg-4 controlDiv" style="border: 1px solid black;">
+        <div class="col-lg-10 controlDiv">
             <button type="button" class="btn btn-secondary" onclick="$('#txtImagenes').click()">Imagenes <i class="far fa-images"></i></button>
             <br>
             <div style="display:none">
@@ -182,20 +189,30 @@
                     <input class="form-control" type="file" onchange="subirImagenes()" id="txtImagenes" name="filenames[]" multiple>
                     <input type="text" id="fileNumEntradaImg" name="fileNumEntradaImg">
                 </form>
+                <form id="IncomeImgDeleteForm" action="/delete_img_entrada/" method="post" enctype="multipart/form-data">
+                    @csrf
+                    <input type="text" id="ImgDeleteNumEntrada" name="ImgDeleteNumEntrada">
+                    <input style="hidden" type="text" id="ImgNameDeleteNumEntrada" name="ImgNameDeleteNumEntrada">
+                </form>
             </div>
+            <br>
 
             @php
-            $income_imgs_paths='/entradas/'.$numero_de_entrada.'/images/';
+            $income_imgs_paths='public/entradas/'.$numero_de_entrada.'/images/';
             $income_imgs = Storage::files($income_imgs_paths);
             foreach ($income_imgs as $income_img) 
             {
-                //echo "<div class='divFile'>";
-                //echo asset('storage/entradas/202100010/images/1628238110_1.jpg');
-                //echo public_path();
-                //echo "<img src=\"{{ url('storage/app/entradas/202100010/images/1628238110_1.jpg') }}\"/>";
-                //echo "<img src='../storage/app/entradas/202100010/images/1628238110_1.jpg'>";
-                echo "<img src='".asset('/storage/imagen_test.jpg')."'>";
-                //echo "</div>";
+                $img_file_name_array=explode('/',$income_img);
+
+                $img_file_name=$img_file_name_array[count($img_file_name_array)-1];
+                $img_file_url='storage/entradas/'.$numero_de_entrada.'/images/'.$img_file_name;
+
+                echo "<div class='img_card col-lg-3'>";
+                echo "    <div class='img_card_top'>";
+                echo "        <h6><b>".$img_file_name."</b><button onclick='deleteImg(\"".$img_file_name."\")'><i class='fas fa-times'></i></button></h6>"; 
+                echo "    </div>";
+                echo "    <img src='".asset($img_file_url)."'>";
+                echo "</div>";
             }
             @endphp
         </div>
@@ -434,6 +451,26 @@ function guardarEntrada()
             }
         },
     });
+}
+
+function deletePacking()
+{
+    let NumEntrada = $("#txtNumEntrada").val();
+    if (confirm("Desea eliminar el packing list?"))
+    {
+        $("#fileDeleteNumEntrada").val(NumEntrada);
+        $("#packingDeleteForm").submit();
+    }
+}
+function deleteImg(img_name)
+{
+    let NumEntrada = $("#txtNumEntrada").val();
+    if (confirm("Desea eliminar esta imagen?"))
+    {
+        $("#ImgDeleteNumEntrada").val(NumEntrada);
+        $("#ImgNameDeleteNumEntrada").val(img_name);
+        $("#IncomeImgDeleteForm").submit();
+    }
 }
 
 </script>

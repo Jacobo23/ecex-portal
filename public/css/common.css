@@ -34,8 +34,15 @@
 }
 .container-fluid
 {
+    
     background: rgb(0,52,112);
     background: radial-gradient(circle, rgba(0,52,112,1) 52%, rgba(0,25,55,1) 100%);
+    /*
+    background: rgb(0,52,112);
+    background: radial-gradient(circle, rgba(112,0,0,1) 52%, rgba(166,0,0,1) 100%);
+    
+    background: rgb(230,230,230);
+    background: radial-gradient(circle, rgba(230,230,230,1) 65%, rgba(223,189,189,1) 100%);*/
 }
 .divFile
 {
@@ -46,4 +53,28 @@
     display: inline-block;
 }
 
+.img_card {
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 40%;
+    border-radius: 5px;
+    display: inline-block;
+    margin: 10px;;
+  }
+  
+  .img_card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  }
+  
+  .img_card img {
+    border-radius: 5px 5px 0 0;
+  }
+  
+  .img_card_top {
+    padding: 2px 16px;
+  }
+
+  .img_card_top button {
+    float: right;
+  }
 
