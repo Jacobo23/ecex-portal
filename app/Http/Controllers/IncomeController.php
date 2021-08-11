@@ -10,6 +10,7 @@ use App\Models\Carrier;
 use App\Models\Supplier;
 use App\Models\MeasurementUnit;
 use App\Models\BundleType;
+use Illuminate\Support\Facades\Session;
 
 class IncomeController extends Controller
 {
@@ -116,6 +117,11 @@ class IncomeController extends Controller
         $proveedores = Supplier::All();
         $ums = MeasurementUnit::All();
         $umb = BundleType::All();
+        $part_number = null;
+        if (Session::has('part_number'))
+        {
+            $part_number = Session::get('part_number');
+        }
         return view('intern.entradas.create', [
             'income' => $income,
             'numero_de_entrada' => $numero_de_entrada,
@@ -124,6 +130,7 @@ class IncomeController extends Controller
             'proveedores' => $proveedores,
             'unidades_de_medida' => $ums,
             'tipos_de_bulto' => $umb,
+            'part_number' => $part_number,
         ]);
     }
 

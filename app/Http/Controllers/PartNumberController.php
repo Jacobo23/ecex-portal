@@ -4,6 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\PartNumber;
 use Illuminate\Http\Request;
+use App\Models\Customer;
+use App\Models\MeasurementUnit;
+use App\Models\Income;
+use App\Models\Carrier;
+use App\Models\Supplier;
+use App\Models\BundleType;
+use Illuminate\Support\Facades\Session;
 
 class PartNumberController extends Controller
 {
@@ -14,7 +21,7 @@ class PartNumberController extends Controller
      */
     public function index()
     {
-        //
+        return PartNumber::all();
     }
 
     /**
@@ -22,9 +29,12 @@ class PartNumberController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function popup()
     {
-        //
+        return "nose";
+        //return view('intern.part_number.create', [
+        //    'part_number' => $part_number
+        //]);
     }
 
     /**
@@ -35,7 +45,44 @@ class PartNumberController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //NO USAR ESTE METODO PARA UPDATES
+        //para update se deben usar las funciones in-line del formulario correspondiente.
+        $part_number = PartNumber::where('part_number',$request->txtNumeroDeParte)->where('customer_id',$request->txtCliente)->first();
+        if($part_number)
+        {
+            if(strlen($request->from_Incomes) > 0 )
+            {
+                Session::flash('part_number', $part_number);
+                return redirect('/int/entradas/'.$request->from_Incomes);
+            }
+            return "El numero de parte ya existe. " . $part_number->id;
+        }
+        $part_number = new PartNumber;
+        $part_number->part_number = strtoupper($request->txtNumeroDeParte);
+        $part_number->customer_id = $request->txtCliente;
+        $part_number->um = $request->txtUM;
+        $part_number->unit_weight = $request->txtPesoUnitario;
+        $part_number->desc_ing = $request->txtDescIng;
+        $part_number->desc_esp = $request->txtDescEsp;
+        $part_number->origin_country = $request->txtPais;
+        $part_number->fraccion = $request->txtFraccion;
+        $part_number->nico = $request->txtNico;
+        $part_number->brand = $request->txtMarca ?? "";
+        $part_number->model = $request->txtModelo ?? "";
+        $part_number->serial = $request->txtSerie ?? "";
+        $part_number->imex = $request->txtIMMEX ?? "";
+        $part_number->fraccion_especial = $request->txtObservacionesFraccion ?? "";
+        $part_number->regime = $request->txtRegimen ?? "";
+        $part_number->warning = 0;
+
+        $part_number->save();
+
+        if(strlen($request->from_Incomes) > 0 )
+        {
+            Session::flash('part_number', $part_number);
+            return redirect('/int/entradas/'.$request->from_Incomes);
+        }
+        return "Registrado: " . $part_number->id;
     }
 
     /**
@@ -44,9 +91,9 @@ class PartNumberController extends Controller
      * @param  \App\Models\PartNumber  $partNumber
      * @return \Illuminate\Http\Response
      */
-    public function show(PartNumber $partNumber)
+    public function show(string $partNumber)
     {
-        //
+        return PartNumber::where("part_number",$partNumber)->first();
     }
 
     /**
@@ -55,9 +102,19 @@ class PartNumberController extends Controller
      * @param  \App\Models\PartNumber  $partNumber
      * @return \Illuminate\Http\Response
      */
-    public function edit(PartNumber $partNumber)
+    public function edit(string $partNumber, string $customer, string $numEntrada)
     {
-        //
+        //NO USAR ESTE METODO PARA UPDATES
+        //para update se deben usar las funciones in-line del formulario correspondiente.
+        $clientes = Customer::All();
+        $ums = MeasurementUnit::All();
+        return view('intern.part_number.create', [
+            'part_number' => $partNumber,
+            'clientes' => $clientes,
+            'cliente' => $customer,
+            'unidades_de_medida' => $ums,
+            'from_income' => $numEntrada,
+        ]);
     }
 
     /**

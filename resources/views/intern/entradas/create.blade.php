@@ -167,17 +167,21 @@
                 </form>
             </div>
             @php
-            $packinglist_path='/public/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf';
-            if (Storage::exists($packinglist_path)) {
-            echo "<br>";
-            echo "<div class='img_card col-lg-12' style='padding:10px'>";
-
-            echo "    <div class='img_card_top'>";
-            echo "        <h6><b>Packing list</b><button onclick='deletePacking()'><i class='fas fa-times'></i></button></h6>"; 
-            echo "    </div>";
-            echo "    <p><strong>Tamaño: </strong> ". round(Storage::size($packinglist_path)/1000000,2,PHP_ROUND_HALF_UP ) ." Mb</p>";
-            echo "</div>";
-            }@endphp
+            if(isset($numero_de_entrada))
+            {
+                $packinglist_path='/public/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf';
+                if (Storage::exists($packinglist_path)) 
+                {
+                    echo "<br>";
+                    echo "<div class='img_card col-lg-12' style='padding:10px'>";
+                    echo "    <div class='img_card_top'>";
+                    echo "        <h6><b>Packing list</b><button onclick='deletePacking()'><i class='fas fa-times'></i></button></h6>"; 
+                    echo "    </div>";
+                    echo "    <p><strong>Tamaño: </strong> ". round(Storage::size($packinglist_path)/1000000,2,PHP_ROUND_HALF_UP ) ." Mb</p>";
+                    echo "</div>";
+                }
+            }
+            @endphp
         </div>
 
         <div class="col-lg-10 controlDiv">
@@ -198,21 +202,24 @@
             <br>
 
             @php
-            $income_imgs_paths='public/entradas/'.$numero_de_entrada.'/images/';
-            $income_imgs = Storage::files($income_imgs_paths);
-            foreach ($income_imgs as $income_img) 
+            if(isset($numero_de_entrada))
             {
-                $img_file_name_array=explode('/',$income_img);
+                $income_imgs_paths='public/entradas/'.$numero_de_entrada.'/images/';
+                $income_imgs = Storage::files($income_imgs_paths);
+                foreach ($income_imgs as $income_img) 
+                {
+                    $img_file_name_array=explode('/',$income_img);
 
-                $img_file_name=$img_file_name_array[count($img_file_name_array)-1];
-                $img_file_url='storage/entradas/'.$numero_de_entrada.'/images/'.$img_file_name;
+                    $img_file_name=$img_file_name_array[count($img_file_name_array)-1];
+                    $img_file_url='storage/entradas/'.$numero_de_entrada.'/images/'.$img_file_name;
 
-                echo "<div class='img_card col-lg-3'>";
-                echo "    <div class='img_card_top'>";
-                echo "        <h6><b>".$img_file_name."</b><button onclick='deleteImg(\"".$img_file_name."\")'><i class='fas fa-times'></i></button></h6>"; 
-                echo "    </div>";
-                echo "    <img src='".asset($img_file_url)."'>";
-                echo "</div>";
+                    echo "<div class='img_card col-lg-3'>";
+                    echo "    <div class='img_card_top'>";
+                    echo "        <h6><b>".$img_file_name."</b><button onclick='deleteImg(\"".$img_file_name."\")'><i class='fas fa-times'></i></button></h6>"; 
+                    echo "    </div>";
+                    echo "    <img src='".asset($img_file_url)."'>";
+                    echo "</div>";
+                }
             }
             @endphp
         </div>
@@ -257,7 +264,7 @@
     <div class="row">
         <div class="col-lg-4 controlDiv" >
             <label class="form-label">Numero de parte:</label>
-            <input type="text" class="form-control" id="txtNumeroDeParte" value="">       
+            <input type="text" class="form-control" id="txtNumeroDeParte" value="" onfocusout="getPartNumberInfo()">       
         </div>
         <div class="col-lg-4 controlDiv" >
             <label class="form-label">Descripción Inglés:</label>
@@ -319,7 +326,7 @@
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">PO:</label>
-            <input type="text" class="form-control" id="txtPO" value="">       
+            <input type="text" class="form-control" id="txtPOPartida" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">locación:</label>
@@ -363,6 +370,9 @@
         <textarea class="form-control" id="txtObservacionesPartida" rows="2"></textarea>
     </div>
 
+    <div id="fraccionAlert" class="alert alert-warning" role="alert" style="display:none">
+    </div>
+
     <h5 class="separtor"></h5>
 
     <div class="row" style="margin-top:20px;">
@@ -380,6 +390,12 @@
 @endsection
 @section('scripts')
 <script>
+
+@if (isset($part_number))
+$("#txtNumeroDeParte").val("{{ $part_number->part_number }}");
+getPartNumberInfo();
+@endif
+
 function subirPacking()
 {
     let NumEntrada = $("#txtNumEntrada").val();
@@ -470,6 +486,103 @@ function deleteImg(img_name)
         $("#ImgDeleteNumEntrada").val(NumEntrada);
         $("#ImgNameDeleteNumEntrada").val(img_name);
         $("#IncomeImgDeleteForm").submit();
+    }
+}
+
+function getPartNumberInfo()
+{
+    let NumEntrada = $("#txtNumEntrada").val();
+    if(NumEntrada.length != 9)
+    {
+        showModal("Alerta!","Primero guarde la entrada.");
+        return;
+    }
+    let numeroDeParte = $("#txtNumeroDeParte").val();
+    let cliente = $("#txtCliente").val();
+    $.ajax({url: "/part_number/"+numeroDeParte,context: document.body}).done(function(result) 
+        {
+            if(result.part_number == null)
+            {
+                if(confirm("El número de parte no existe, desea crearlo?"))
+                {
+                    //window.open('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit', '_blank').focus();
+                    location.replace('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit');
+                }
+                return;
+            }
+            fillPartidaFields(result);
+        });
+}
+
+function fillPartidaFields(data)
+{
+/*
+    txtNumeroDeParte
+    txtDescIng
+    txtDescEsp
+    txtCantidad
+    txtUM
+    txtBultos
+    txtUMB
+    txtPesoNeto
+    txtPesoBruto
+    txtPais
+    txtFraccion
+    txtNico
+    txtPO
+    txtIMMEX
+    txtIMMEX
+    txtMarca
+    txtModelo
+    txtSerie
+    txtPO
+    txtRegimen
+    txtPO
+    txtObservacionesPartida
+
+    part_number
+customer_id
+um
+unit_weight
+*/
+    //let NumEntrada = $("#txtNumEntrada").val();
+    //if(NumEntrada.length != 9)
+    //{
+    //    showModal("Alerta!","Primero guarde la entrada.");
+    //    return;
+    //}
+    //if($("#txtCliente").val() != data.customer_id)
+    //{
+    //    showModal("Validación","Este numero de parte no corresponde al cliente seleccionado!");
+    //    return;
+    //}
+    
+    $("#txtDescIng").val(data.desc_ing);
+    $("#txtDescEsp").val(data.desc_esp);
+    $("#txtCantidad").val(0);
+    $("#txtUM").val(data.um);
+    $("#txtBultos").val(0);
+    $("#txtUMB").val("");
+    $("#txtPesoNeto").val(0);
+    $("#txtPesoBruto").val(0);
+    $("#txtPais").val(data.origin_country);
+    $("#txtFraccion").val(data.fraccion);
+    $("#txtNico").val(data.nico);
+    $("#txtPOPartida").val($("#txtPO").val());
+    $("#txtIMMEX").val(data.imex);
+    $("#txtMarca").val(data.brand);
+    $("#txtModelo").val(data.model);
+    $("#txtSerie").val(data.serial);
+    $("#txtRegimen").val(data.regime);
+    $("#txtObservacionesPartida").val("");
+    if(data.fraccion_especial != "")
+    {
+        $("#fraccionAlert").show();
+        $("#fraccionAlert").html(data.fraccion_especial);
+    }
+    else
+    {
+        $("#fraccionAlert").removeAttr("style").hide();
     }
 }
 

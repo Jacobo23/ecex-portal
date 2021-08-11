@@ -33,6 +33,8 @@ Route::post('/upload_img_entrada/','UploadFileController@uploadImgEntrada');
 Route::post('/delete_img_entrada/','UploadFileController@deleteImgEntrada');
 //
 Route::resource('/int/entradas', 'IncomeController')->middleware('auth');
-Route::resource('/ext/clientes', 'CustomerController')->middleware('auth');
-
+//Route::resource('/ext/clientes', 'CustomerController')->middleware('auth');
+//
+Route::resource('/part_number', 'PartNumberController')->middleware('auth');
+Route::get('/part_number/{partNumber}/{customer}/{numEntrada}/edit','PartNumberController@edit');
 require __DIR__.'/auth.php';
