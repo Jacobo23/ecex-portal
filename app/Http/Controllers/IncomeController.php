@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Models\Income;
+use App\Models\IncomeRow;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Carrier;
@@ -97,7 +98,12 @@ class IncomeController extends Controller
             $entrada->number = (is_null($number)) ? 1 : $number + 1;
         }
         $entrada->save();
-        return $entrada->year.str_pad($entrada->number,5,"0",STR_PAD_LEFT);
+        $numero_de_entrada = $entrada->year.str_pad($entrada->number,5,"0",STR_PAD_LEFT);
+
+        return response()->json([
+            'numero_de_entrada' => $numero_de_entrada,
+            'id_entrada' => $entrada->id,
+        ]);
     }
 
     /**
@@ -131,6 +137,7 @@ class IncomeController extends Controller
             'unidades_de_medida' => $ums,
             'tipos_de_bulto' => $umb,
             'part_number' => $part_number,
+            'income_rows' => $income->income_rows,
         ]);
     }
 

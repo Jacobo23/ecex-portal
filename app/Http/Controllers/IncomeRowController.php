@@ -36,6 +36,87 @@ class IncomeRowController extends Controller
     public function store(Request $request)
     {
         //
+        /* 
+        txtNumeroDeParte
+        txtNumeroDeParteID
+        txtDescIng
+        txtDescEsp
+        txtCantidad
+        txtUM
+        txtBultos
+        txtUMB
+        txtPesoNeto
+        txtPesoBruto
+        txtPais
+        txtFraccion
+        txtNico
+        txtPOPartida
+        txtLocacion
+        txtIMMEX
+        txtMarca
+        txtModelo
+        txtSerie
+        txtLote
+        txtRegimen
+        txtSkids
+        txtObservacionesPartida
+        */
+        $incomeRow = null;
+        $is_update = false;
+        
+        if($request->incomeRowID)
+        {
+            // es update
+            $incomeRow = IncomeRow::find($request->incomeRowID);
+            $is_update = true;
+        }
+        else
+        {
+            //es insert
+            $incomeRow = new IncomeRow;
+            $incomeRow->income_id = $request->incomeID ;
+        }
+        
+        $incomeRow->part_number_id = $request->txtNumeroDeParteID ;
+        $incomeRow->units = $request->txtCantidad ;
+        $incomeRow->bundles = $request->txtBultos ;
+        $incomeRow->umb = $request->txtUMB ;
+        $incomeRow->ump = $request->txtUM ;
+        $incomeRow->net_weight = $request->txtPesoNeto ;
+        $incomeRow->gross_weight = $request->txtPesoBruto ;
+        $incomeRow->po = $request->txtPOPartida ?? "";
+        $incomeRow->desc_ing = $request->txtDescIng ;
+        $incomeRow->desc_esp = $request->txtDescEsp ;
+        $incomeRow->origin_country = $request->txtPais ;
+        $incomeRow->fraccion = $request->txtFraccion ;
+        $incomeRow->nico = $request->txtNico ?? "";
+        $incomeRow->location = $request->txtLocacion ?? "";
+        $incomeRow->observations = $request->txtObservacionesPartida ?? "";
+        //$incomeRow->extras = "";
+        $incomeRow->brand = $request->txtMarca ?? "";
+        $incomeRow->model = $request->txtModelo ?? "";
+        $incomeRow->serial = $request->txtSerie ?? "";
+        $incomeRow->lot = $request->txtLote ?? "";
+        //$incomeRow->packing_id = "";
+        $incomeRow->imex = $request->txtIMMEX ?? "";
+        $incomeRow->regime = $request->txtRegimen ?? "";
+        $incomeRow->skids = $request->txtSkids ?? "";
+
+        $incomeRow->save();
+
+        if(!is_null($incomeRow->id))
+        {
+            return response()->json([
+                'msg' => "Partida guardada!",
+                'is_update' => $is_update,
+                'id' => $incomeRow->id,
+            ]);
+        }
+        else
+        {
+            return "La partida no se pudo guardar, verifique los datos.";
+        }
+
     }
 
     /**
@@ -46,7 +127,10 @@ class IncomeRowController extends Controller
      */
     public function show(IncomeRow $incomeRow)
     {
-        //
+        return response()->json([
+            'income_row' => $incomeRow,
+            'part_number' => $incomeRow->part_number(),
+        ]);
     }
 
     /**

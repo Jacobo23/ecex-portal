@@ -91,10 +91,15 @@ class PartNumberController extends Controller
      * @param  \App\Models\PartNumber  $partNumber
      * @return \Illuminate\Http\Response
      */
-    public function show(string $partNumber)
+    public function show(PartNumber $partNumber)
     {
-        return PartNumber::where("part_number",$partNumber)->first();
+        return "operacion no permitida";//PartNumber::where("part_number",$partNumber)->first();
     }
+    public function getInfo(string $partNumber, string $customer)
+    {
+        return PartNumber::where("part_number",$partNumber)->where("customer_id",$customer)->first();
+    }
+    
 
     /**
      * Show the form for editing the specified resource.

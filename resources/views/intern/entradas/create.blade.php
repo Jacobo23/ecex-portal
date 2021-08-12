@@ -177,7 +177,7 @@
                     echo "    <div class='img_card_top'>";
                     echo "        <h6><b>Packing list</b><button onclick='deletePacking()'><i class='fas fa-times'></i></button></h6>"; 
                     echo "    </div>";
-                    echo "    <p><strong>Tamaño: </strong> ". round(Storage::size($packinglist_path)/1000000,2,PHP_ROUND_HALF_UP ) ." Mb</p>";
+                    echo "    <p><a href='/download_pakinglist/".$numero_de_entrada."'><i class='fas fa-arrow-circle-down'></i></a><strong>Tamaño: </strong> ". round(Storage::size($packinglist_path)/1000000,2,PHP_ROUND_HALF_UP ) ." Mb</p>";
                     echo "</div>";
                 }
             }
@@ -241,15 +241,22 @@
     <div class="row" style="margin-top:20px;">
         <div class="col-lg-1 controlDiv" style="text-align:center;">
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-primary">+</button>
+                <button type="button" class="btn btn-primary" onclick="createPartida()">+</button>
             </div>
         </div>
         <div class="col-lg-10 controlDiv" style="overflow: auto; text-align:center;">
-        <div class="btn-group me-2" role="group" style="">
-            <button type="button" class="btn btn-outline-secondary">1</button>
-            <button type="button" class="btn btn-outline-secondary">2</button>
-            <button type="button" class="btn btn-outline-secondary">3</button>
-            <button type="button" class="btn btn-outline-secondary">4</button>
+        <div class="btn-group me-2" id="div_btns_partidas" role="group">
+        @php
+        if(isset($income))
+        {
+            $income_row_index = 0;
+            foreach ($income->income_rows as $income_row) 
+            {
+                $income_row_index++;
+                echo "<button type='button' class='btn btn-outline-secondary btnIncomeRow' onclick='goPartida(this.id)' id='btnIncomeRow_".$income_row->id."'>".$income_row_index."</button>";
+            }
+        }
+        @endphp
         </div>
         </div>
         <div class="col-lg-1 controlDiv" style="text-align:center;">
@@ -261,29 +268,35 @@
 
     <h5 class="separtor"></h5>
 
+    <form id="formIncomeRow" action="/income_row" method="post">
+    @csrf
     <div class="row">
         <div class="col-lg-4 controlDiv" >
             <label class="form-label">Numero de parte:</label>
-            <input type="text" class="form-control" id="txtNumeroDeParte" value="" onfocusout="getPartNumberInfo()">       
+            <input type="text" class="form-control" id="txtNumeroDeParte" name="txtNumeroDeParte" value="" onfocusout="getPartNumberInfo()">   
+            <input type="hidden" id="txtNumeroDeParteID" name="txtNumeroDeParteID">
+            <input type="hidden" id="txtNumeroDePartePesoU" name="txtNumeroDePartePesoU">
+            <input type="hidden" id="incomeID" name="incomeID" value="{{ $income->id ?? '' }}"> 
+            <input type="hidden" id="incomeRowID" name="incomeRowID" value=""> 
         </div>
         <div class="col-lg-4 controlDiv" >
             <label class="form-label">Descripción Inglés:</label>
-            <input type="text" class="form-control" id="txtDescIng" value="">       
+            <input type="text" class="form-control" id="txtDescIng" name="txtDescIng" value="">       
         </div>
         <div class="col-lg-4 controlDiv" >
             <label class="form-label">Descripción Español:</label>
-            <input type="text" class="form-control" id="txtDescEsp" value="">       
+            <input type="text" class="form-control" id="txtDescEsp" name="txtDescEsp" value="">       
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">Cantidad:</label>
-            <input type="number" class="form-control" id="txtCantidad" value="">       
+            <input type="number" class="form-control" id="txtCantidad" name="txtCantidad" value="" onchange="calcularPesoNeto()">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">UM:</label>
-            <select class="form-select" id = "txtUM">
+            <select class="form-select" id="txtUM" name="txtUM">
             @foreach ($unidades_de_medida as $unidade_de_medidaOp)
             <option value="{{ $unidade_de_medidaOp->desc }}">{{ $unidade_de_medidaOp->desc }}</option>
             @endforeach
@@ -291,84 +304,86 @@
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">Bultos:</label>
-            <input type="number" class="form-control" id="txtBultos" value="">       
+            <input type="number" class="form-control" id="txtBultos" name="txtBultos" value="" onchange="calcularPesoBruto()">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">Tipo bulto:</label>
-            <select class="form-select" id = "txtUMB">
+            <select class="form-select" id = "txtUMB" name="txtUMB" onchange="tipoBultoChange()">
             @foreach ($tipos_de_bulto as $tipos_de_bultoOp)
             <option value="{{ $tipos_de_bultoOp->desc }}">{{ $tipos_de_bultoOp->desc }}</option>
             @endforeach
             </select>
+            <input type="hidden" id="txtUMBPeso">
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">Peso neto:</label>
-            <input type="number" class="form-control" id="txtPesoNeto" value="">       
+            <input type="number" class="form-control" id="txtPesoNeto" name="txtPesoNeto" value="" onchange="calcularPesoBruto()">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">Peso bruto:</label>
-            <input type="number" class="form-control" id="txtPesoBruto" value="">       
+            <input type="number" class="form-control" id="txtPesoBruto" name="txtPesoBruto" value="">       
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">País:</label>
-            <input type="text" class="form-control" id="txtPais" value="">       
+            <input type="text" class="form-control" id="txtPais" name="txtPais" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">fracción:</label>
-            <input type="text" class="form-control" id="txtFraccion" value="">       
+            <input type="text" class="form-control" id="txtFraccion" name="txtFraccion" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">nico:</label>
-            <input type="text" class="form-control" id="txtNico" value="">       
+            <input type="text" class="form-control" id="txtNico" name="txtNico" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">PO:</label>
-            <input type="text" class="form-control" id="txtPOPartida" value="">       
+            <input type="text" class="form-control" id="txtPOPartida" name="txtPOPartida" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">locación:</label>
-            <input type="text" class="form-control" id="txtIMMEX" value="">       
+            <input type="text" class="form-control" id="txtLocacion" name="txtLocacion" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">IMMEX:</label>
-            <input type="text" class="form-control" id="txtIMMEX" value="">       
+            <input type="text" class="form-control" id="txtIMMEX" name="txtIMMEX" value="">       
         </div>
     </div>
 
     <div class="row">
     <div class="col-lg-2 controlDiv" >
             <label class="form-label">marca:</label>
-            <input type="text" class="form-control" id="txtMarca" value="">       
+            <input type="text" class="form-control" id="txtMarca" name="txtMarca" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">modelo:</label>
-            <input type="text" class="form-control" id="txtModelo" value="">       
+            <input type="text" class="form-control" id="txtModelo" name="txtModelo" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">serie:</label>
-            <input type="text" class="form-control" id="txtSerie" value="">       
+            <input type="text" class="form-control" id="txtSerie" name="txtSerie" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">lote:</label>
-            <input type="text" class="form-control" id="txtPO" value="">       
+            <input type="text" class="form-control" id="txtLote" name="txtLote" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">regimen:</label>
-            <input type="text" class="form-control" id="txtRegimen" value="">       
+            <input type="text" class="form-control" id="txtRegimen" name="txtRegimen" value="">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">skids:</label>
-            <input type="text" class="form-control" id="txtPO" value="">       
+            <input type="text" class="form-control" id="txtSkids" name="txtSkids" value="">       
         </div>
     </div>
 
     <div class="mb-3">
         <label class="form-label">Observaciones</label>
-        <textarea class="form-control" id="txtObservacionesPartida" rows="2"></textarea>
+        <textarea class="form-control" id="txtObservacionesPartida" name="txtObservacionesPartida" rows="2"></textarea>
     </div>
+    </form>
 
     <div id="fraccionAlert" class="alert alert-warning" role="alert" style="display:none">
     </div>
@@ -377,7 +392,7 @@
 
     <div class="row" style="margin-top:20px;">
         <div class="col-lg-9 controlDiv"></div>
-        <input type="button" class="col-lg-1 btn btn-success " style="margin-right:20px;" value="Guardar">
+        <input type="button" class="col-lg-1 btn btn-success " style="margin-right:20px;" value="Guardar" onclick="guardarPartida()">
         <input type="button" class="col-lg-1 btn btn-danger " value="Eliminar">
     </div>  
 
@@ -395,6 +410,39 @@
 $("#txtNumeroDeParte").val("{{ $part_number->part_number }}");
 getPartNumberInfo();
 @endif
+
+function tipoBultoChange()
+{
+    let txtUMB = $("#txtUMB").val();
+    var bultos_peso = {@foreach ($tipos_de_bulto as $tipos_de_bultoOp)@if(!$loop->first) , @endif"{{ $tipos_de_bultoOp->desc }}":{{ $tipos_de_bultoOp->weight }}@endforeach};
+    for (var key in bultos_peso) 
+    {
+        if(key == txtUMB)
+        {
+            $("#txtUMBPeso").val(bultos_peso[key]);
+            break;
+        }
+        // en caso de no encontrar nada el valor se pone a cero
+        $("#txtUMBPeso").val(bultos_peso[key]);
+    }
+    calcularPesoBruto();
+}
+
+function calcularPesoNeto()
+{
+    let cantidad = Number($("#txtCantidad").val());
+    let peso_unitario = Number($("#txtNumeroDePartePesoU").val());
+    $("#txtPesoNeto").val(cantidad*peso_unitario);
+    calcularPesoBruto();
+}
+
+function calcularPesoBruto()
+{
+    let peso_neto = Number($("#txtPesoNeto").val());
+    let cantidad_bultos = Number($("#txtBultos").val());
+    let peso_bulto = Number($("#txtUMBPeso").val());
+    $("#txtPesoBruto").val(cantidad_bultos*peso_bulto+peso_neto);
+}
 
 function subirPacking()
 {
@@ -458,9 +506,9 @@ function guardarEntrada()
         success: function(response) {
             if(response.length == 9)
             {
-                showModal("Notificación","Registrado con exito: '"+response+"'");
-                $("#txtNumEntrada").val(response);
-    
+                showModal("Notificación","Registrado con exito: '"+response["numero_de_entrada"]+"'");
+                $("#txtNumEntrada").val(response["numero_de_entrada"]);
+                $("#incomeID").val(response["id_entrada"]);    
             } else
             {
                 showModal("Notificación","Error: "+response+".");
@@ -497,9 +545,10 @@ function getPartNumberInfo()
         showModal("Alerta!","Primero guarde la entrada.");
         return;
     }
+    
     let numeroDeParte = $("#txtNumeroDeParte").val();
     let cliente = $("#txtCliente").val();
-    $.ajax({url: "/part_number/"+numeroDeParte,context: document.body}).done(function(result) 
+    $.ajax({url: "/part_number/"+numeroDeParte+"/"+cliente+"/get",context: document.body}).done(function(result) 
         {
             if(result.part_number == null)
             {
@@ -511,40 +560,12 @@ function getPartNumberInfo()
                 return;
             }
             fillPartidaFields(result);
+            $("#incomeRowID").val("");
         });
 }
 
 function fillPartidaFields(data)
 {
-/*
-    txtNumeroDeParte
-    txtDescIng
-    txtDescEsp
-    txtCantidad
-    txtUM
-    txtBultos
-    txtUMB
-    txtPesoNeto
-    txtPesoBruto
-    txtPais
-    txtFraccion
-    txtNico
-    txtPO
-    txtIMMEX
-    txtIMMEX
-    txtMarca
-    txtModelo
-    txtSerie
-    txtPO
-    txtRegimen
-    txtPO
-    txtObservacionesPartida
-
-    part_number
-customer_id
-um
-unit_weight
-*/
     //let NumEntrada = $("#txtNumEntrada").val();
     //if(NumEntrada.length != 9)
     //{
@@ -556,7 +577,10 @@ unit_weight
     //    showModal("Validación","Este numero de parte no corresponde al cliente seleccionado!");
     //    return;
     //}
-    
+
+    $("#txtNumeroDeParte").val(data.part_number);
+    $("#txtNumeroDeParteID").val(data.id);
+    $("#txtNumeroDePartePesoU").val(data.unit_weight);
     $("#txtDescIng").val(data.desc_ing);
     $("#txtDescEsp").val(data.desc_esp);
     $("#txtCantidad").val(0);
@@ -584,7 +608,133 @@ unit_weight
     {
         $("#fraccionAlert").removeAttr("style").hide();
     }
+    $('#txtNumeroDeParte').prop('readonly', false);
 }
+
+function createPartida()
+{
+    $(".btnIncomeRow").each(function(){
+        $(this).removeClass("active");
+    });
+    $("#incomeRowID").val("");
+    $("#txtNumeroDeParte").val("");
+    $("#txtNumeroDeParteID").val("");
+    $("#txtNumeroDePartePesoU").val("");
+    $("#txtDescIng").val("");
+    $("#txtDescEsp").val("");
+    $("#txtCantidad").val("");
+    $("#txtUM").val("");
+    $("#txtBultos").val("");
+    $("#txtUMB").val("");
+    $("#txtUMBPeso").val("0");
+    $("#txtPesoNeto").val("");
+    $("#txtPesoBruto").val("");
+    $("#txtPais").val("");
+    $("#txtFraccion").val("");
+    $("#txtNico").val("");
+    $("#txtPOPartida").val("");
+    $("#txtLocacion").val("");
+    $("#txtIMMEX").val("");
+    $("#txtMarca").val("");
+    $("#txtModelo").val("");
+    $("#txtSerie").val("");
+    $("#txtLote").val("");
+    $("#txtRegimen").val("");
+    $("#txtSkids").val("");
+    $("#txtPO").val("");
+    $("#txtObservacionesPartida").val("");
+    $("#fraccionAlert").removeAttr("style").hide();
+    $("#fraccionAlert").html("");
+    $('#txtNumeroDeParte').prop('readonly', false);
+}
+
+function goPartida(id)
+{
+    $(".btnIncomeRow").each(function(){
+        $(this).removeClass("active");
+    });
+    $("#"+id).addClass("active");
+
+    let income_row_id = id.split("_")[1];
+    $.ajax({url: "/income_row/"+income_row_id,context: document.body}).done(function(response) 
+        {
+            $("#incomeRowID").val(response.income_row.id);
+            $("#txtNumeroDeParte").val(response.part_number.part_number);
+            $("#txtNumeroDeParteID").val(response.part_number.id);
+            $("#txtNumeroDePartePesoU").val(response.part_number.unit_weight);
+            $('#txtNumeroDeParte').prop('readonly', true);
+            $("#txtDescIng").val(response.income_row.desc_ing);
+            $("#txtDescEsp").val(response.income_row.desc_esp);
+            $("#txtCantidad").val(response.income_row.units);
+            $("#txtUM").val(response.income_row.ump);
+            $("#txtBultos").val(response.income_row.bundles);
+            $("#txtUMB").val(response.income_row.umb);
+            $("#txtUMBPeso").val();
+            $("#txtPesoNeto").val(response.income_row.net_weight);
+            $("#txtPesoBruto").val(response.income_row.gross_weight);
+            $("#txtPais").val(response.income_row.origin_country);
+            $("#txtFraccion").val(response.income_row.fraccion);
+            $("#txtNico").val(response.income_row.nico);
+            $("#txtPOPartida").val(response.income_row.po);
+            $("#txtLocacion").val(response.income_row.location);
+            $("#txtIMMEX").val(response.income_row.imex);
+            $("#txtMarca").val(response.income_row.brand);
+            $("#txtModelo").val(response.income_row.model);
+            $("#txtSerie").val(response.income_row.serial);
+            $("#txtLote").val(response.income_row.lot);
+            $("#txtRegimen").val(response.income_row.regime);
+            $("#txtSkids").val(response.income_row.skids);
+            $("#txtPO").val(response.income_row.po);
+            $("#txtObservacionesPartida").val(response.income_row.observations);
+            $("#fraccionAlert").html("");
+            if(response.part_number.fraccion_especial != "")
+            {
+                $("#fraccionAlert").show();
+                $("#fraccionAlert").html(response.part_number.fraccion_especial);
+            }
+            else
+            {
+                $("#fraccionAlert").removeAttr("style").hide();
+            }
+        });
+
+}
+
+function guardarPartida()
+{
+    if($("#txtNumEntrada").val().length != 9 || $("#incomeID").val().length < 1)
+    {
+        showModal("Alerta!","Primero guarde la entrada.");
+        return;
+    }
+    //$("#formIncomeRow").submit();
+    $.ajax({
+        method: 'POST',
+        url: $("#formIncomeRow").attr("action"),
+        data: $("#formIncomeRow").serialize(), 
+        success: function(response) {
+            showModal("Notificación","Registrado con exito: '"+response.msg+"'");
+            if(!response.is_update)
+            {
+                let index_ultima_partida = 1;
+                $(".btnIncomeRow").each(function(){
+                    index_ultima_partida++
+                });
+                $("#div_btns_partidas").html($("#div_btns_partidas").html()+"<button type='button' class='btn btn-outline-secondary btnIncomeRow' onclick='goPartida(this.id)' id='btnIncomeRow_"+response.id+"'>"+index_ultima_partida+"</button>");
+                $("#btnIncomeRow_"+response.id).click();
+            }
+        },
+    });
+}
+
+function eliminarPartida()
+{
+    if($("#incomeRowID").val() != "")
+    {
+        
+    }
+}
+
 
 </script>
 @endsection
