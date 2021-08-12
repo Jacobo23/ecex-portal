@@ -153,7 +153,7 @@
 
         <div class="col-lg-2 controlDiv" >
 
-            <button type="button" class="btn btn-secondary" onclick="$('#txtPacking').click()">Packing list <i class="far fa-file-alt"></i></button>
+            <button type="button" class="btn btn-secondary" onclick="packingBtnClick()">Packing list <i class="far fa-file-alt"></i></button>
             <br>
             <div style="display:none">
                 <form id="packingForm" action="/upload_pakinglist" method="post" enctype="multipart/form-data">
@@ -185,7 +185,7 @@
         </div>
 
         <div class="col-lg-10 controlDiv">
-            <button type="button" class="btn btn-secondary" onclick="$('#txtImagenes').click()">Imagenes <i class="far fa-images"></i></button>
+            <button type="button" class="btn btn-secondary" onclick="imgBtnClick()">Imagenes <i class="far fa-images"></i></button>
             <br>
             <div style="display:none">
                 <form id="IncomeImgForm" action="/upload_img_entrada/" method="post" enctype="multipart/form-data">
@@ -393,7 +393,7 @@
     <div class="row" style="margin-top:20px;">
         <div class="col-lg-9 controlDiv"></div>
         <input type="button" class="col-lg-1 btn btn-success " style="margin-right:20px;" value="Guardar" onclick="guardarPartida()">
-        <input type="button" class="col-lg-1 btn btn-danger " value="Eliminar">
+        <input type="button" class="col-lg-1 btn btn-danger " value="Eliminar" onclick="eliminarPartida()">
     </div>  
 
 
@@ -443,7 +443,26 @@ function calcularPesoBruto()
     let peso_bulto = Number($("#txtUMBPeso").val());
     $("#txtPesoBruto").val(cantidad_bultos*peso_bulto+peso_neto);
 }
-
+function packingBtnClick()
+{
+    let NumEntrada = $("#txtNumEntrada").val();
+    if(NumEntrada.length != 9)
+    {
+        showModal("Alerta!","Primero guarde la entrada.");
+        return;
+    }
+    $('#txtPacking').click();
+}
+function imgBtnClick()
+{
+    let NumEntrada = $("#txtNumEntrada").val();
+    if(NumEntrada.length != 9)
+    {
+        showModal("Alerta!","Primero guarde la entrada.");
+        return;
+    }
+    $('#txtImagenes').click();
+}
 function subirPacking()
 {
     let NumEntrada = $("#txtNumEntrada").val();
@@ -504,7 +523,7 @@ function guardarEntrada()
         url: $("#encabezadoForm").attr("action"),
         data: $("#encabezadoForm").serialize(), 
         success: function(response) {
-            if(response.length == 9)
+            if(response.numero_de_entrada.length == 9)
             {
                 showModal("Notificación","Registrado con exito: '"+response["numero_de_entrada"]+"'");
                 $("#txtNumEntrada").val(response["numero_de_entrada"]);
@@ -543,6 +562,11 @@ function getPartNumberInfo()
     if(NumEntrada.length != 9)
     {
         showModal("Alerta!","Primero guarde la entrada.");
+        return;
+    }
+
+    if($('#txtNumeroDeParte').prop('readonly'))
+    {
         return;
     }
     
@@ -707,6 +731,11 @@ function guardarPartida()
         showModal("Alerta!","Primero guarde la entrada.");
         return;
     }
+    if($("#incomeRowID").val().length < 1)
+    {
+        showModal("Alerta!","Número de parte no valido.");
+        return;
+    }
     //$("#formIncomeRow").submit();
     $.ajax({
         method: 'POST',
@@ -718,7 +747,7 @@ function guardarPartida()
             {
                 let index_ultima_partida = 1;
                 $(".btnIncomeRow").each(function(){
-                    index_ultima_partida++
+                    index_ultima_partida++;
                 });
                 $("#div_btns_partidas").html($("#div_btns_partidas").html()+"<button type='button' class='btn btn-outline-secondary btnIncomeRow' onclick='goPartida(this.id)' id='btnIncomeRow_"+response.id+"'>"+index_ultima_partida+"</button>");
                 $("#btnIncomeRow_"+response.id).click();
@@ -729,9 +758,40 @@ function guardarPartida()
 
 function eliminarPartida()
 {
-    if($("#incomeRowID").val() != "")
+    if(!confirm("¿Desea eliminar la partida?"))
     {
-        
+        return;
+    }
+    let id_income_row = $("#incomeRowID").val();
+    let token = $("[name='_token']").val();
+    if(id_income_row != "")
+    {
+        $.ajax(
+        {
+            url: "/income_row/"+id_income_row,
+            type: 'DELETE',
+            data: {
+                "_token": token,
+            },
+            success: function (){
+                showModal("Notificación","Partida Eliminada");
+                let index_ultima_partida = 1;
+                $(".btnIncomeRow").each(function(){
+                    
+                    $(this).html(index_ultima_partida);
+                    if($(this).attr("id").split("_")[1] == id_income_row)
+                    {
+                        $(this).remove();
+                    }
+                    else
+                    {
+                        index_ultima_partida++;
+                    }
+                    // se corre la siguiente funcion para resetear todos los controles
+                    createPartida();
+                });
+            }
+        });
     }
 }
 

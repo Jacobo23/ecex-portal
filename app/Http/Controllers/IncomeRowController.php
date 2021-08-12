@@ -164,6 +164,6 @@ class IncomeRowController extends Controller
      */
     public function destroy(IncomeRow $incomeRow)
     {
-        //
+        return $incomeRow->delete();
     }
 }
