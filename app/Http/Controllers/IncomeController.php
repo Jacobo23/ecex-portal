@@ -12,6 +12,8 @@ use App\Models\Supplier;
 use App\Models\MeasurementUnit;
 use App\Models\BundleType;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
+use PDF;
 
 class IncomeController extends Controller
 {
@@ -22,8 +24,9 @@ class IncomeController extends Controller
      */
     public function index()
     {
-        //$entradas = Entrada::all();
-        //return view('entradas.index', ['entradas' => $entradas]);
+        $entradas = Income::all();
+        $can_delete = Auth::user()->canDeleteIncome();
+        return view('intern.entradas.index', ['incomes' => $entradas, 'can_delete' => $can_delete]);
     }
 
     /**
@@ -74,22 +77,22 @@ class IncomeController extends Controller
         $entrada->customer_id = $request->txtCliente;
         $entrada->carrier_id = $request->txtTransportista;
         $entrada->supplier_id = $request->txtProveedor;
-        $entrada->reference = $request->txtReferencia;
-        $entrada->trailer = $request->txtCaja;
-        $entrada->seal = $request->txtSello;
-        $entrada->observations = $request->txtObservaciones;
-        $entrada->impoExpo = $request->txtImpoExpo;
-        $entrada->invoice = $request->txtFactura;
-        $entrada->tracking = $request->txtTracking;
-        $entrada->po = $request->txtPO;
+        $entrada->reference = $request->txtReferencia ?? "";
+        $entrada->trailer = $request->txtCaja ?? "";
+        $entrada->seal = $request->txtSello ?? "";
+        $entrada->observations = $request->txtObservaciones ?? "";
+        $entrada->impoExpo = $request->txtImpoExpo ?? "";
+        $entrada->invoice = $request->txtFactura ?? "";
+        $entrada->tracking = $request->txtTracking ?? "";
+        $entrada->po = $request->txtPO ?? "";
         $entrada->sent = false;
         $entrada->user = Auth::user()->name;
         $entrada->reviewed = isset($request->chkRev);
-        $entrada->reviewed_by = $request->txtActualizadoPor;
+        $entrada->reviewed_by = $request->txtActualizadoPor ?? "";
         $entrada->closed = false;
         $entrada->urgent = isset($request->chkUrgente);
         $entrada->onhold = isset($request->chkOnhold);
-        $entrada->type = $request->txtClasificacion;
+        $entrada->type = $request->txtClasificacion ?? "";
         if(is_null($entrada->id))
         {
             //asignar numero de entrada
@@ -172,6 +175,33 @@ class IncomeController extends Controller
      */
     public function destroy(Income $income)
     {
-        //
+        //por alguna razon este metodo no funciono enviando un formulario con method 'DELETE'
+        //$income->delete();
+    }
+    public function delete(Income $income)
+    {
+        //TO DO: falta verificar que las partidas no tengan salida.
+        $partidas = $income->income_rows;
+        foreach ($partidas as $partida) 
+        {
+            $partida->delete();
+        }
+        $income->delete();
+        //borramos los archivos
+        Storage::deleteDirectory('public/entradas/'.$income->getIncomeNumber());
+            
+    }
+
+    public function downloadPDF(Income $income)
+    {
+        $numero_de_entrada = $income->year.str_pad($income->number,5,"0",STR_PAD_LEFT);
+        $income->income_rows; //<- se llama esta linea con el fin de cargar las partidas de esta entrada
+
+        return view('intern.entradas.pdf', [
+            'income' => $income,
+        ]);
+
+        //$pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
+        //return $pdf->download($numero_de_entrada.'.pdf');
     }
 }

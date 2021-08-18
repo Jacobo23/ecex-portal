@@ -14,4 +14,5 @@ class IncomeRow extends Model
     {
         return PartNumber::find($this->part_number_id);
     }
+    
 }

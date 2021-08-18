@@ -25,20 +25,25 @@ Route::get('/dashboard', function () {
 Route::get('/', [UserController::class, 'redirectUser'])->middleware(['auth']);
 Route::get('/int', function () {return view('intern.home');})->middleware(['auth']);
 Route::get('/ext', function () {return view('customer.home');})->middleware(['auth']);
-//
+//Files
 Route::post('/upload_pakinglist/','UploadFileController@uploadPakinglist');
-Route::get('int/entradas/{entrada}/download_packing/','UploadFileController@downloadPacking');
-Route::post('/delete_pakinglist/','UploadFileController@deletePacking');
 Route::get('/download_pakinglist/{entrada}','UploadFileController@downloadPacking');
+Route::post('/delete_pakinglist/','UploadFileController@deletePacking');
 Route::post('/upload_img_entrada/','UploadFileController@uploadImgEntrada');
 Route::post('/delete_img_entrada/','UploadFileController@deleteImgEntrada');
 //
-Route::resource('/int/entradas', 'IncomeController')->middleware('auth');
+
 //Route::resource('/ext/clientes', 'CustomerController')->middleware('auth');
-//
+
+//Incomes internal
+Route::resource('/int/entradas', 'IncomeController')->middleware('auth');
+Route::get('/int/entradas/{income}/download_pdf','IncomeController@downloadPDF');
+Route::get('/int/entradas/{income}/delete','IncomeController@delete');
+//Income rows internal
+Route::resource('/income_row', 'IncomeRowController')->middleware('auth');
+//Part Numbers
 Route::resource('/part_number', 'PartNumberController')->middleware('auth');
 Route::get('/part_number/{partNumber}/{customer}/get','PartNumberController@getInfo');
 Route::get('/part_number/{partNumber}/{customer}/{numEntrada}/edit','PartNumberController@edit');
-//
-Route::resource('/income_row', 'IncomeRowController')->middleware('auth');
+
 require __DIR__.'/auth.php';

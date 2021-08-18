@@ -231,7 +231,7 @@
         <input type="button" class="col-lg-2 btn btn-success" onclick="guardarEntrada()" value="Registrar" style="margin-right:20px;">
 
         <div class="btn-group col-lg-2" role="group">
-            <button type="button" class="btn btn-outline-primary">Imprimir</button>
+            <button type="button" class="btn btn-outline-primary" onclick="downloadPDF()">Imprimir</button>
             <button type="button" class="btn btn-outline-primary">Terminar</button>
         </div>
     </div>   
@@ -395,8 +395,6 @@
         <input type="button" class="col-lg-1 btn btn-success " style="margin-right:20px;" value="Guardar" onclick="guardarPartida()">
         <input type="button" class="col-lg-1 btn btn-danger " value="Eliminar" onclick="eliminarPartida()">
     </div>  
-
-
 
 </div>
 </div>
@@ -581,6 +579,11 @@ function getPartNumberInfo()
                     //window.open('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit', '_blank').focus();
                     location.replace('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit');
                 }
+                else
+                {
+                    $('#txtNumeroDeParte').val("");
+                    $('#txtNumeroDeParte').focus();
+                }
                 return;
             }
             fillPartidaFields(result);
@@ -731,7 +734,7 @@ function guardarPartida()
         showModal("Alerta!","Primero guarde la entrada.");
         return;
     }
-    if($("#incomeRowID").val().length < 1)
+    if($("#txtNumeroDeParteID").val().length < 1)
     {
         showModal("Alerta!","Número de parte no valido.");
         return;
@@ -793,6 +796,16 @@ function eliminarPartida()
             }
         });
     }
+}
+
+function downloadPDF()
+{
+    let incomeID = $("#incomeID").val();
+    if(incomeID.length < 1)
+    {
+        return;
+    }
+    window.open('/int/entradas/'+incomeID+'/download_pdf', '_blank').focus();
 }
 
 

@@ -19,8 +19,8 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <h4 class="separtor">Entradas</h4>
-                        <a class="selectMenu" href="entradas/create">Lista <i class="fas fa-list"></i></a>
-                        <a class="selectMenu " href="entradas/create">Crear <i class="fas fa-plus"></i></a>
+                        <a class="selectMenu" href="/int/entradas/">Lista <i class="fas fa-list"></i></a>
+                        <a class="selectMenu " href="/int/entradas/create">Crear <i class="fas fa-plus"></i></a>
                     </div>
                     <div class="col-lg-6">
                         <h4 class="separtor">Salidas</h4>
