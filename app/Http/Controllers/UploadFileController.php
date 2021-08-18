@@ -12,16 +12,30 @@ class UploadFileController extends Controller
         Storage::put('/public/entradas/'.$request->fileNumEntrada.'/packing_list/packing-list.pdf', file_get_contents($request->file('file')));
         return redirect('/int/entradas/'.$request->fileNumEntrada);        
     }
+    public function uploadPakinglistOutcome(Request $request)
+    {
+        Storage::put('/public/salidas/'.$request->fileNumSalida.'/packing_list/packing-list.pdf', file_get_contents($request->file('file')));
+        return redirect('/int/salidas/'.$request->fileNumSalida);        
+    }
 
     public function downloadPacking($entrada)
     {
         return Storage::download('public/entradas/'.$entrada.'/packing_list/packing-list.pdf');
+    }
+    public function downloadPackingOutcome($salida)
+    {
+        return Storage::download('public/salidas/'.$salida.'/packing_list/packing-list.pdf');
     }
 
     public function deletePacking(Request $request)
     {
         Storage::delete('public/entradas/'.$request->fileDeleteNumEntrada.'/packing_list/packing-list.pdf');
         return redirect('/int/entradas/'.$request->fileDeleteNumEntrada); 
+    }
+    public function deletePackingOutcome(Request $request)
+    {
+        Storage::delete('public/salidas/'.$request->fileDeleteNumSalida.'/packing_list/packing-list.pdf');
+        return redirect('/int/salidas/'.$request->fileDeleteNumSalida); 
     }
 
     public function uploadImgEntrada(Request $request)
@@ -34,12 +48,25 @@ class UploadFileController extends Controller
         }
         return redirect('/int/entradas/'.$request->fileNumEntradaImg);  
     }
+    public function uploadImgSalida(Request $request)
+    {
+        $i = 0;
+        foreach ($request->file('filenames') as $file) 
+        {
+            $i++;
+            Storage::put('/public/salidas/'.$request->fileNumSalidaImg.'/images/'.time().'_'.$i.'.'.$file->extension(), file_get_contents($file), 'public');
+        }
+        return redirect('/int/salidas/'.$request->fileNumSalidaImg);  
+    }
 
     public function deleteImgEntrada(Request $request)
     {
         Storage::delete('public/entradas/'.$request->ImgDeleteNumEntrada.'/images/'.$request->ImgNameDeleteNumEntrada);
         return redirect('/int/entradas/'.$request->ImgDeleteNumEntrada); 
     }
-    
-    
+    public function deleteImgOutcome(Request $request)
+    {
+        Storage::delete('public/salidas/'.$request->ImgDeleteNumSalida.'/images/'.$request->ImgNameDeleteNumSalida);
+        return redirect('/int/salidas/'.$request->ImgDeleteNumSalida); 
+    }
 }

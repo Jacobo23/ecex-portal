@@ -31,7 +31,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Fecha:</label>
-            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@endif">
+            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@endif" min="{{ date('Y-m-d') }}">
         </div>
 
         <div class="col-lg-3 controlDiv" >

@@ -24,9 +24,9 @@
                     </div>
                     <div class="col-lg-6">
                         <h4 class="separtor">Salidas</h4>
-                        <a class="selectMenu" href="Entradas">Lista <i class="fas fa-list"></i></a>
-                        <a class="selectMenu " href="Entradas/create">Crear <i class="fas fa-plus"></i></a>
-                        <a class="selectMenu " href="Entradas/create">Ordenes de carga<i class="fas fa-shopping-cart"></i></a>
+                        <a class="selectMenu" href="/int/salidas/">Lista <i class="fas fa-list"></i></a>
+                        <a class="selectMenu " href="/int/salidas/create">Crear <i class="fas fa-plus"></i></a>
+                        <a class="selectMenu " href="/int/salidas/">Ordenes de carga<i class="fas fa-shopping-cart"></i></a>
                     </div>
                     <div class="col-lg-6">
                         <h4 class="separtor">Reportes</h4>

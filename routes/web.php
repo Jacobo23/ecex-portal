@@ -26,12 +26,18 @@ Route::get('/', [UserController::class, 'redirectUser'])->middleware(['auth']);
 Route::get('/int', function () {return view('intern.home');})->middleware(['auth']);
 Route::get('/ext', function () {return view('customer.home');})->middleware(['auth']);
 //Files
+  //incomes
 Route::post('/upload_pakinglist/','UploadFileController@uploadPakinglist');
 Route::get('/download_pakinglist/{entrada}','UploadFileController@downloadPacking');
 Route::post('/delete_pakinglist/','UploadFileController@deletePacking');
 Route::post('/upload_img_entrada/','UploadFileController@uploadImgEntrada');
 Route::post('/delete_img_entrada/','UploadFileController@deleteImgEntrada');
-//
+  //outcomes
+Route::post('upload_pakinglist_outcome/','UploadFileController@uploadPakinglistOutcome');
+Route::post('/delete_pakinglist_outcome/','UploadFileController@deletePackingOutcome');
+Route::get('/download_pakinglist_outcome/{salida}','UploadFileController@downloadPackingOutcome');
+Route::post('/upload_img_salida/','UploadFileController@uploadImgSalida');
+Route::post('/delete_img_salida/','UploadFileController@deleteImgOutcome');
 
 //Route::resource('/ext/clientes', 'CustomerController')->middleware('auth');
 
@@ -45,5 +51,7 @@ Route::resource('/income_row', 'IncomeRowController')->middleware('auth');
 Route::resource('/part_number', 'PartNumberController')->middleware('auth');
 Route::get('/part_number/{partNumber}/{customer}/get','PartNumberController@getInfo');
 Route::get('/part_number/{partNumber}/{customer}/{numEntrada}/edit','PartNumberController@edit');
+//Outcomes internal
+Route::resource('/int/salidas', 'OutcomeController')->middleware('auth');
 
 require __DIR__.'/auth.php';

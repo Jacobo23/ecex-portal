@@ -17,7 +17,7 @@ class CreateOutcomesTable extends Migration
             $table->id();
             $table->integer('year');
             $table->integer('number');
-            $table->integer('regime');
+            $table->string('regime');
             $table->dateTime('cdate', $precision = 0);
             $table->unsignedBigInteger('customer_id');
             $table->unsignedBigInteger('carrier_id');
