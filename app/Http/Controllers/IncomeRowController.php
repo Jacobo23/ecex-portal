@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\IncomeRow;
+use App\Models\InventoryBundle;
 use Illuminate\Http\Request;
 
 class IncomeRowController extends Controller
@@ -106,6 +107,16 @@ class IncomeRowController extends Controller
 
         if(!is_null($incomeRow->id))
         {
+            //registrar bultos en inventario
+            $inv_bundle = InventoryBundle::where('income_row_id',$incomeRow->id)->first();
+            if($inv_bundle === null)
+            {
+                $inv_bundle = new InventoryBundle;
+            }
+            $inv_bundle->income_row_id = $incomeRow->id;
+            $inv_bundle->quantity = $incomeRow->bundles;
+            $inv_bundle->save();
+
             return response()->json([
                 'msg' => "Partida guardada!",
                 'is_update' => $is_update,
@@ -164,7 +175,7 @@ class IncomeRowController extends Controller
      */
     public function destroy(IncomeRow $incomeRow)
     {
-        return $incomeRow->delete();
+        $incomeRow->delete();
     }
 
     public function hasOutcomes(IncomeRow $income_row)

@@ -30,8 +30,8 @@
                     </div>
                     <div class="col-lg-6">
                         <h4 class="separtor">Reportes</h4>
-                        <a class="selectMenu" href="Entradas">Inventario <i class="fas fa-th-list"></i></a>
-                        <a class="selectMenu " href="Entradas/create">Cajas <i class="fas fa-trailer"></i></a>
+                        <a class="selectMenu" href="/int/inventario/">Inventario <i class="fas fa-th-list"></i></a>
+                        <a class="selectMenu " href="/int/salidas/">Cajas <i class="fas fa-trailer"></i></a>
                     </div>
                     <div class="col-lg-6">
                         <h4 class="separtor">Catalogos</h4>

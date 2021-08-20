@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\OutcomeRow;
 use App\Models\IncomeRow;
 use App\Models\Income;
+use App\Models\InventoryBundle;
 use App\Models\BundleType;
 
 use Illuminate\Http\Request;
@@ -38,5 +39,10 @@ class InventoryController extends Controller
             'inventory' => $available_rows,
             'tipos_de_bulto' => $umb,
         ]);
+    }
+
+    public function getAll()
+    {
+        
     }
 }

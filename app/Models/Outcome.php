@@ -14,9 +14,14 @@ class Outcome extends Model
     {
         return $this->hasMany(OutcomeRow::class);
     }
-    public function getOutcomeNumber()
+    public function getOutcomeNumber($regime)
     {
-        return $this->year.str_pad($this->number,5,"0",STR_PAD_LEFT)."-".$this->regime;
+        $posfix = "";
+        if($regime)
+        {
+            $posfix = "-".$this->regime;
+        }
+        return $this->year.str_pad($this->number,5,"0",STR_PAD_LEFT).$posfix;
     }
     public function customer()
     {

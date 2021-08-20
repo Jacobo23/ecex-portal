@@ -229,10 +229,28 @@ class IncomeController extends Controller
     {
         //TO DO: falta verificar que las partidas no tengan salida.
         $partidas = $income->income_rows;
-        foreach ($partidas as $partida) 
+        $lista_de_salidas = "";
+        foreach ($partidas as $partidas) 
         {
-            $partida->delete();
+            $outcomes = $partidas->get_discounting_outcomes();
+            foreach ($outcomes as $outcome) 
+            {
+                $lista_de_salidas .= " '".$outcome."'";
+            }            
         }
+        //si no se encuentra ninguna salida descontando a alguna de las partidas procedemos con el borrado
+        if($lista_de_salidas == "")
+        {
+            foreach ($partidas as $partida) 
+            {
+                $partida->delete();           
+            }
+        }
+        else
+        {
+            return "Alguna o algunas de las partidas de ésta entrada ya cuentan con salida: " . $lista_de_salidas . "<br>Verifíque con su equipo.";
+        }
+        
         $income->delete();
         //borramos los archivos
         Storage::deleteDirectory('public/entradas/'.$income->getIncomeNumber());

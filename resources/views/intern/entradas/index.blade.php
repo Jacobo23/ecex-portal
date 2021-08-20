@@ -132,8 +132,16 @@ function eliminarEntrada(id,num_entrada)
     }
     $.ajax({url: "/int/entradas/"+id+"/delete",context: document.body}).done(function(result) 
         {
-            showModal("Notificación","Entrada '" + num_entrada + "' eliminada");
-            $("#inc_row_"+id).remove();
+            if(result != "")
+            {
+                showModal("Notificación",result);
+            }
+            else
+            {
+                showModal("Notificación","Entrada '" + num_entrada + "' eliminada");
+                $("#inc_row_"+id).remove();
+            }
+            
         });
 }
 

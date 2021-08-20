@@ -8,6 +8,8 @@ use App\Models\PartNumber;
 use App\Models\Outcome;
 use App\Models\OutcomeRow;
 use App\Models\Income;
+use App\Models\InventoryBundle;
+
 
 class IncomeRow extends Model
 {
@@ -39,7 +41,7 @@ class IncomeRow extends Model
         $outcome_numbers=array();
         foreach ($outcomes as $outcome) 
         {
-            array_push($outcome_numbers,$outcome->getOutcomeNumber());
+            array_push($outcome_numbers,$outcome->getOutcomeNumber(true));
         }
         return $outcome_numbers;
     }

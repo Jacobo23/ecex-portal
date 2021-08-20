@@ -54,10 +54,12 @@ Route::get('/part_number/{partNumber}/{customer}/get','PartNumberController@getI
 Route::get('/part_number/{partNumber}/{customer}/{numEntrada}/edit','PartNumberController@edit');
 //Outcomes internal
 Route::resource('/int/salidas', 'OutcomeController')->middleware('auth');
+Route::get('/int/salidas/{outcome}/delete','OutcomeController@delete');
 //Outcome Rows internal
 Route::resource('/outcome_row', 'OutcomeRowController')->middleware('auth');
 Route::get('/outcome_row_delete/{outcome_row_id}','OutcomeRowController@destroy');
 //INVENTORY
 Route::get('/int/inventory/{customer_id}/{days_before}','InventoryController@get');
+//Route::get('/int/inventory/{customer_id}/{days_before}','InventoryController@get');
 
 require __DIR__.'/auth.php';

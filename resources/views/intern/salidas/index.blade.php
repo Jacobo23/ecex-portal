@@ -88,7 +88,7 @@
             <tbody>
                 @foreach ($outcomes as $outcome)
                 <tr id="otc_row_{{ $outcome->id }}">
-                    <td><a href="/int/salidas/{{ $outcome->getOutcomeNumber() }}">{{ $outcome->getOutcomeNumber() }}</a></td>
+                    <td><a href="/int/salidas/{{ $outcome->getOutcomeNumber(false) }}">{{ $outcome->getOutcomeNumber(true) }}</a></td>
                     <td>{{ explode(" ", $outcome->cdate)[0] }}</td>
                     <td>{{ $outcome->customer->name }}</td>
                     <td>{{ $outcome->invoice }}</td>
@@ -98,7 +98,7 @@
                     <td>{{ $outcome->getTipoBultos() }}</td>
                     <td>@if ($outcome->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td><i class="far fa-folder-open"></i></td>
-                    @if ($can_delete) <td><button onclick="eliminarSalida({{ $outcome->id }},'{{ $outcome->getOutcomeNumber() }}')"><i class="fas fa-times" style="color:red"></i></button></td> @endif
+                    @if ($can_delete) <td><button onclick="eliminarSalida({{ $outcome->id }},'{{ $outcome->getOutcomeNumber(false) }}')"><i class="fas fa-times" style="color:red"></i></button></td> @endif
                 </tr>
                 @endforeach
             </tbody>
@@ -114,7 +114,7 @@
 
 function eliminarSalida(id,num_salida)
 {
-    if(!confirm("ESTO NO ESTA PROGRAMADO ¿Desea eliminar la salida '"+num_salida+"'?"))
+    if(!confirm("¿Desea eliminar la salida '"+num_salida+"'?"))
     {
         return;
     }
