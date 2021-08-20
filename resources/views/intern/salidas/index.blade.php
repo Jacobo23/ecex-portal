@@ -12,7 +12,7 @@
 <header class="bg-white shadow">
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Entradas.
+            Salidas.
         </h2>
     </div>
 </header>
@@ -26,7 +26,7 @@
 
         <h5 class="separtor">Filtros:</h5>
 
-        <form action="/int/entradas" method="get">
+        <form action="/int/salidas" method="get">
         <div class="row">
             <div class="col-lg-2 controlDiv" >
                 <label class="form-label">Cliente:</label>
@@ -47,13 +47,9 @@
                 </select>
             </div>
             
-            <div class="col-lg-2 controlDiv" style="">
-                <label class="form-label">Tracking:</label>
-                <input type="text" class="form-control" id="txtTracking" name="txtTracking" value="{{ $tracking }}" placeholder="Tracking">       
-            </div>
-            <div class="col-lg-4 controlDiv form-check form-switch" style="position:relative;top:40px;">
-                <input class="form-check-input" type="checkbox" id="chkInventario" name="chkInventario" {{ ($en_inventario) ? "checked" : "" }}>
-                <label class="form-check-label" for="chkInventario">Inventario <small>*esto puede demorar la busqueda.</small></label>
+            <div class="col-lg-3 controlDiv" style="">
+                <label class="form-label">otros:</label>
+                <input type="text" class="form-control" id="txtOtros" name="txtOtros" value="{{ $otros }}" placeholder="Factura / Pedimento / Referencia">       
             </div>
 
             <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
@@ -76,41 +72,33 @@
         <table class="table table-sm table-striped table-bordered table-hover">
             <thead>
                 <tr>
-                    <th scope="col">Entrada #</th>
+                    <th scope="col">Salida #</th>
                     <th scope="col">Fecha</th>
-                    <th scope="col">Dias</th>
                     <th scope="col">Cliente</th>
-                    <th scope="col">Tracking</th>
+                    <th scope="col">Factura</th>
+                    <th scope="col">Pedimento</th>
+                    <th scope="col">Referencia</th>
                     <th scope="col">Bultos</th>
                     <th scope="col">Tipo-bulto</th>
-                    <th scope="col">Materia/Equipo</th>
                     <th scope="col">Enviada</th>
-                    <th scope="col">Revisada</th>
-                    <th scope="col">Urgente</th>
-                    <th scope="col">On-hold</th>
-                    <th scope="col">Balance</th>
                     <th scope="col">Folder</th>
                     @if ($can_delete) <th scope="col">Eliminar</th> @endif
                 </tr>
             </thead>
             <tbody>
-                @foreach ($incomes as $income)
-                <tr id="inc_row_{{ $income->id }}">
-                    <td><a href="/int/entradas/{{ $income->getIncomeNumber() }}">{{ $income->getIncomeNumber() }}</a></td>
-                    <td>{{ explode(" ", $income->cdate)[0] }}</td>
-                    <td>{{ $income->getDiasTrascurridos() }}</td>
-                    <td>{{ $income->customer->name }}</td>
-                    <td>{{ $income->tracking }}</td>
-                    <td>{{ $income->getBultos() }}</td>
-                    <td>{{ $income->getTipoBultos() }}</td>
-                    <td>{{ $income->type }}</td>
-                    <td>@if ($income->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td>@if ($income->reviewed_by) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td>@if ($income->urgent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td>@if ($income->onhold) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td><i class="fas fa-balance-scale"></i></td>
+                @foreach ($outcomes as $outcome)
+                <tr id="otc_row_{{ $outcome->id }}">
+                    <td><a href="/int/salidas/{{ $outcome->getOutcomeNumber() }}">{{ $outcome->getOutcomeNumber() }}</a></td>
+                    <td>{{ explode(" ", $outcome->cdate)[0] }}</td>
+                    <td>{{ $outcome->customer->name }}</td>
+                    <td>{{ $outcome->invoice }}</td>
+                    <td>{{ $outcome->pediment }}</td>
+                    <td>{{ $outcome->reference }}</td>
+                    <td>{{ $outcome->getBultos() }}</td>
+                    <td>{{ $outcome->getTipoBultos() }}</td>
+                    <td>@if ($outcome->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td><i class="far fa-folder-open"></i></td>
-                    @if ($can_delete) <td><button onclick="eliminarEntrada({{ $income->id }},'{{ $income->getIncomeNumber() }}')"><i class="fas fa-times" style="color:red"></i></button></td> @endif
+                    @if ($can_delete) <td><button onclick="eliminarSalida({{ $outcome->id }},'{{ $outcome->getOutcomeNumber() }}')"><i class="fas fa-times" style="color:red"></i></button></td> @endif
                 </tr>
                 @endforeach
             </tbody>
@@ -124,16 +112,16 @@
 @section('scripts')
 <script>
 
-function eliminarEntrada(id,num_entrada)
+function eliminarSalida(id,num_salida)
 {
-    if(!confirm("¿Desea eliminar la entrada '"+num_entrada+"'?"))
+    if(!confirm("ESTO NO ESTA PROGRAMADO ¿Desea eliminar la salida '"+num_salida+"'?"))
     {
         return;
     }
-    $.ajax({url: "/int/entradas/"+id+"/delete",context: document.body}).done(function(result) 
+    $.ajax({url: "/int/salidas/"+id+"/delete",context: document.body}).done(function(result) 
         {
-            showModal("Notificación","Entrada '" + num_entrada + "' eliminada");
-            $("#inc_row_"+id).remove();
+            showModal("Notificación","Salida '" + num_salida + "' eliminada");
+            $("#otc_row_"+id).remove();
         });
 }
 

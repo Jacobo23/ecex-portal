@@ -31,7 +31,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Fecha:</label>
-            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@endif" min="{{ date('Y-m-d') }}">
+            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@endif" >
         </div>
 
         <div class="col-lg-3 controlDiv" >
@@ -740,6 +740,7 @@ function guardarPartida()
         return;
     }
     //$("#formIncomeRow").submit();
+    
     $.ajax({
         method: 'POST',
         url: $("#formIncomeRow").attr("action"),
@@ -769,31 +770,41 @@ function eliminarPartida()
     let token = $("[name='_token']").val();
     if(id_income_row != "")
     {
-        $.ajax(
+
+        
+    $.ajax({url: "/income_row_has_outcomes/"+id_income_row,context: document.body}).done(function(response) 
         {
-            url: "/income_row/"+id_income_row,
-            type: 'DELETE',
-            data: {
-                "_token": token,
-            },
-            success: function (){
-                showModal("Notificación","Partida Eliminada");
-                let index_ultima_partida = 1;
-                $(".btnIncomeRow").each(function(){
-                    
-                    $(this).html(index_ultima_partida);
-                    if($(this).attr("id").split("_")[1] == id_income_row)
-                    {
-                        $(this).remove();
-                    }
-                    else
-                    {
-                        index_ultima_partida++;
-                    }
-                    // se corre la siguiente funcion para resetear todos los controles
-                    createPartida();
-                });
+            if(response.length > 0)
+            {
+                showModal("Alerta!","Esta partida ya cuenta con salida(s): " + response + ".<br>Verifíque con su equipo.");
+                return;
             }
+            $.ajax(
+            {
+                url: "/income_row/"+id_income_row,
+                type: 'DELETE',
+                data: {
+                    "_token": token,
+                },
+                success: function (){
+                    showModal("Notificación","Partida Eliminada");
+                    let index_ultima_partida = 1;
+                    $(".btnIncomeRow").each(function(){
+                        
+                        $(this).html(index_ultima_partida);
+                        if($(this).attr("id").split("_")[1] == id_income_row)
+                        {
+                            $(this).remove();
+                        }
+                        else
+                        {
+                            index_ultima_partida++;
+                        }
+                        // se corre la siguiente funcion para resetear todos los controles
+                        createPartida();
+                    });
+                }
+            });
         });
     }
 }

@@ -22,11 +22,58 @@ class IncomeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $entradas = Income::all();
+        
         $can_delete = Auth::user()->canDeleteIncome();
-        return view('intern.entradas.index', ['incomes' => $entradas, 'can_delete' => $can_delete]);
+        $clientes = Customer::All();
+
+        $cliente = $request->txtCliente ?? 0;
+        $rango = $request->txtRango ?? 30;
+        $tracking = $request->txtTracking ?? "";
+        $en_inventario = isset($request->chkInventario);
+        //$entradas = Income::all();
+        $entradas = Income::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString())
+            ->where('tracking', 'like', '%'.$tracking.'%');
+        if($cliente > 0)
+        {
+            $entradas = $entradas->where('customer_id',$cliente);
+        }
+        $entradas = $entradas->get();
+
+        if($en_inventario)
+        {
+            foreach ($entradas as $key => $entrada) 
+            {
+                $partidas = $entrada->income_rows;
+                $count = 0;
+                foreach ($partidas as $partida) 
+                {
+                    $count += ($partida->units - $partida->get_discounted_units());
+                    if($count > 0)
+                    {
+                        break;
+                    }
+                }
+                if($count == 0)
+                {
+                    $entrada->id = 0;
+                }
+            }
+            //discriminar las entradas con id = 0 porque no tienen inventario restante
+            $entradas = $entradas->where('id', '>', 0);
+        }
+            
+
+        return view('intern.entradas.index', [
+            'incomes' => $entradas,
+            'can_delete' => $can_delete,
+            'clientes' => $clientes,
+            'cliente' => $cliente,
+            'rango' => $rango,
+            'tracking' => $tracking,
+            'en_inventario' => $en_inventario,
+        ]);
     }
 
     /**

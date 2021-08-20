@@ -166,4 +166,17 @@ class IncomeRowController extends Controller
     {
         return $incomeRow->delete();
     }
+
+    public function hasOutcomes(IncomeRow $income_row)
+    {
+        $response = "";
+        $outcomes = $income_row->get_discounting_outcomes();
+        foreach ($outcomes as $outcome) 
+        {
+            $response .= " '".$outcome."'";
+        }
+        return $response;
+    }
+
+    
 }

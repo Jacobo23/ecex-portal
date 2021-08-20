@@ -18,7 +18,35 @@ class OutcomeController extends Controller
      */
     public function index()
     {
-        //
+        $can_delete = Auth::user()->canDeleteIncome();
+        $clientes = Customer::All();
+
+        $cliente = $request->txtCliente ?? 0;
+        $rango = $request->txtRango ?? 30;
+        $otros = $request->txtOtros ?? "";
+
+        //$salidas = Outcome::all();
+        $can_delete = Auth::user()->canDeleteOutcome();
+
+
+        $salidas = Outcome::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString());
+        if($cliente > 0)
+        {
+            $salidas = $salidas->where('customer_id',$cliente);
+        }
+        $salidas = $salidas->orWhere('invoice', 'like', '%'.$otros.'%')
+            ->orWhere('pediment', 'like', '%'.$otros.'%')
+            ->orWhere('reference', 'like', '%'.$otros.'%')->get();
+
+
+        return view('intern.salidas.index', [
+            'outcomes' => $salidas,
+            'can_delete' => $can_delete,
+            'clientes' => $clientes,
+            'cliente' => $cliente,
+            'rango' => $rango,
+            'otros' => $otros,
+        ]);
     }
 
     /**
@@ -108,6 +136,7 @@ class OutcomeController extends Controller
         $clientes = Customer::All();
         $transportistas = Carrier::All();
         $regimes = Regime::All();
+        
         return view('intern.salidas.create', [
             'outcome' => $outcome,
             'numero_de_salida' => $numero_de_salida,

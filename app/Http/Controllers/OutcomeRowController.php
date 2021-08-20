@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\OutcomeRow;
 use Illuminate\Http\Request;
 
+
 class OutcomeRowController extends Controller
 {
     /**
@@ -12,9 +13,9 @@ class OutcomeRowController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        return "";
     }
 
     /**
@@ -36,6 +37,25 @@ class OutcomeRowController extends Controller
     public function store(Request $request)
     {
         //
+        $cout = count($request->income_row_id);
+        $outcome_rows_ids=array();
+
+        for ($i = 0; $i < $cout; $i++) 
+        {
+            $outcome_row = new OutcomeRow;
+            $outcome_row->outcome_id = $request->outcomeID;
+            $outcome_row->income_row_id = $request->income_row_id[$i];
+            $outcome_row->units = $request->units[$i];
+            $outcome_row->bundles = $request->bundles[$i];
+            $outcome_row->ump = $request->ump[$i];
+            $outcome_row->umb = $request->umb[$i];
+            $outcome_row->net_weight = $request->net_weight[$i];
+            $outcome_row->gross_weight = $request->gross_weight[$i];
+            $outcome_row->save();
+            array_push($outcome_rows_ids,$outcome_row->id);
+        }
+        
+        return $outcome_rows_ids;
     }
 
     /**
@@ -78,8 +98,8 @@ class OutcomeRowController extends Controller
      * @param  \App\Models\OutcomeRow  $outcomeRow
      * @return \Illuminate\Http\Response
      */
-    public function destroy(OutcomeRow $outcomeRow)
+    public function destroy(OutcomeRow $outcome_row_id)
     {
-        //
+        $outcome_row_id->delete();
     }
 }

@@ -46,4 +46,8 @@ class User extends Authenticatable
     {
         return str_contains(Auth::user()->permits, 'del_income');
     }
+    public function canDeleteOutcome()
+    {
+        return str_contains(Auth::user()->permits, 'del_outcome');
+    }
 }

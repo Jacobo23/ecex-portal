@@ -47,11 +47,17 @@ Route::get('/int/entradas/{income}/download_pdf','IncomeController@downloadPDF')
 Route::get('/int/entradas/{income}/delete','IncomeController@delete');
 //Income rows internal
 Route::resource('/income_row', 'IncomeRowController')->middleware('auth');
+Route::get('/income_row_has_outcomes/{income_row}', 'IncomeRowController@hasOutcomes')->middleware('auth');
 //Part Numbers
 Route::resource('/part_number', 'PartNumberController')->middleware('auth');
 Route::get('/part_number/{partNumber}/{customer}/get','PartNumberController@getInfo');
 Route::get('/part_number/{partNumber}/{customer}/{numEntrada}/edit','PartNumberController@edit');
 //Outcomes internal
 Route::resource('/int/salidas', 'OutcomeController')->middleware('auth');
+//Outcome Rows internal
+Route::resource('/outcome_row', 'OutcomeRowController')->middleware('auth');
+Route::get('/outcome_row_delete/{outcome_row_id}','OutcomeRowController@destroy');
+//INVENTORY
+Route::get('/int/inventory/{customer_id}/{days_before}','InventoryController@get');
 
 require __DIR__.'/auth.php';
