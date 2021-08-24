@@ -18,7 +18,7 @@ class CreateLoadOrdersTable extends Migration
             $table->string('regimen')->default("");
             $table->unsignedBigInteger('customer_id');
             $table->dateTime('cdate', $precision = 0);
-            $table->string('notes')->default("");
+            $table->string('notes',512)->default("");
             $table->string('status')->default("");
             $table->timestamps();
         });

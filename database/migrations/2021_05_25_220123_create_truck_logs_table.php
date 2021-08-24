@@ -22,7 +22,7 @@ class CreateTruckLogsTable extends Migration
             $table->unsignedBigInteger('customer_id');
             $table->string('trailer')->default("");
             $table->boolean('loaded')->default(true);
-            $table->string('observations')->default("");
+            $table->string('observations',512)->default("");
             $table->timestamps();
         });
     }

@@ -19,11 +19,16 @@ class DatabaseSeeder extends Seeder
             CarrierSeeder::class,
             MeasurementUnitSeeder::class,
             CustomerSeeder::class,
-            PartNumberSeeder::class,
+            //PartNumberSeeder::class,
             SupplierSeeder::class,
             CountrySeeder::class,
             RegimeSeeder::class,
             TruckLocationSeeder::class,
+            UserSeeder::class,
+            TestPartNumberSeeder::class,
+            TestIncomeSeeder::class,
+            TestOutcomeSeeder::class,
+            TestOutcomeSeeder::class,
         ]);
     }
 }

@@ -16,7 +16,7 @@ class CreateBundleTypesTable extends Migration
         Schema::create('bundle_types', function (Blueprint $table) {
             $table->id();
             $table->string('desc');
-            $table->decimal('weight', 8, 2);
+            $table->decimal('weight', 13, 4);
         });
     }
 

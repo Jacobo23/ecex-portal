@@ -18,7 +18,7 @@ class CreatePartNumbersTable extends Migration
             $table->string('part_number');
             $table->unsignedBigInteger('customer_id');
             $table->string('um');
-            $table->decimal('unit_weight', 8, 2);
+            $table->decimal('unit_weight', 13, 4);
             $table->string('desc_ing')->default("");
             $table->string('desc_esp')->default("");
             $table->string('origin_country')->default("");
@@ -28,9 +28,9 @@ class CreatePartNumbersTable extends Migration
             $table->string('model')->default("");
             $table->string('serial')->default("");
             $table->string('imex')->default("");
-            $table->string('fraccion_especial')->default("");
+            $table->string('fraccion_especial',512)->default("");
             $table->string('regime')->default("");
-            $table->boolean('warning')->default(false);
+            $table->string('warning')->default("");//<- debe ser una lista separada por comas de los proveedores con los que este numero de parte salte una alerta
             $table->timestamps();
         });
     }

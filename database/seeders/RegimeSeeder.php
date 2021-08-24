@@ -15,7 +15,10 @@ class RegimeSeeder extends Seeder
     public function run()
     {
         DB::table('regimes')->insert(['name' => 'IN']);
+        DB::table('regimes')->insert(['name' => 'AF']);
+        DB::table('regimes')->insert(['name' => 'A1']);
+        DB::table('regimes')->insert(['name' => 'V1']);
+        DB::table('regimes')->insert(['name' => 'R1']);
         DB::table('regimes')->insert(['name' => 'NA']);
-        DB::table('regimes')->insert(['name' => 'VN']);
     }
 }

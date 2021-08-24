@@ -105,7 +105,7 @@
                     <td>{{ $income->getTipoBultos() }}</td>
                     <td>{{ $income->type }}</td>
                     <td>@if ($income->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td>@if ($income->reviewed_by) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
+                    <td>@if ($income->reviewed) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td>@if ($income->urgent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td>@if ($income->onhold) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td><i class="fas fa-balance-scale"></i></td>

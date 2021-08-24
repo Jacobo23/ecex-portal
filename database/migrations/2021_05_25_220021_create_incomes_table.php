@@ -24,7 +24,7 @@ class CreateIncomesTable extends Migration
             $table->string('reference')->default("");
             $table->string('trailer')->default("");
             $table->string('seal')->default("");
-            $table->string('observations')->default("");
+            $table->string('observations',1024)->default("");
             $table->string('impoExpo')->default("");
             $table->string('invoice')->default("");
             $table->string('tracking')->default("");

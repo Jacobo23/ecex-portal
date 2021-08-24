@@ -15,7 +15,7 @@ class CreateDbLogsTable extends Migration
     {
         Schema::create('db_logs', function (Blueprint $table) {
             $table->id();
-            $table->string('text');
+            $table->string('text',2048);
             $table->timestamps();
         });
     }
