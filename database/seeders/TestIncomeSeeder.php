@@ -80,7 +80,7 @@ class TestIncomeSeeder extends Seeder
                         }
                         else
                         {
-                            $part_n = PartNumber::where('part_number',$row2["NumeroDeParteID"])->first();
+                            $part_n = PartNumber::where('id',$row2["NumeroDeParteID"])->first();
                         }
                         $incomeRow->id = $row2["id"];
                         $incomeRow->part_number_id = $part_n ? $part_n->id : 130373;

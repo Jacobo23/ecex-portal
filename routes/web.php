@@ -60,6 +60,8 @@ Route::resource('/outcome_row', 'OutcomeRowController')->middleware('auth');
 Route::get('/outcome_row_delete/{outcome_row_id}','OutcomeRowController@destroy');
 //INVENTORY
 Route::get('/int/inventory/{customer_id}/{days_before}','InventoryController@get');
-//Route::get('/int/inventory/{customer_id}/{days_before}','InventoryController@get');
+Route::get('/int/inventory','InventoryController@index');
+Route::get('/int/inventory/{cliente}/{rango}/{others}/complete','InventoryController@getAll');
+//                 Defaults->   0       /     30     / NO_FILTER       <- cuando llames esta ruta no dejes vacios los campos
 
 require __DIR__.'/auth.php';
