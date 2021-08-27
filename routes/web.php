@@ -52,6 +52,7 @@ Route::get('/income_row_has_outcomes/{income_row}', 'IncomeRowController@hasOutc
 Route::resource('/part_number', 'PartNumberController')->middleware('auth');
 Route::get('/part_number/{partNumber}/{customer}/get','PartNumberController@getInfo');
 Route::get('/part_number/{partNumber}/{customer}/{numEntrada}/edit','PartNumberController@edit');
+Route::get('/part_number/{partNumber_id}/edit_existing','PartNumberController@edit_existing');
 //Outcomes internal
 Route::resource('/int/salidas', 'OutcomeController')->middleware('auth');
 Route::get('/int/salidas/{outcome}/delete','OutcomeController@delete');
@@ -61,6 +62,7 @@ Route::get('/outcome_row_delete/{outcome_row_id}','OutcomeRowController@destroy'
 //INVENTORY
 Route::get('/int/inventory/{customer_id}/{days_before}','InventoryController@get');
 Route::get('/int/inventory','InventoryController@index');
+Route::get('/int/inventory_xls','InventoryController@downloadInventory');
 Route::get('/int/inventory/{cliente}/{rango}/{others}/complete','InventoryController@getAll');
 //                 Defaults->   0       /     30     / NO_FILTER       <- cuando llames esta ruta no dejes vacios los campos
 

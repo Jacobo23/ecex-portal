@@ -62,6 +62,9 @@
             <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
                 <button type="submit" class="btn btn-primary">Buscar</button>     
             </div>
+            <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
+                <button type="button" class="btn btn-success" onclick="descargar()"><i class="far fa-file-excel"></i></button>     
+            </div>
         </div>
             
         </form>
@@ -106,7 +109,7 @@
                     <td>{{ $partida->po }}</td>
                     <td>{{ $partida->origin_country }}</td>
                     <td>{{ $partida->fraccion }}.{{ $partida->nico }}</td>
-                    <td>{{ $partida->pbrando }}</td>
+                    <td>{{ $partida->brand }}</td>
                     <td>{{ $partida->model }}</td>
                     <td>{{ $partida->serial }}</td>
                     <td>{{ $partida->skids }}</td>
@@ -141,6 +144,11 @@ function editarBultos(id,control)
             }
             
         });
+}
+function descargar()
+{
+    var path = "/int/inventory_xls?txtCliente="+$("#txtCliente").val()+"&txtRango="+$("#txtRango").val();
+    location.href=path;
 }
 
 </script>

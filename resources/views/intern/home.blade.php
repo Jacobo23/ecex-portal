@@ -13,7 +13,7 @@
 
 <!-- Page Content -->
 <div class="py-12">
-    <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto sm:px-6 lg:px-8">
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 bg-white border-b border-gray-200" >
                 <div class="row">
@@ -35,10 +35,10 @@
                     </div>
                     <div class="col-lg-6">
                         <h4 class="separtor">Catalogos</h4>
-                        <a class="selectMenu" href="Entradas">Numeros de parte<i class="fas fa-book"></i></a>
-                        <a class="selectMenu " href="Entradas/create">Clientes <i class="far fa-address-book"></i></a>
-                        <a class="selectMenu " href="Entradas/create">Proveedores <i class="fas fa-truck"></i></a>
-                        <a class="selectMenu " href="Entradas/create">Trasportistas <i class="fas fa-bus"></i></a>
+                        <a class="selectMenu" href="/part_number">Números de parte<i class="fas fa-book"></i></a>
+                        <a class="selectMenu " href="/customer">Clientes <i class="far fa-address-book"></i></a>
+                        <a class="selectMenu " href="/supplier">Proveedores <i class="fas fa-truck"></i></a>
+                        <a class="selectMenu " href="/carrier">Trasportistas <i class="fas fa-bus"></i></a>
                     </div>
                 </div>
             </div>

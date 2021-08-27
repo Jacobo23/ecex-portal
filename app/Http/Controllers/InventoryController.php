@@ -8,6 +8,8 @@ use App\Models\InventoryBundle;
 use App\Models\BundleType;
 use App\Models\PartNumber;
 use App\Models\Customer;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\InventoryExport;
 
 use Illuminate\Http\Request;
 
@@ -96,6 +98,16 @@ class InventoryController extends Controller
             'otros' => $otros,
         ]);
 
+    }
+    public function downloadInventory(Request $request)
+    {
+        $cliente = $request->txtCliente ?? 0;
+        $rango = $request->txtRango ?? 30;
+        $otros = $request->txtOtros ?? "";
+
+        $partidas = $this->getAll($cliente, $rango, "NO_FILTER");
+        $export = new InventoryExport($partidas);
+        return Excel::download($export, 'inventory.xlsx');
     }
 
 }

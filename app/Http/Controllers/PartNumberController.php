@@ -6,10 +6,8 @@ use App\Models\PartNumber;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\MeasurementUnit;
-use App\Models\Income;
-use App\Models\Carrier;
-use App\Models\Supplier;
-use App\Models\BundleType;
+use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Support\Facades\Session;
 
 class PartNumberController extends Controller
@@ -19,22 +17,64 @@ class PartNumberController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return PartNumber::all();
+        $clientes = Customer::All();
+
+        $cliente = $request->txtCliente ?? 0;
+        $desc = $request->txtDesc ?? "";
+        $offset = $request->txtTab ?? "1"; //<-- tab debe venir del formulario y comienza en 1, representa los tab (paginacion) que queremos consultar, despues le restaremos 1 porque en el codigo lo necesitamos base 0 pero el usuario debe verlo en base 1
+        $offset--;
+        $items = 10;
+        $result = $this->index_object($cliente, $desc, $offset, $items);
+        $part_numbers = $result[0];
+        $count = $result[1]/$items;
+
+        $can_delete = Auth::user()->canDeletePartNumber();
+        $can_edit = Auth::user()->canEditPartNumber();
+
+        return view('intern.part_number.index', [
+            'part_numbers' => $part_numbers,
+            'tab' => $offset+1,
+            'desc' => $desc,
+            'clientes' => $clientes,
+            'cliente' => $cliente,
+            'tab_count' => $count,
+            'can_delete' => $can_delete,
+            'can_edit' => $can_edit,
+        ]);
     }
+
+    public function index_object(string $cliente, string $desc, string $offset, string $items)
+    {
+        $obj = PartNumber::whereRaw(" ( desc_ing like '%".$desc."%' or desc_esp like '%".$desc."%' ) ");
+        if($cliente != "0")
+        {
+            $obj->where('customer_id',$cliente);
+        }
+        $total_count = $obj->count();
+        $obj = $obj->skip($items*$offset)->take($items)->get();
+
+        return [$obj,$total_count];
+    }
+
 
     /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function popup()
+    public function create()
     {
-        return "nose";
-        //return view('intern.part_number.create', [
-        //    'part_number' => $part_number
-        //]);
+        $clientes = Customer::All();
+        $ums = MeasurementUnit::All();
+
+        return view('intern.part_number.create', [
+            'part_number' => "",
+            'clientes' => $clientes,
+            'unidades_de_medida' => $ums,
+            'from_income' => "",
+        ]);
     }
 
     /**
@@ -45,19 +85,17 @@ class PartNumberController extends Controller
      */
     public function store(Request $request)
     {
-        //NO USAR ESTE METODO PARA UPDATES
-        //para update se deben usar las funciones in-line del formulario correspondiente.
         $part_number = PartNumber::where('part_number',$request->txtNumeroDeParte)->where('customer_id',$request->txtCliente)->first();
-        if($part_number)
+        if(strlen($request->from_Incomes) > 0 && $part_number)
         {
-            if(strlen($request->from_Incomes) > 0 )
-            {
-                Session::flash('part_number', $part_number);
-                return redirect('/int/entradas/'.$request->from_Incomes);
-            }
-            return "El numero de parte ya existe. " . $part_number->id;
+            Session::flash('part_number', $part_number);
+            return redirect('/int/entradas/'.$request->from_Incomes);
         }
-        $part_number = new PartNumber;
+        if(!$part_number)
+        {
+            $part_number = new PartNumber;
+        }
+        
         $part_number->part_number = strtoupper($request->txtNumeroDeParte);
         $part_number->customer_id = $request->txtCliente;
         $part_number->um = $request->txtUM;
@@ -82,7 +120,7 @@ class PartNumberController extends Controller
             Session::flash('part_number', $part_number);
             return redirect('/int/entradas/'.$request->from_Incomes);
         }
-        return "Registrado: " . $part_number->id;
+        return redirect('/part_number');
     }
 
     /**
@@ -110,7 +148,8 @@ class PartNumberController extends Controller
     public function edit(string $partNumber, string $customer, string $numEntrada)
     {
         //NO USAR ESTE METODO PARA UPDATES
-        //para update se deben usar las funciones in-line del formulario correspondiente.
+        //para update se deben usar las funciones in-line del formulario correspondiente.   ( edit_existing() )
+
         $clientes = Customer::All();
         $ums = MeasurementUnit::All();
         return view('intern.part_number.create', [
@@ -119,6 +158,21 @@ class PartNumberController extends Controller
             'cliente' => $customer,
             'unidades_de_medida' => $ums,
             'from_income' => $numEntrada,
+        ]);
+    }
+    public function edit_existing(string $partNumber_id)
+    {
+        $clientes = Customer::All();
+        $ums = MeasurementUnit::All();
+        $part_number = PartNumber::find($partNumber_id);
+
+        return view('intern.part_number.create', [
+            'part_number_obj' => $part_number,
+            'part_number' => $part_number->part_number,
+            'clientes' => $clientes,
+            'cliente' => $part_number->customer_id,
+            'unidades_de_medida' => $ums,
+            'from_income' => "",
         ]);
     }
 
