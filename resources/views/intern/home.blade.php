@@ -36,9 +36,9 @@
                     <div class="col-lg-6">
                         <h4 class="separtor">Catalogos</h4>
                         <a class="selectMenu" href="/part_number">Números de parte<i class="fas fa-book"></i></a>
-                        <a class="selectMenu " href="/customer">Clientes <i class="far fa-address-book"></i></a>
-                        <a class="selectMenu " href="/supplier">Proveedores <i class="fas fa-truck"></i></a>
-                        <a class="selectMenu " href="/carrier">Trasportistas <i class="fas fa-bus"></i></a>
+                        <a class="selectMenu " href="/int/catalog/customers">Clientes <i class="far fa-address-book"></i></a>
+                        <a class="selectMenu " href="/int/catalog/suppliers">Proveedores <i class="fas fa-truck"></i></a>
+                        <a class="selectMenu " href="/int/catalog/carriers">Trasportistas <i class="fas fa-bus"></i></a>
                     </div>
                 </div>
             </div>

@@ -48,6 +48,11 @@ Route::get('/int/entradas/{income}/delete','IncomeController@delete');
 //Income rows internal
 Route::resource('/income_row', 'IncomeRowController')->middleware('auth');
 Route::get('/income_row_has_outcomes/{income_row}', 'IncomeRowController@hasOutcomes')->middleware('auth');
+Route::get('/income_row_massive/{income_number}', 'IncomeRowController@masiva')->middleware('auth');
+Route::post('/income_row_massive_load', 'IncomeRowController@upload_masiva')->middleware('auth');
+Route::get('/download_massive_template','IncomeRowController@download_massive_template');
+Route::post('/income_row_massive_store_row', 'IncomeRowController@store_massive_row')->middleware('auth');
+Route::post('/income_row_massive_clear_rows/{income}', 'IncomeRowController@clear_income_rows')->middleware('auth');
 //Part Numbers
 Route::resource('/part_number', 'PartNumberController')->middleware('auth');
 Route::get('/part_number/{partNumber}/{customer}/get','PartNumberController@getInfo');
@@ -65,5 +70,14 @@ Route::get('/int/inventory','InventoryController@index');
 Route::get('/int/inventory_xls','InventoryController@downloadInventory');
 Route::get('/int/inventory/{cliente}/{rango}/{others}/complete','InventoryController@getAll');
 //                 Defaults->   0       /     30     / NO_FILTER       <- cuando llames esta ruta no dejes vacios los campos
+//Customer
+Route::resource('/int/catalog/customers', 'CustomerController')->middleware('auth');
+//Carriers
+Route::get('/int/catalog/carriers_add/{carrier}','CarrierController@add')->middleware('auth');
+Route::get('/int/catalog/carriers','CarrierController@index')->middleware('auth');
+//Supplier
+Route::get('/int/catalog/suppliers_add/{supplier}','SupplierController@add')->middleware('auth');
+Route::get('/int/catalog/suppliers','SupplierController@index')->middleware('auth');
+//Route::get('/int/catalog/carriers/get','CarrierController@index_obj')->middleware('auth');
 
 require __DIR__.'/auth.php';

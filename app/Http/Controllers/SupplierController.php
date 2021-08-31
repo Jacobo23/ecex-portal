@@ -14,7 +14,26 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        //
+        $suppliers =  Supplier::orderBy('name','ASC')->get();
+        return view('intern.proveedores.index', [
+            'suppliers' => $suppliers,
+        ]);
+    }
+
+    public function add(string $supplier)
+    {
+        $new_supplier =  Supplier::where('name',$supplier)->first();
+        if(!$new_supplier)
+        {
+            $new_supplier =  new Supplier;
+            $new_supplier->name = $supplier;
+            $new_supplier->save();
+        }
+        
+        return response()->json([
+            'supplier' => $new_supplier->name,
+            'id' => $new_supplier->id,
+        ]);
     }
 
     /**

@@ -26,7 +26,7 @@
     </div>
     <div class="col-lg-3 controlDiv" >
         <label class="form-label">Cliente:</label>
-        <select class="form-select" id = "txtCliente" name = "txtCliente">
+        <select class="form-select" id = "txtCliente" name = "txtCliente" @if (isset($cliente)) disabled @endif>
         <option value=0 selected></option>
         @foreach ($clientes as $clienteOp)
         <option value="{{ $clienteOp->id }}" @php if(isset($cliente)){if($cliente == $clienteOp->id){echo "selected";}}@endphp >{{ $clienteOp->name }}</option>
@@ -163,6 +163,5 @@ function guardar()
     }
     document.getElementById("PartNumberForm").submit();
 }
-
 </script>
 @endsection

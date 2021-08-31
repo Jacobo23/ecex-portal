@@ -50,6 +50,7 @@ class User extends Authenticatable
     {
         return str_contains(Auth::user()->permits, 'del_outcome');
     }
+
     public function canDeletePartNumber()
     {
         return str_contains(Auth::user()->permits, 'del_part_number');
@@ -57,5 +58,23 @@ class User extends Authenticatable
     public function canEditPartNumber()
     {
         return str_contains(Auth::user()->permits, 'edit_part_number');
+    }
+
+    public function canDeleteCustomer()
+    {
+        return str_contains(Auth::user()->permits, 'del_customer');
+    }
+    public function canEditCustomer()
+    {
+        return str_contains(Auth::user()->permits, 'edit_customer');
+    }
+
+    public function canDeleteCarrier()
+    {
+        return str_contains(Auth::user()->permits, 'del_carrier');
+    }
+    public function canEditCarrier()
+    {
+        return str_contains(Auth::user()->permits, 'edit_carrier');
     }
 }

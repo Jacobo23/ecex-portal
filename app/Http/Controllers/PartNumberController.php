@@ -25,7 +25,7 @@ class PartNumberController extends Controller
         $desc = $request->txtDesc ?? "";
         $offset = $request->txtTab ?? "1"; //<-- tab debe venir del formulario y comienza en 1, representa los tab (paginacion) que queremos consultar, despues le restaremos 1 porque en el codigo lo necesitamos base 0 pero el usuario debe verlo en base 1
         $offset--;
-        $items = 10;
+        $items = 100;
         $result = $this->index_object($cliente, $desc, $offset, $items);
         $part_numbers = $result[0];
         $count = $result[1]/$items;
@@ -196,6 +196,12 @@ class PartNumberController extends Controller
      */
     public function destroy(PartNumber $partNumber)
     {
-        //
+        $dependent_incomes = $partNumber->dependent_Incomes();
+        if (strlen($dependent_incomes) > 0)
+        {
+            return "Este número de parte esta presente en una o varias entradas, por lo tanto <strong>no se puede eliminar.</strong> <br>Lista de entradas:" . $dependent_incomes;
+        }
+        $partNumber->delete();
+        return "Eliminado!";
     }
 }

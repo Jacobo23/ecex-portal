@@ -14,7 +14,29 @@ class CarrierController extends Controller
      */
     public function index()
     {
-        //
+        $carriers =  Carrier::orderBy('name','ASC')->get();
+        return view('intern.transportistas.index', [
+            'carriers' => $carriers,
+        ]);
+    }
+    public function index_obj()
+    {
+        return Carrier::orderBy('name','ASC')->get();
+    }
+    public function add(string $carrier)
+    {
+        $new_carrier =  Carrier::where('name',$carrier)->first();
+        if(!$new_carrier)
+        {
+            $new_carrier =  new Carrier;
+            $new_carrier->name = $carrier;
+            $new_carrier->save();
+        }
+        
+        return response()->json([
+            'carrier' => $new_carrier->name,
+            'id' => $new_carrier->id,
+        ]);
     }
 
     /**

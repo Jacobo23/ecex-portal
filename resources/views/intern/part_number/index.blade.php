@@ -25,7 +25,7 @@
 <!-- Page Content -->
 
 <div class="py-12">
-<div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
+<div class="max-w-full mx-auto sm:px-6 lg:px-8">
 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 <div class="p-6 bg-white border-b border-gray-200">
 
@@ -67,7 +67,12 @@
                         {
                             for ($i = 1; $i <= $tab_count+1; $i++)
                             {
-                                echo "<button type='button' class='btn btn-outline-secondary btnIncomeRow' onclick='goTab(".$i.")' id='btnTab_".$i."'>".$i."</button>";
+                                $active_tab = "";
+                                if($tab == $i)
+                                {
+                                    $active_tab = "active";
+                                }
+                                echo "<button type='button' class='btn btn-outline-secondary btnIncomeRow ".$active_tab."' onclick='goTab(".$i.")' id='btnTab_".$i."' >".$i."</button>";
                             }
                         }
                         @endphp
@@ -110,12 +115,12 @@
             <tbody>
                 @foreach ($part_numbers as $part_number)
                 <tr id="pn_row_{{ $part_number->id }}">
-                    <td>{{ $part_number->part_number }}</td>
+                    <td style="font-size:0.9em">{{ $part_number->part_number }}</td>
                     <td>{{ $part_number->customer->name }}</td>
                     <td>{{ $part_number->um }}</td>
                     <td>{{ $part_number->unit_weight }}</td>
-                    <td>{{ $part_number->desc_ing }}</td>
-                    <td>{{ $part_number->desc_esp }}</td>
+                    <td style="font-size:0.8em; min-width:110px;">{{ $part_number->desc_ing }}</td>
+                    <td style="font-size:0.8em; min-width:110px;">{{ $part_number->desc_esp }}</td>
                     <td>{{ $part_number->origin_country }}</td>
                     <td>{{ $part_number->fraccion }}.{{ $part_number->nico }}</td>
                     <td>{{ $part_number->brand }}</td>
@@ -123,9 +128,9 @@
                     <td>{{ $part_number->serial }}</td>
                     <td>{{ $part_number->imex }}</td>
                     <td>{{ $part_number->regime }}</td>
-                    <td>{{ $part_number->fraccion_especial }}</td>
-                    @if ($can_delete) <td><a href="/part_number/{{ $part_number->id }}/edit_existing" class="btn btn-light" role="button" aria-pressed="true"><i class="fas fa-edit"></i></a></td> @endif
-                    @if ($can_delete) <td><button onclick="eliminar({{ $part_number->id }})"><i class="fas fa-times" style="color:red"></i></button></td> @endif
+                    <td style="font-size:0.7em; min-width:110px;">{{ $part_number->fraccion_especial }}</td>
+                    @if ($can_edit) <td><a href="/part_number/{{ $part_number->id }}/edit_existing" class="btn btn-light" role="button" aria-pressed="true"><i class="fas fa-edit"></i></a></td> @endif
+                    @if ($can_delete) <td><button class="btn btn-light" type='button' onclick="eliminar({{ $part_number->id }})"><i class="fas fa-times" style="color:red"></i></button></td> @endif
                 </tr>
                 @endforeach
             </tbody>
@@ -138,27 +143,31 @@
 @section('scripts')
 <script>
 
+
 function eliminar(id)
 {
-    return;
-    if(!confirm("¿Desea eliminar la entrada '"+num_entrada+"'?"))
+    if(!confirm("¿Desea eliminar el número de parte?"))
     {
         return;
     }
-    $.ajax({url: "/int/entradas/"+id+"/delete",context: document.body}).done(function(result) 
+    let token = $("[name='_token']").val();
+    $.ajax(
         {
-            if(result != "")
-            {
-                showModal("Notificación",result);
+            url: "/part_number/"+id,
+            type: 'DELETE',
+            data: {
+                "_token": token,
+            },
+            success: function (response){
+                showModal("Notificación",response);
+                if(response == "Eliminado!")
+                {
+                    $("#pn_row_"+id).remove();
+                }
             }
-            else
-            {
-                showModal("Notificación","Entrada '" + num_entrada + "' eliminada");
-                $("#inc_row_"+id).remove();
-            }
-            
         });
 }
+
 function buscar()
 {
     $("#txtTab").val("1");
@@ -182,10 +191,6 @@ function goNext()
     $("#frmPartNumber").submit();
 }
 function editar(id)
-{
-    location.href = "/part_number/"+id+"/edit";
-}
-function eliminar(id)
 {
     location.href = "/part_number/"+id+"/edit";
 }
