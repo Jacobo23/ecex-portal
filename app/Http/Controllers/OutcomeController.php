@@ -10,6 +10,8 @@ use App\Models\Regime;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\OutcomesExport;
 
 class OutcomeController extends Controller
 {
@@ -20,19 +22,13 @@ class OutcomeController extends Controller
      */
     public function index(Request $request)
     {
-        $can_delete = Auth::user()->canDeleteIncome();
         $clientes = Customer::All();
         $cliente = $request->txtCliente ?? 0;
         $rango = $request->txtRango ?? 30;
         $otros = $request->txtOtros ?? "";
         $can_delete = Auth::user()->canDeleteOutcome();
-        //$salidas = Outcome::all();
-        $salidas = Outcome::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString());
-        if($cliente != 0)
-        {
-            $salidas = $salidas->where('customer_id',$cliente);
-        }
-        $salidas = $salidas->whereRaw(' (invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%") ')->get();
+        $salidas = $this->get_Outcomes_obj($cliente, $rango, $otros);
+        
         return view('intern.salidas.index', [
             'outcomes' => $salidas,
             'can_delete' => $can_delete,
@@ -41,6 +37,33 @@ class OutcomeController extends Controller
             'rango' => $rango,
             'otros' => $otros,
         ]);
+    }
+
+    public function get_Outcomes_obj(string $cliente, string $rango, string $otros)
+    {
+        $salidas = Outcome::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString());
+        if($cliente != 0)
+        {
+            $salidas = $salidas->where('customer_id',$cliente);
+        }
+        $salidas = $salidas->whereRaw(' (invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%") ')->get();
+        return $salidas;
+    }
+
+    public function download_outcomes_xls(Request $request)
+    {
+        $cliente = $request->txtCliente ?? 0;
+        $rango = $request->txtRango ?? 30;
+        $otros = $request->txtOtros ?? "";
+
+        $salidas = $this->get_Outcomes_obj($cliente, $rango, $otros);
+
+        foreach ($salidas as $salida) {
+            $salida->outcome_rows;
+        }
+        
+        $export = new OutcomesExport($salidas);
+        return Excel::download($export, 'reporte_de_salidas.xlsx');
     }
 
     /**

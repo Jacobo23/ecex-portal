@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\OutcomeRow;
 use App\Models\Customer;
+use App\Models\Carrier;
 
 class Outcome extends Model
 {
@@ -26,6 +27,10 @@ class Outcome extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+    public function carrier()
+    {
+        return $this->belongsTo(Carrier::class);
     }
 
 

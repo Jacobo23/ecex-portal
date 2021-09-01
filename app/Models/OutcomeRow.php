@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Outcome;
 use App\Models\IncomeRow;
+use App\Models\PartNumber;
 
 class OutcomeRow extends Model
 {
@@ -15,8 +16,10 @@ class OutcomeRow extends Model
     {
         return $this->belongsTo(Outcome::class);
     }
+    
     public function income_row()
     {
         return $this->belongsTo(IncomeRow::class);
     }
+
 }

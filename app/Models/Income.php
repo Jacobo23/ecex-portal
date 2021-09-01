@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\IncomeRow;
 use App\Models\Customer;
+use App\Models\Carrier;
+use App\Models\Supplier;
 
 class Income extends Model
 {
@@ -19,6 +21,14 @@ class Income extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+    public function carrier()
+    {
+        return $this->belongsTo(Carrier::class);
+    }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
     //funciones
     public function getIncomeNumber()

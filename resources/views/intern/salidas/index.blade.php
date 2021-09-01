@@ -47,13 +47,16 @@
                 </select>
             </div>
             
-            <div class="col-lg-3 controlDiv" style="">
+            <div class="col-lg-2 controlDiv" style="">
                 <label class="form-label">otros:</label>
                 <input type="text" class="form-control" id="txtOtros" name="txtOtros" value="{{ $otros }}" placeholder="Factura / Pedimento / Referencia">       
             </div>
 
             <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
                 <button type="submit" class="btn btn-primary">Buscar</button>     
+            </div>
+            <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
+                <button type="button" class="btn btn-success" onclick="descargarXLS()">Descargar <i class="far fa-file-excel"></i></button>     
             </div>
         </div>
             
@@ -123,6 +126,12 @@ function eliminarSalida(id,num_salida)
             showModal("Notificación","Salida '" + num_salida + "' eliminada");
             $("#otc_row_"+id).remove();
         });
+}
+
+function descargarXLS()
+{
+    let path = "/int/salidas_xls?txtCliente="+$("#txtCliente").val()+"&txtRango="+$("#txtRango").val()+"&txtOtros="+$("#txtOtros").val();
+    location.href = path;   
 }
 
 </script>

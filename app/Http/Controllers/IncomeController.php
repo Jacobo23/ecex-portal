@@ -14,6 +14,8 @@ use App\Models\BundleType;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use PDF;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\IncomesExport;
 
 class IncomeController extends Controller
 {
@@ -32,7 +34,39 @@ class IncomeController extends Controller
         $rango = $request->txtRango ?? 30;
         $tracking = $request->txtTracking ?? "";
         $en_inventario = isset($request->chkInventario);
-        //$entradas = Income::all();
+
+        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario);
+
+        
+        return view('intern.entradas.index', [
+            'incomes' => $entradas,
+            'can_delete' => $can_delete,
+            'clientes' => $clientes,
+            'cliente' => $cliente,
+            'rango' => $rango,
+            'tracking' => $tracking,
+            'en_inventario' => $en_inventario,
+        ]);
+    }
+
+    public function download_incomes_xls(Request $request)
+    {
+        $cliente = $request->txtCliente ?? 0;
+        $rango = $request->txtRango ?? 30;
+        $tracking = $request->txtTracking ?? "";
+        $en_inventario = isset($request->chkInventario);
+
+        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario);
+        foreach ($entradas as $income) {
+            $income->income_rows;
+        }
+        
+        $export = new IncomesExport($entradas);
+        return Excel::download($export, 'reporte_de_entradas.xlsx');
+    }
+
+    public function get_Incomes_obj(string $cliente, string $rango, string $tracking, bool $en_inventario)
+    {
         $entradas = Income::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString())
             ->where('tracking', 'like', '%'.$tracking.'%');
         if($cliente > 0)
@@ -63,17 +97,7 @@ class IncomeController extends Controller
             //discriminar las entradas con id = 0 porque no tienen inventario restante
             $entradas = $entradas->where('id', '>', 0);
         }
-            
-
-        return view('intern.entradas.index', [
-            'incomes' => $entradas,
-            'can_delete' => $can_delete,
-            'clientes' => $clientes,
-            'cliente' => $cliente,
-            'rango' => $rango,
-            'tracking' => $tracking,
-            'en_inventario' => $en_inventario,
-        ]);
+        return $entradas;
     }
 
     /**

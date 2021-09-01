@@ -45,6 +45,8 @@ Route::post('/delete_img_salida/','UploadFileController@deleteImgOutcome')->midd
 Route::resource('/int/entradas', 'IncomeController')->middleware(['auth','allow.only:user']);
 Route::get('/int/entradas/{income}/download_pdf','IncomeController@downloadPDF')->middleware('auth');
 Route::get('/int/entradas/{income}/delete','IncomeController@delete')->middleware(['auth','allow.only:user']);
+Route::get('/int/entradas_xls','IncomeController@download_incomes_xls')->middleware(['auth','allow.only:user']);
+
 //Income rows internal
 Route::resource('/income_row', 'IncomeRowController')->middleware('auth')->middleware(['auth','allow.only:user']);
 Route::get('/income_row_has_outcomes/{income_row}', 'IncomeRowController@hasOutcomes')->middleware(['auth','allow.only:user']);
@@ -61,6 +63,7 @@ Route::get('/part_number/{partNumber_id}/edit_existing','PartNumberController@ed
 //Outcomes internal
 Route::resource('/int/salidas', 'OutcomeController')->middleware('auth')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas/{outcome}/delete','OutcomeController@delete')->middleware(['auth','allow.only:user']);
+Route::get('/int/salidas_xls','OutcomeController@download_outcomes_xls')->middleware(['auth','allow.only:user']);
 //Outcome Rows internal
 Route::resource('/outcome_row', 'OutcomeRowController')->middleware(['auth','allow.only:user']);
 Route::get('/outcome_row_delete/{outcome_row_id}','OutcomeRowController@destroy')->middleware(['auth','allow.only:user']);

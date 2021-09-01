@@ -56,13 +56,16 @@
                 <label class="form-label">Tracking:</label>
                 <input type="text" class="form-control" id="txtTracking" name="txtTracking" value="{{ $tracking }}" placeholder="Tracking">       
             </div>
-            <div class="col-lg-4 controlDiv form-check form-switch" style="position:relative;top:40px;">
+            <div class="col-lg-2 controlDiv form-check form-switch" style="position:relative;top:40px;">
                 <input class="form-check-input" type="checkbox" id="chkInventario" name="chkInventario" {{ ($en_inventario) ? "checked" : "" }}>
-                <label class="form-check-label" for="chkInventario">Inventario <small>*esto puede demorar la busqueda.</small></label>
+                <label class="form-check-label" for="chkInventario">Inventario <small><i class="far fa-clock" style="color:red"></i></small></label>
             </div>
 
             <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
                 <button type="submit" class="btn btn-primary">Buscar</button>     
+            </div>
+            <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
+                <button type="button" class="btn btn-success" onclick="descargarXLS()">Descargar <i class="far fa-file-excel"></i></button>     
             </div>
         </div>
             
@@ -143,6 +146,16 @@ function eliminarEntrada(id,num_entrada)
             }
             
         });
+}
+
+function descargarXLS()
+{
+    let path = "/int/entradas_xls?txtCliente="+$("#txtCliente").val()+"&txtRango="+$("#txtRango").val()+"&txtTracking="+$("#txtTracking").val();
+    if($('#chkInventario').prop('checked'))
+    {
+        path += "&chkInventario=true";
+    }
+    location.href = path;   
 }
 
 </script>
