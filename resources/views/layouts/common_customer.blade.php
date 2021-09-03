@@ -12,7 +12,7 @@
         
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/common.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/common_customer.css') }}">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 
         <!-- Scripts -->
@@ -40,7 +40,7 @@
 
         <!-- Modal -->
         <div class="modal fade" id="alertModal" tabindex="-1" aria-labelledby="TituloModal" aria-hidden="true">
-        <div class="modal-dialog" id="alertModal_content">
+        <div class="modal-dialog">
             <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="TituloModal">Modal title</h5>

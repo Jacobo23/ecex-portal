@@ -63,7 +63,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Cliente:</label>
-            <select class="form-select" id = "txtCliente" name = "txtCliente">
+            <select class="form-select" id = "txtCliente" name = "txtCliente" onchange="checkCampoCliente()">
             <option value=0 selected></option>
             @foreach ($clientes as $clienteOp)
             <option value="{{ $clienteOp->id }}" @php if(isset($income)){if($income->customer_id === $clienteOp->id){echo "selected";}}@endphp >{{ $clienteOp->name }}</option>
@@ -941,6 +941,29 @@ function downloadPDF()
         return;
     }
     window.open('/int/entradas/'+incomeID+'/download_pdf', '_blank').focus();
+}
+
+function checkCampoCliente()
+{
+    let NumEntrada = $("#txtNumEntrada").val();
+    let income_id = $("#incomeID").val();
+    if(NumEntrada.length != 9 || income_id.length < 1)
+    {
+        return;
+    }
+
+    $.ajax({url: "/int/entradas_can_change_customer/" + income_id,context: document.body}).done(function(response) 
+        {
+            if(response["has_rows"])
+            {
+                if($("#txtCliente").val() != response["original_customer"])
+                {
+                    showModal("Advertencia","No se puede cambiar el cliente porque la entrada ya cuenta con "+response["income_rows_count"]+" partidas.");
+                    $("#txtCliente").val(response["original_customer"]);
+                }
+                
+            }
+        });
 }
 
 </script>

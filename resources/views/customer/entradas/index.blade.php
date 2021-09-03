@@ -1,7 +1,7 @@
-@extends('layouts.common')
+@extends('layouts.common_customer')
 @section('headers')
 <style>
-    td
+    td, th
     {
         text-align:center;
     }
@@ -31,17 +31,8 @@
 
         <h5 class="separtor">Filtros:</h5>
 
-        <form action="/int/entradas" method="get">
+        <form action="/ext/entradas" method="get">
         <div class="row">
-            <div class="col-lg-2 controlDiv" >
-                <label class="form-label">Cliente:</label>
-                <select class="form-select" id = "txtCliente" name = "txtCliente">
-                <option value=0 selected></option>
-                @foreach ($clientes as $clienteOp)
-                <option value="{{ $clienteOp->id }}" @if ( $cliente == $clienteOp->id) selected @endif >{{ $clienteOp->name }}</option>
-                @endforeach
-                </select>
-            </div>
             <div class="col-lg-2 controlDiv" >
                 <label class="form-label">Rango:</label>
                 <select class="form-select" id = "txtRango" name = "txtRango">
@@ -51,16 +42,11 @@
                     <option value="365" @if ( $rango == 365) selected @endif >1 año</option>
                 </select>
             </div>
-            
             <div class="col-lg-2 controlDiv" style="">
                 <label class="form-label">Tracking:</label>
                 <input type="text" class="form-control" id="txtTracking" name="txtTracking" value="{{ $tracking }}" placeholder="Tracking">       
             </div>
-            <div class="col-lg-2 controlDiv form-check form-switch" style="position:relative;top:40px;">
-                <input class="form-check-input" type="checkbox" id="chkInventario" name="chkInventario" {{ ($en_inventario) ? "checked" : "" }}>
-                <label class="form-check-label" for="chkInventario">Inventario <small><i class="far fa-clock" style="color:red"></i></small></label>
-            </div>
-
+            
             <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
                 <button type="submit" class="btn btn-primary">Buscar</button>     
             </div>
@@ -73,48 +59,37 @@
 
         <h5 class="separtor">Lista:</h5>
 
-
-
-        <!-- como esta pantalla no contiene formularios debemos agregar uno para tener un token csrf-->
-        <form method="DELETE">
-        @csrf
-        </form>
         <table class="table table-sm table-striped table-bordered table-hover">
             <thead>
                 <tr>
                     <th scope="col">Entrada #</th>
                     <th scope="col">Fecha</th>
-                    <th scope="col">Dias</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Tracking</th>
-                    <th scope="col">Bultos</th>
-                    <th scope="col">Materia/Equipo</th>
-                    <th scope="col">Enviada</th>
                     <th scope="col">Revisada</th>
+                    <th scope="col">Bultos</th>
+                    <th scope="col">Dias</th>
+                    <th scope="col">Proveedor</th>
+                    <th scope="col">PO</th>
+                    <th scope="col">Tracking</th>
+                    <th scope="col">Impo/Expo</th>
+                    <th scope="col">Adjuntos</th>
                     <th scope="col">Urgente</th>
                     <th scope="col">On-hold</th>
-                    <th scope="col">Balance</th>
-                    <th scope="col">Folder</th>
-                    <th scope="col" style="display:none">adjuntos</th>
-                    @if ($can_delete) <th scope="col">Eliminar</th> @endif
                 </tr>
             </thead>
             <tbody>
                 @foreach ($incomes as $income)
                 <tr id="inc_row_{{ $income->id }}" @if ( $income->get_color_fila_estado() != '') class="table-{{ $income->get_color_fila_estado() }}" @endif>
-                    <td><a href="/int/entradas/{{ $income->getIncomeNumber() }}">{{ $income->getIncomeNumber() }}</a></td>
+                    <td><a href="">{{ $income->getIncomeNumber() }}</a></td>
                     <td>{{ explode(" ", $income->cdate)[0] }}</td>
-                    <td>{{ $income->getDiasTrascurridos() }}</td>
-                    <td>{{ $income->customer->name }}</td>
-                    <td class="oversized-col">{{ $income->tracking }}</td>
-                    <td>{{ $income->getBultos() }} {{ $income->getTipoBultos() }}</td>
-                    <td>{{ $income->type }}</td>
-                    <td>@if ($income->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td>@if ($income->reviewed) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td>@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
-                    <td>@if ($income->onhold) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td><i class="fas fa-balance-scale"></i></td>
+                    <td>{{ $income->getBultos() }} {{ $income->getTipoBultos() }}</td>
+                    <td>{{ $income->getDiasTrascurridos() }}</td>
+                    <td>{{ $income->supplier->name }}</td>
+                    <td>{{ $income->po }}</td>
+                    <td class="oversized-col">{{ $income->tracking }}</td>
+                    <td>{{ $income->impoExpo }}</td>
                     <td><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_income_{{ $income->id }}')"><i class="far fa-folder-open"></i></button></td>
+
                     <td id="adjuntos_income_{{ $income->id }}" style="display:none">
                         @php
                         $packinglist_path='/public/entradas/'.$income->getIncomeNumber().'/packing_list/packing-list.pdf';
@@ -148,7 +123,9 @@
                         }
                         @endphp
                     </td>
-                    @if ($can_delete) <td><button onclick="eliminarEntrada({{ $income->id }},'{{ $income->getIncomeNumber() }}')"><i class="fas fa-times" style="color:red"></i></button></td> @endif
+                    
+                    <td>@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
+                    <td>@if ($income->onhold) <button id="btn_onhold_{{ $income->id }}" class="btn btn-primary">on hold</button> @endif</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -161,34 +138,9 @@
 @section('scripts')
 <script>
 
-function eliminarEntrada(id,num_entrada)
-{
-    if(!confirm("¿Desea eliminar la entrada '"+num_entrada+"'?"))
-    {
-        return;
-    }
-    $.ajax({url: "/int/entradas/"+id+"/delete",context: document.body}).done(function(result) 
-        {
-            if(result != "")
-            {
-                showModal("Notificación",result);
-            }
-            else
-            {
-                showModal("Notificación","Entrada '" + num_entrada + "' eliminada");
-                $("#inc_row_"+id).remove();
-            }
-            
-        });
-}
-
 function descargarXLS()
 {
-    let path = "/int/entradas_xls?txtCliente="+$("#txtCliente").val()+"&txtRango="+$("#txtRango").val()+"&txtTracking="+$("#txtTracking").val();
-    if($('#chkInventario').prop('checked'))
-    {
-        path += "&chkInventario=true";
-    }
+    let path = "/ext/entradas_xls?txtRango="+$("#txtRango").val()+"&txtTracking="+$("#txtTracking").val();
     location.href = path;   
 }
 
@@ -197,6 +149,5 @@ function showAdjuntos(content_row)
     var html = $("#"+content_row).html();   
     showModal("Adjuntos",html);
 }
-
 </script>
 @endsection

@@ -8,6 +8,7 @@ use App\Models\IncomeRow;
 use App\Models\Customer;
 use App\Models\Carrier;
 use App\Models\Supplier;
+use Illuminate\Support\Facades\Storage;
 
 class Income extends Model
 {
@@ -54,7 +55,13 @@ class Income extends Model
             }
         }
 
-        return strval($diff->format("%a")) -  $fines_de_semana;
+        $dias = strval($diff->format("%a")) -  $fines_de_semana;
+        if($dias < 0)
+        {
+            $dias = 0;
+        }
+
+        return $dias;
     }
     public function getBultos()
     {
@@ -87,6 +94,32 @@ class Income extends Model
             $i++;
         }
         return $umb;
+    }
+    public function get_color_fila_estado()
+    {
+        //en la lista de entradas pintaremos usando clases de bootstrap dependiendo del estado de la entrada
+        $color = "";
+        $limite = 4;//dias
+        if($this->getDiasTrascurridos() >= $limite)
+        {
+            if($this->urgent)
+            {
+                $color = "danger";
+            }
+            else
+            {
+                $color = "warning";
+            }
+        }
+        if($this->onhold)
+        {
+            $color = "sencondary";
+        }
+        
+
+
+
+        return $color;
     }
 
 

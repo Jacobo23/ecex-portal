@@ -6,10 +6,9 @@
             <th scope="col" style="text-align:center">Fecha</th>
             <th scope="col" style="text-align:center">Número_de_parte</th>
             <th scope="col" style="text-align:center">Piezas</th>
+            <th scope="col" style="text-align:center">Um.</th>
             <th scope="col" style="text-align:center">Bultos</th>
-            <th scope="col" style="text-align:center">Tipo_bulto</th>
             <th scope="col" style="text-align:center">Peso_neto</th>
-            <th scope="col" style="text-align:center">Peso_bruto</th>
             <th scope="col" style="text-align:center; min-width:200px;">Description</th>
         </tr>
     </thead>
@@ -49,43 +48,18 @@
             </td>
             <td>{{ $row->income->getIncomeNumber() }}<input type="hidden" id="txtIncomeRowId_{{ $row->id }}" name="income_row_id[]" value="{{ $row->id }}"></td>
             <td>{{ explode(' ',$row->income->cdate)[0] }}</td>
-            <td>{{ $row->part_number()->part_number }} <input type="hidden" name="txtNumeroDePartePesoU_{{ $row->id }}" id="txtNumeroDePartePesoU_{{ $row->id }}" value="{{ $row->part_number()->unit_weight }}"></td>
+            <td>{{ $row->part_number()->part_number }}</td>
             <td>
-                <input type="number" class="form-control" id="txtCantidad_{{ $row->id }}" name="units[]" value="{{ $row->units }}" max="{{ $row->units }}" onchange="validarCantidad(this,{{ $row->units }})" readonly>
-                <input type="hidden" id="txtUM_{{ $row->id }}" name="ump[]" value="{{ $row->ump }}">
+                <input type="number" class="form-control" style="width:150px" id="txtCantidad_{{ $row->id }}" name="units[]" value="{{ $row->units }}" max="{{ $row->units }}" onchange="validarCantidad(this,{{ $row->units }})" readonly>
             </td>
-            <td><input type="number" class="form-control" id="txtBultos_{{ $row->id }}" name="bundles[]" value="{{ $row->bundles }}" readonly onchange="calcularPesoBruto({{ $row->id }})"></td>
-            <td>
-                <select class="form-select" id = "txtUMB_{{ $row->id }}" name = "umb[]" disabled onchange="tipoBultoChange({{ $row->id }})">
-                    @php 
-                    $peso_bulto = 0;
-                    foreach ($tipos_de_bulto as $tipos_de_bultoOp)
-                    {
-                        $selected = "";
-                        if($row->umb === $tipos_de_bultoOp->desc)
-                        {
-                            $selected = "selected";
-                            $peso_bulto = $tipos_de_bultoOp->weight;
-                        }
-                        echo "<option value='".$tipos_de_bultoOp->desc."' ".$selected." >".$tipos_de_bultoOp->desc."</option>";
-                    }
-                    @endphp
-                </select>
-                @php
-                echo "<input type='hidden' name='txtUMBPeso_".$row->id."' id='txtUMBPeso_".$row->id."' value='".$peso_bulto."'>";
-                @endphp
-            </td>
-            <td><input type="number" class="form-control" id="txtPesoNeto_{{ $row->id }}" name="net_weight[]" value="{{ $row->part_number()->unit_weight * $row->units }}" readonly  onchange="calcularPesoBruto({{ $row->id }})"></td>
-            <td><input type="number" class="form-control" id="txtPesoBruto_{{ $row->id }}" name="gross_weight[]" value="{{ $row->gross_weight }}" readonly></td>
+            <td>{{ $row->ump }}</td>
+            <td>{{ $row->bundles }} {{ $row->umb }}</td>
+            <td>{{ $row->part_number()->unit_weight * $row->units }}</td>
             <td style="font-size: 0.9em;">{{ $row->desc_ing }}</td>
         </tr>
         @endforeach
     </tbody>
 </table>
-
-tipoBultoChange
-calcularPesoNeto
-calcularPesoBruto
 
 
 

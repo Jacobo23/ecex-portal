@@ -1,4 +1,4 @@
-@extends('layouts.common')
+@extends('layouts.common_customer')
 @section('headers')
 <style>
     td
@@ -26,17 +26,8 @@
 
         <h5 class="separtor">Filtros:</h5>
 
-        <form action="/int/salidas" method="get">
+        <form action="/ext/salidas" method="get">
         <div class="row">
-            <div class="col-lg-2 controlDiv" >
-                <label class="form-label">Cliente:</label>
-                <select class="form-select" id = "txtCliente" name = "txtCliente">
-                <option value=0 selected></option>
-                @foreach ($clientes as $clienteOp)
-                <option value="{{ $clienteOp->id }}" @if ( $cliente == $clienteOp->id) selected @endif >{{ $clienteOp->name }}</option>
-                @endforeach
-                </select>
-            </div>
             <div class="col-lg-2 controlDiv" >
                 <label class="form-label">Rango:</label>
                 <select class="form-select" id = "txtRango" name = "txtRango">
@@ -47,12 +38,12 @@
                 </select>
             </div>
             
-            <div class="col-lg-4 controlDiv" style="">
+            <div class="col-lg-2 controlDiv" style="">
                 <label class="form-label">otros:</label>
-                <input type="text" class="form-control" id="txtOtros" name="txtOtros" value="{{ $otros }}" placeholder="Entrada/# de parte/Factura/Pedimento/Referencia">       
+                <input type="text" class="form-control" id="txtOtros" name="txtOtros" value="{{ $otros }}" placeholder="Factura / Pedimento / Referencia">       
             </div>
 
-            <div class="col-lg-1 controlDiv" style="position:relative;top:30px;">
+            <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
                 <button type="submit" class="btn btn-primary">Buscar</button>     
             </div>
             <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
@@ -64,15 +55,7 @@
 
         <h5 class="separtor">Lista:</h5>
 
-
-
-        <!-- como esta pantalla no contiene formularios debemos agregar uno para tener un token csrf-->
-        <form method="DELETE">
-        @csrf
-        </form>
-        
-
-        <table class="table table-sm table-striped table-bordered table-hover">
+            <table class="table table-sm table-striped table-bordered table-hover">
             <thead>
                 <tr>
                     <th scope="col">Salida #</th>
@@ -83,9 +66,7 @@
                     <th scope="col">Referencia</th>
                     <th scope="col">Bultos</th>
                     <th scope="col">Tipo-bulto</th>
-                    <th scope="col">Enviada</th>
                     <th scope="col">Folder</th>
-                    @if ($can_delete) <th scope="col">Eliminar</th> @endif
                 </tr>
             </thead>
             <tbody>
@@ -99,7 +80,6 @@
                     <td>{{ $outcome->reference }}</td>
                     <td>{{ $outcome->getBultos() }}</td>
                     <td>{{ $outcome->getTipoBultos() }}</td>
-                    <td>@if ($outcome->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_outcome_{{ $outcome->id }}')"><i class="far fa-folder-open"></i></button></td>
                     <td id="adjuntos_outcome_{{ $outcome->id }}" style="display:none">
                         @php
@@ -134,7 +114,6 @@
                         }
                         @endphp
                     </td>
-                    @if ($can_delete) <td><button onclick="eliminarSalida({{ $outcome->id }},'{{ $outcome->getOutcomeNumber(false) }}')"><i class="fas fa-times" style="color:red"></i></button></td> @endif
                 </tr>
                 @endforeach
             </tbody>
@@ -148,22 +127,9 @@
 @section('scripts')
 <script>
 
-function eliminarSalida(id,num_salida)
-{
-    if(!confirm("¿Desea eliminar la salida '"+num_salida+"'?"))
-    {
-        return;
-    }
-    $.ajax({url: "/int/salidas/"+id+"/delete",context: document.body}).done(function(result) 
-        {
-            showModal("Notificación","Salida '" + num_salida + "' eliminada");
-            $("#otc_row_"+id).remove();
-        });
-}
-
 function descargarXLS()
 {
-    let path = "/int/salidas_xls?txtCliente="+$("#txtCliente").val()+"&txtRango="+$("#txtRango").val()+"&txtOtros="+$("#txtOtros").val();
+    let path = "/ext/salidas_xls?txtRango="+$("#txtRango").val()+"&txtOtros="+$("#txtOtros").val();
     location.href = path;   
 }
 

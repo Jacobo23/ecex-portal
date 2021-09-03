@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Outcome;
+use App\Models\OutcomeRow;
 use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\Carrier;
@@ -12,6 +13,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\OutcomesExport;
+use App\Exports\OutcomesCustomerExport;
+use App\Models\BundleType;
+use App\Models\LoadOrder;
 
 class OutcomeController extends Controller
 {
@@ -24,10 +28,12 @@ class OutcomeController extends Controller
     {
         $clientes = Customer::All();
         $cliente = $request->txtCliente ?? 0;
+        $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
         $rango = $request->txtRango ?? 30;
         $otros = $request->txtOtros ?? "";
         $can_delete = Auth::user()->canDeleteOutcome();
-        $salidas = $this->get_Outcomes_obj($cliente, $rango, $otros);
+        
+        $salidas = $this->get_Outcomes_obj($cliente_ids, $rango, $otros);
         
         return view('intern.salidas.index', [
             'outcomes' => $salidas,
@@ -39,30 +45,93 @@ class OutcomeController extends Controller
         ]);
     }
 
-    public function get_Outcomes_obj(string $cliente, string $rango, string $otros)
+    public function index_customer(Request $request)
+    {
+        $cliente = explode(",",Auth::user()->customer_ids);
+        $rango = $request->txtRango ?? 30;
+        $otros = $request->txtOtros ?? "";
+        $salidas = $this->get_Outcomes_obj($cliente, $rango, $otros);
+        
+        return view('customer.salidas.index', [
+            'outcomes' => $salidas,
+            'cliente' => $cliente,
+            'rango' => $rango,
+            'otros' => $otros,
+        ]);
+    }
+
+    public function get_Outcomes_obj(array $cliente, string $rango, string $otros)
     {
         $salidas = Outcome::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString());
-        if($cliente != 0)
+        
+
+        //if(count($cliente) > 0)
+        //{
+        //    $salidas = $salidas->whereIn('customer_id',$cliente);
+        //}
+
+        //en caso de el el campo "otros" sea un numeo de parte o de entrada buscaremos
+        $partidas_filtradas = array();
+        $salidas_aux = $salidas;
+        $salidas_aux = $salidas_aux->get();
+        foreach ($salidas_aux as $salida) 
         {
-            $salidas = $salidas->where('customer_id',$cliente);
+            $outcome_rows = $salida->outcome_rows;
+            foreach ($outcome_rows as $outcome_row) 
+            {
+                $income_row = $outcome_row->income_row;
+                if($income_row->part_number()->name == $otros || $income_row->income->getIncomeNumber() == $otros)
+                {
+                    array_push($partidas_filtradas, $outcome_row->outcome_id);
+                }
+            }
         }
-        $salidas = $salidas->whereRaw(' (invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%") ')->get();
+        $sql_whereIn = "";
+        if(count($partidas_filtradas) > 0)
+        {
+            $sql_whereIn = "or id IN(".implode(",",$partidas_filtradas).")";
+        }
+
+
+        //
+
+
+        
+        $salidas = $salidas->whereRaw(' (invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%" '.$sql_whereIn.') ');
+        $salidas = $salidas->get();
         return $salidas;
     }
 
     public function download_outcomes_xls(Request $request)
     {
         $cliente = $request->txtCliente ?? 0;
+        $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
         $rango = $request->txtRango ?? 30;
         $otros = $request->txtOtros ?? "";
 
-        $salidas = $this->get_Outcomes_obj($cliente, $rango, $otros);
+        $salidas = $this->get_Outcomes_obj($cliente_ids, $rango, $otros);
 
         foreach ($salidas as $salida) {
             $salida->outcome_rows;
         }
         
         $export = new OutcomesExport($salidas);
+        return Excel::download($export, 'reporte_de_salidas.xlsx');
+    }
+    public function download_outcomes_xls_customer(Request $request)
+    {
+        $cliente = $request->txtCliente ?? 0;
+        $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
+        $rango = $request->txtRango ?? 30;
+        $otros = $request->txtOtros ?? "";
+
+        $salidas = $this->get_Outcomes_obj($cliente_ids, $rango, $otros);
+
+        //foreach ($salidas as $salida) {
+        //    $salida->outcome_rows;
+        //}
+        
+        $export = new OutcomesCustomerExport($salidas);
         return Excel::download($export, 'reporte_de_salidas.xlsx');
     }
 
@@ -76,10 +145,13 @@ class OutcomeController extends Controller
         $clientes = Customer::All();
         $transportistas = Carrier::All();
         $regimes = Regime::All();
+        $tipos_de_bulto = BundleType::All();
+
         return view('intern.salidas.create', [
             'clientes' => $clientes,
             'transportistas' => $transportistas,
             'regimes' => $regimes,
+            'tipos_de_bulto' => $tipos_de_bulto,
         ]);
     }
 
@@ -153,6 +225,8 @@ class OutcomeController extends Controller
         $clientes = Customer::All();
         $transportistas = Carrier::All();
         $regimes = Regime::All();
+        $tipos_de_bulto = BundleType::All();
+        
         
         return view('intern.salidas.create', [
             'outcome' => $outcome,
@@ -160,8 +234,35 @@ class OutcomeController extends Controller
             'clientes' => $clientes,
             'transportistas' => $transportistas,
             'regimes' => $regimes,
+            'tipos_de_bulto' => $tipos_de_bulto,
         ]);
     }
+
+    public function loadOC(LoadOrder $load_order)
+    {
+        $outcome = new Outcome;
+        $outcome->regime = $load_order->regimen;
+        $outcome->observations = $load_order->notes;
+        $outcome->customer_id = $load_order->customer_id;
+
+        $clientes = Customer::All();
+        $transportistas = Carrier::All();
+        $regimes = Regime::All();
+        $tipos_de_bulto = BundleType::All();
+        
+        
+        return view('intern.salidas.create', [
+            'outcome' => $outcome,
+            'numero_de_salida' => "",
+            'clientes' => $clientes,
+            'transportistas' => $transportistas,
+            'regimes' => $regimes,
+            'tipos_de_bulto' => $tipos_de_bulto,
+            'load_order' => $load_order,
+        ]);
+    }
+
+    
 
     /**
      * Show the form for editing the specified resource.
@@ -198,7 +299,28 @@ class OutcomeController extends Controller
     }
     public function delete(Outcome $outcome)
     {
-        $outcome->delete();
-        Storage::deleteDirectory('public/salidas/'.$income->getOutcomeNumber(false));
+        $path = 'public/salidas/'.$outcome->getOutcomeNumber(false);
+        if($outcome->delete())
+        {
+            Storage::deleteDirectory($path);
+        }
+    }
+
+    public function can_change_customer(Outcome $outcome)
+    {
+        //esta funcion es para evitar que el usuario cambie el cliente de una entrada si esta ya cuenta con partidas asociadas a otro cliente
+        $outcome_rows = $outcome->outcome_rows;
+        $has_rows = (count($outcome_rows) > 0);
+        $customer = $outcome->customer_id;
+        if($has_rows)
+        {
+            $customer = $outcome_rows[0]->income_row->part_number()->customer_id;
+        }
+        
+        return response()->json([
+            'original_customer' => $customer,
+            'outcome_rows_count' => count($outcome_rows),
+            'has_rows' => $has_rows,
+        ]);
     }
 }

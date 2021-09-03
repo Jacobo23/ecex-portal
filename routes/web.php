@@ -22,7 +22,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 //HOME
-Route::get('/', [UserController::class, 'redirectUser'])->middleware(['auth']);
+Route::get('/', [UserController::class, 'redirectUser'])->middleware(['auth'])->name('home');
 Route::get('/int', function () {return view('intern.home');})->middleware(['auth']);
 Route::get('/ext', function () {return view('customer.home');})->middleware(['auth']);
 //Files
@@ -43,6 +43,8 @@ Route::post('/delete_img_salida/','UploadFileController@deleteImgOutcome')->midd
 
 //Incomes internal
 Route::resource('/int/entradas', 'IncomeController')->middleware(['auth','allow.only:user']);
+Route::get('/int/entradas_can_change_customer/{income}','IncomeController@can_change_customer')->middleware(['auth','allow.only:user']);
+
 Route::get('/int/entradas/{income}/download_pdf','IncomeController@downloadPDF')->middleware('auth');
 Route::get('/int/entradas/{income}/delete','IncomeController@delete')->middleware(['auth','allow.only:user']);
 Route::get('/int/entradas_xls','IncomeController@download_incomes_xls')->middleware(['auth','allow.only:user']);
@@ -64,6 +66,9 @@ Route::get('/part_number/{partNumber_id}/edit_existing','PartNumberController@ed
 Route::resource('/int/salidas', 'OutcomeController')->middleware('auth')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas/{outcome}/delete','OutcomeController@delete')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas_xls','OutcomeController@download_outcomes_xls')->middleware(['auth','allow.only:user']);
+Route::get('/int/salidas_can_change_customer/{outcome}','OutcomeController@can_change_customer')->middleware(['auth','allow.only:user']);
+
+
 //Outcome Rows internal
 Route::resource('/outcome_row', 'OutcomeRowController')->middleware(['auth','allow.only:user']);
 Route::get('/outcome_row_delete/{outcome_row_id}','OutcomeRowController@destroy')->middleware(['auth','allow.only:user']);
@@ -81,5 +86,25 @@ Route::get('/int/catalog/carriers','CarrierController@index')->middleware(['auth
 //Supplier
 Route::get('/int/catalog/suppliers_add/{supplier}','SupplierController@add')->middleware(['auth','allow.only:user']);
 Route::get('/int/catalog/suppliers','SupplierController@index')->middleware(['auth','allow.only:user']);
+
+//ORDEN DE CARGA
+Route::get('/int/ordenes_de_carga','LoadOrderController@index_intern')->middleware(['auth','allow.only:user']);
+Route::get('/int/salidas_OC/{load_order}','OutcomeController@loadOC')->middleware(['auth','allow.only:user']);
+
+/////////////////////EXTARNAL FORM CUSTOMERS////////////////////////////
+//INCOMES
+Route::get('/ext/entradas', 'IncomeController@index_customer')->middleware(['auth','allow.only:customer']);
+Route::get('/ext/entradas_xls','IncomeController@download_incomes_xls_customer')->middleware(['auth','allow.only:customer']);
+//OUTCOMES
+Route::get('/ext/salidas', 'OutcomeController@index_customer')->middleware(['auth','allow.only:customer']);
+Route::get('/ext/salidas_xls','OutcomeController@download_outcomes_xls_customer')->middleware(['auth','allow.only:customer']);
+//INVENTARIO
+Route::get('/ext/inventario','InventoryController@index_customer')->middleware(['auth','allow.only:customer']);
+Route::get('/ext/inventory_xls','InventoryController@downloadInventory_customer')->middleware(['auth','allow.only:customer']);
+//ORDEN DE CARGA
+Route::get('/ext/ordenes_de_carga','LoadOrderController@index')->middleware(['auth','allow.only:customer']);
+Route::get('/ext/ordenes_de_carga/create','LoadOrderController@create')->middleware(['auth','allow.only:customer']);
+Route::get('/ext/inventory_oc/{days_before}','InventoryController@get_for_oc')->middleware(['auth','allow.only:customer']);
+Route::post('/ext/ordenes_de_carga','LoadOrderController@store')->middleware(['auth','allow.only:customer']);
 
 require __DIR__.'/auth.php';

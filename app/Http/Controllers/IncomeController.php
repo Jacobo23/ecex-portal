@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use PDF;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\IncomesExport;
+use App\Exports\IncomesCustomerExport;
 
 class IncomeController extends Controller
 {
@@ -31,12 +32,12 @@ class IncomeController extends Controller
         $clientes = Customer::All();
 
         $cliente = $request->txtCliente ?? 0;
+        $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
         $rango = $request->txtRango ?? 30;
         $tracking = $request->txtTracking ?? "";
         $en_inventario = isset($request->chkInventario);
 
-        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario);
-
+        $entradas = $this->get_Incomes_obj($cliente_ids,$rango,$tracking,$en_inventario);
         
         return view('intern.entradas.index', [
             'incomes' => $entradas,
@@ -52,11 +53,12 @@ class IncomeController extends Controller
     public function download_incomes_xls(Request $request)
     {
         $cliente = $request->txtCliente ?? 0;
+        $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
         $rango = $request->txtRango ?? 30;
         $tracking = $request->txtTracking ?? "";
         $en_inventario = isset($request->chkInventario);
 
-        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario);
+        $entradas = $this->get_Incomes_obj($cliente_ids,$rango,$tracking,$en_inventario);
         foreach ($entradas as $income) {
             $income->income_rows;
         }
@@ -64,14 +66,49 @@ class IncomeController extends Controller
         $export = new IncomesExport($entradas);
         return Excel::download($export, 'reporte_de_entradas.xlsx');
     }
-
-    public function get_Incomes_obj(string $cliente, string $rango, string $tracking, bool $en_inventario)
+    public function download_incomes_xls_customer(Request $request)
     {
+        $cliente = explode(",",Auth::user()->customer_ids);
+        $rango = $request->txtRango ?? 30;
+        $tracking = $request->txtTracking ?? "";
+        $en_inventario = true;
+
+        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario);
+        //foreach ($entradas as $income) {
+        //    $income->income_rows;
+        //}
+        
+        $export = new IncomesCustomerExport($entradas);
+        return Excel::download($export, 'reporte_de_entradas.xlsx');
+    }
+    
+
+    public function index_customer(Request $request)
+    {
+        $cliente = explode(",",Auth::user()->customer_ids);
+        $rango = $request->txtRango ?? 30;
+        $tracking = $request->txtTracking ?? "";
+        $en_inventario = true;
+
+        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario);
+
+        return view('customer.entradas.index', [
+            'incomes' => $entradas,
+            'cliente' => $cliente,
+            'rango' => $rango,
+            'tracking' => $tracking,
+        ]);
+    }
+
+    public function get_Incomes_obj(array $cliente, string $rango, string $tracking, bool $en_inventario)
+    {
+        // '$cliente' en realidad es un array de los customer_id que vamos a filtrar NINGUNO DEBE SER CERO 0
         $entradas = Income::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString())
             ->where('tracking', 'like', '%'.$tracking.'%');
-        if($cliente > 0)
+        
+        if(count($cliente) > 0)
         {
-            $entradas = $entradas->where('customer_id',$cliente);
+            $entradas = $entradas->whereIn('customer_id',$cliente);
         }
         $entradas = $entradas->get();
 
@@ -97,6 +134,7 @@ class IncomeController extends Controller
             //discriminar las entradas con id = 0 porque no tienen inventario restante
             $entradas = $entradas->where('id', '>', 0);
         }
+        
         return $entradas;
     }
 
@@ -177,6 +215,24 @@ class IncomeController extends Controller
         return response()->json([
             'numero_de_entrada' => $numero_de_entrada,
             'id_entrada' => $entrada->id,
+        ]);
+    }
+
+    public function can_change_customer(Income $income)
+    {
+        //esta funcion es para evitar que el usuario cambie el cliente de una entrada si esta ya cuenta con partidas asociadas a otro cliente
+        $income_rows = $income->income_rows;
+        $has_rows = (count($income_rows) > 0);
+        $customer = $income->customer_id;
+        if($has_rows)
+        {
+            $customer = $income_rows[0]->part_number()->customer_id;
+        }
+        
+        return response()->json([
+            'original_customer' => $customer,
+            'income_rows_count' => count($income_rows),
+            'has_rows' => $has_rows,
         ]);
     }
 

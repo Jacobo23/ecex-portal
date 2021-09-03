@@ -48,7 +48,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Cliente:</label>
-            <select class="form-select" id = "txtCliente" name = "txtCliente">
+            <select class="form-select" id = "txtCliente" name = "txtCliente" onchange="checkCampoCliente()">
             <option value=0 selected></option>
             @foreach ($clientes as $clienteOp)
             <option value="{{ $clienteOp->id }}" @php if(isset($outcome)){if($outcome->customer_id === $clienteOp->id){echo "selected";}}@endphp >{{ $clienteOp->name }}</option>
@@ -298,6 +298,10 @@
 @section('scripts')
 <script>
 
+//$(document).ready(function(){
+//  $("#tbl_inv").html("{{ load_order }}")
+//});
+
 function packingBtnClick()
 {
     let NumSalida = $("#txtNumSalida").val();
@@ -438,6 +442,16 @@ function selectRow(row_id)
     $("#txtUMB_"+row_id).prop('disabled', check);
     $("#txtPesoNeto_"+row_id).prop('readonly', check);
     $("#txtPesoBruto_"+row_id).prop('readonly', check);
+    if(!check)
+    {
+        $("#inv_row_"+row_id).addClass("table-warning");
+    }
+    else
+    {
+        $("#inv_row_"+row_id).removeClass("table-warning");
+    }
+    
+    
 
     //let txtCantidad = $("#txtCantidad_"+row_id).prop('readonly', false);
     //let txtBultos = $("#txtBultos_"+row_id).prop('readonly', false);
@@ -516,7 +530,15 @@ function validarCantidad(control,max)
     {
         showModal("Precaución!","Esta partida tiene un máximo de <strong>'" + max + "'</strong> unidades, verifíque la cantidad.");
         control.value = max;
+        return;
     }
+    if(control.value < 0)
+    {
+        control.value = 0;
+        return;
+    }
+    let row_id = control.id.split("_")[1];
+    calcularPesoNeto(row_id);
 }
 
 function eliminarPartida(outcome_row_id)
@@ -531,6 +553,62 @@ function eliminarPartida(outcome_row_id)
             //limpiamos el inventario para forzar a que el usuario lo consulte de nuevo
             $("#tbl_inv").html("");
         });
+}
+
+function checkCampoCliente()
+{
+    let NumSalida = $("#txtNumSalida").val();
+    let outcome_id = $("#outcomeID").val();
+    if(NumSalida.length != 9 || outcome_id.length < 1)
+    {
+        return;
+    }
+
+    $.ajax({url: "/int/salidas_can_change_customer/" + outcome_id,context: document.body}).done(function(response) 
+        {
+            if(response["has_rows"])
+            {
+                if($("#txtCliente").val() != response["original_customer"])
+                {
+                    showModal("Advertencia","No se puede cambiar el cliente porque la salida ya cuenta con "+response["outcome_rows_count"]+" partidas.");
+                    $("#txtCliente").val(response["original_customer"]);
+                }
+                
+            }
+        });
+}
+
+function tipoBultoChange(row_id)
+{
+    let txtUMB = $("#txtUMB_"+row_id).val();
+    var bultos_peso = {@foreach ($tipos_de_bulto as $tipos_de_bultoOp)@if(!$loop->first) , @endif"{{ $tipos_de_bultoOp->desc }}":{{ $tipos_de_bultoOp->weight }}@endforeach};
+    for (var key in bultos_peso) 
+    {
+        if(key == txtUMB)
+        {
+            $("#txtUMBPeso_"+row_id).val(bultos_peso[key]);
+            break;
+        }
+        // en caso de no encontrar nada el valor se pone a cero
+        $("#txtUMBPeso_"+row_id).val(bultos_peso[key]);
+    }
+    calcularPesoBruto(row_id);
+}
+
+function calcularPesoNeto(row_id)
+{
+    let cantidad = Number($("#txtCantidad_"+row_id).val());
+    let peso_unitario = Number($("#txtNumeroDePartePesoU_"+row_id).val());
+    $("#txtPesoNeto_"+row_id).val(cantidad*peso_unitario);
+    calcularPesoBruto(row_id);
+}
+
+function calcularPesoBruto(row_id)
+{
+    let peso_neto = Number($("#txtPesoNeto_"+row_id).val());
+    let cantidad_bultos = Number($("#txtBultos_"+row_id).val());
+    let peso_bulto = Number($("#txtUMBPeso_"+row_id).val());
+    $("#txtPesoBruto_"+row_id).val(cantidad_bultos*peso_bulto+peso_neto);
 }
 
 </script>
