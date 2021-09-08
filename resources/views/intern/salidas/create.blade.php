@@ -298,9 +298,24 @@
 @section('scripts')
 <script>
 
-//$(document).ready(function(){
-//  $("#tbl_inv").html("{{ load_order }}")
-//});
+$(document).ready(function(){
+    loadOC();
+});
+
+function loadOC()
+{
+    @if (isset($load_order))
+    $.ajax({url: "/int/salidas_OC_load_rows/{{ $load_order->id }}",context: document.body}).done(function(result) 
+        {
+            $("#tbl_inv").html(result);
+            $(".chkSingle").each(function(){
+                $( this ).click();
+            });
+        });
+    @else
+    return;
+    @endif
+}
 
 function packingBtnClick()
 {
@@ -371,6 +386,7 @@ function guardarSalida()
     }
     //fin validaciones
 
+
     //document.getElementById("encabezadoForm").submit();
     $.ajax({
         method: 'POST',
@@ -382,6 +398,12 @@ function guardarSalida()
                 showModal("Notificación","Registrado con exito: '"+response["numero_de_salida"]+"'");
                 $("#txtNumSalida").val(response["numero_de_salida"]);
                 $("#outcomeID").val(response["id_salida"]);    
+                @if (isset($load_order))
+                    $.ajax({url: "/int/salidas_OC_set_status/{{ $load_order->id }}/"+response["numero_de_salida"],context: document.body}).done(function(result) 
+                        {
+                            showModal("Notificación","Registrado con exito: '"+response["numero_de_salida"]+"' asgnada a OC-{{ $load_order->id }}");
+                        });
+                @endif
             } else
             {
                 showModal("Notificación","Error: "+response+".");
@@ -434,32 +456,22 @@ function consultarInventario()
         });
 }
 
-function selectRow(row_id)
+function selectRow(row_id,index)
 {
-    var check = !$("#btncheck_"+row_id).prop('checked'); 
-    $("#txtCantidad_"+row_id).prop('readonly', check);
-    $("#txtBultos_"+row_id).prop('readonly', check);
-    $("#txtUMB_"+row_id).prop('disabled', check);
-    $("#txtPesoNeto_"+row_id).prop('readonly', check);
-    $("#txtPesoBruto_"+row_id).prop('readonly', check);
+    var check = !$("#btncheck_"+row_id+"_"+index).prop('checked'); 
+    $("#txtCantidad_"+row_id+"_"+index).prop('readonly', check);
+    $("#txtBultos_"+row_id+"_"+index).prop('readonly', check);
+    $("#txtUMB_"+row_id+"_"+index).prop('disabled', check);
+    $("#txtPesoNeto_"+row_id+"_"+index).prop('readonly', check);
+    $("#txtPesoBruto_"+row_id+"_"+index).prop('readonly', check);
     if(!check)
     {
-        $("#inv_row_"+row_id).addClass("table-warning");
+        $("#inv_row_"+row_id+"_"+index).addClass("table-warning");
     }
     else
     {
-        $("#inv_row_"+row_id).removeClass("table-warning");
+        $("#inv_row_"+row_id+"_"+index).removeClass("table-warning");
     }
-    
-    
-
-    //let txtCantidad = $("#txtCantidad_"+row_id).prop('readonly', false);
-    //let txtBultos = $("#txtBultos_"+row_id).prop('readonly', false);
-    //let txtUMB = $("#txtUMB_"+row_id).prop('disabled', false);
-    //let txtPesoNeto = $("#txtPesoNeto_"+row_id).prop('readonly', false);
-    //let txtPesoBruto = $("#txtPesoBruto_"+row_id).prop('readonly', false);
-
-
 }
 function selectGroup(control,income_id)
 {
@@ -502,14 +514,15 @@ function guardarPartidas()
         if ($(this).prop('checked'))
         {
             var current_row_id = $(this).attr('id').split("_")[1]; 
+            var current_index = $(this).attr('id').split("_")[2];
             //outcomeID  <- ya contiene la clase
-            $("#txtIncomeRowId_"+current_row_id).addClass("outPost");
-            $("#txtCantidad_"+current_row_id).addClass("outPost");
-            $("#txtUM_"+current_row_id).addClass("outPost");
-            $("#txtBultos_"+current_row_id).addClass("outPost");
-            $("#txtUMB_"+current_row_id).addClass("outPost");
-            $("#txtPesoNeto_"+current_row_id).addClass("outPost");
-            $("#txtPesoBruto_"+current_row_id).addClass("outPost");
+            $("#txtIncomeRowId_"+current_row_id+"_"+current_index).addClass("outPost");
+            $("#txtCantidad_"+current_row_id+"_"+current_index).addClass("outPost");
+            $("#txtUM_"+current_row_id+"_"+current_index).addClass("outPost");
+            $("#txtBultos_"+current_row_id+"_"+current_index).addClass("outPost");
+            $("#txtUMB_"+current_row_id+"_"+current_index).addClass("outPost");
+            $("#txtPesoNeto_"+current_row_id+"_"+current_index).addClass("outPost");
+            $("#txtPesoBruto_"+current_row_id+"_"+current_index).addClass("outPost");
         }
     });
     $.ajax({
@@ -524,7 +537,7 @@ function guardarPartidas()
 
 }
 
-function validarCantidad(control,max)
+function validarCantidad(control,max,index)
 {
     if(control.value > max)
     {
@@ -537,8 +550,9 @@ function validarCantidad(control,max)
         control.value = 0;
         return;
     }
+    
     let row_id = control.id.split("_")[1];
-    calcularPesoNeto(row_id);
+    calcularPesoNeto(row_id,index);
 }
 
 function eliminarPartida(outcome_row_id)
@@ -578,37 +592,37 @@ function checkCampoCliente()
         });
 }
 
-function tipoBultoChange(row_id)
+function tipoBultoChange(row_id,index)
 {
-    let txtUMB = $("#txtUMB_"+row_id).val();
+    let txtUMB = $("#txtUMB_"+row_id+"_"+index).val();
     var bultos_peso = {@foreach ($tipos_de_bulto as $tipos_de_bultoOp)@if(!$loop->first) , @endif"{{ $tipos_de_bultoOp->desc }}":{{ $tipos_de_bultoOp->weight }}@endforeach};
     for (var key in bultos_peso) 
     {
         if(key == txtUMB)
         {
-            $("#txtUMBPeso_"+row_id).val(bultos_peso[key]);
+            $("#txtUMBPeso_"+row_id+"_"+index).val(bultos_peso[key]);
             break;
         }
         // en caso de no encontrar nada el valor se pone a cero
-        $("#txtUMBPeso_"+row_id).val(bultos_peso[key]);
+        $("#txtUMBPeso_"+row_id+"_"+index).val(bultos_peso[key]);
     }
-    calcularPesoBruto(row_id);
+    calcularPesoBruto(row_id,index);
 }
 
-function calcularPesoNeto(row_id)
+function calcularPesoNeto(row_id,index)
 {
-    let cantidad = Number($("#txtCantidad_"+row_id).val());
-    let peso_unitario = Number($("#txtNumeroDePartePesoU_"+row_id).val());
-    $("#txtPesoNeto_"+row_id).val(cantidad*peso_unitario);
-    calcularPesoBruto(row_id);
+    let cantidad = Number($("#txtCantidad_"+row_id+"_"+index).val());
+    let peso_unitario = Number($("#txtNumeroDePartePesoU_"+row_id+"_"+index).val());
+    $("#txtPesoNeto_"+row_id+"_"+index).val(cantidad*peso_unitario);
+    calcularPesoBruto(row_id,index);
 }
 
-function calcularPesoBruto(row_id)
+function calcularPesoBruto(row_id,index)
 {
-    let peso_neto = Number($("#txtPesoNeto_"+row_id).val());
-    let cantidad_bultos = Number($("#txtBultos_"+row_id).val());
-    let peso_bulto = Number($("#txtUMBPeso_"+row_id).val());
-    $("#txtPesoBruto_"+row_id).val(cantidad_bultos*peso_bulto+peso_neto);
+    let peso_neto = Number($("#txtPesoNeto_"+row_id+"_"+index).val());
+    let cantidad_bultos = Number($("#txtBultos_"+row_id+"_"+index).val());
+    let peso_bulto = Number($("#txtUMBPeso_"+row_id+"_"+index).val());
+    $("#txtPesoBruto_"+row_id+"_"+index).val(cantidad_bultos*peso_bulto+peso_neto);
 }
 
 </script>

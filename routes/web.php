@@ -90,6 +90,9 @@ Route::get('/int/catalog/suppliers','SupplierController@index')->middleware(['au
 //ORDEN DE CARGA
 Route::get('/int/ordenes_de_carga','LoadOrderController@index_intern')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas_OC/{load_order}','OutcomeController@loadOC')->middleware(['auth','allow.only:user']);
+Route::get('/int/salidas_OC_load_rows/{load_order}','InventoryController@get_oc_partidas_html')->middleware(['auth','allow.only:user']);
+Route::get('/int/salidas_OC_set_status/{load_order}/{outcome_number}','OutcomeController@set_oc_status')->middleware(['auth','allow.only:user']);
+
 
 /////////////////////EXTARNAL FORM CUSTOMERS////////////////////////////
 //INCOMES

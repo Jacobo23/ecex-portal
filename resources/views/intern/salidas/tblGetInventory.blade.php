@@ -36,27 +36,27 @@
                 }
             }
         @endphp
-        <tr id="inv_row_{{ $row->id }}" class="{{ $tr_color }}">
+        <tr id="inv_row_{{ $row->id }}_{{ $loop->index }}" class="{{ $tr_color }}">
             <td>
                 <div class="btn-group" role="group" aria-label="Basic checkbox toggle button group">
-                    <input type="checkbox" class="chkSingle income_{{ $row->income_id }} btn-check" id="btncheck_{{ $row->id }}" autocomplete="off" onchange="selectRow('{{ $row->id }}')">
-                    <label class="btn btn-outline-success btn-sm" for="btncheck_{{ $row->id }}"><i class="far fa-check-square"></i></label>
+                    <input type="checkbox" class="chkSingle income_{{ $row->income_id }} btn-check" id="btncheck_{{ $row->id }}_{{ $loop->index }}" autocomplete="off" onchange="selectRow('{{ $row->id }}','{{ $loop->index }}')">
+                    <label class="btn btn-outline-success btn-sm" for="btncheck_{{ $row->id }}_{{ $loop->index }}"><i class="far fa-check-square"></i></label>
                     @if ($is_first)
                     <input type="checkbox" class="chkGroup btn-check" id="btncheckAll_{{ $row->id }}_{{ $row->income_id }}" autocomplete="off" onchange="selectGroup(this,'{{ $row->income_id }}')">
                     <label class="btn btn-outline-primary btn-sm" for="btncheckAll_{{ $row->id }}_{{ $row->income_id }}"><i class="fas fa-tasks"></i></label>
                     @endif
                 </div>
             </td>
-            <td>{{ $row->income->getIncomeNumber() }}<input type="hidden" id="txtIncomeRowId_{{ $row->id }}" name="income_row_id[]" value="{{ $row->id }}"></td>
+            <td>{{ $row->income->getIncomeNumber() }}<input type="hidden" id="txtIncomeRowId_{{ $row->id }}_{{ $loop->index }}" name="income_row_id[]" value="{{ $row->id }}"></td>
             <td>{{ explode(' ',$row->income->cdate)[0] }}</td>
-            <td>{{ $row->part_number()->part_number }} <input type="hidden" name="txtNumeroDePartePesoU_{{ $row->id }}" id="txtNumeroDePartePesoU_{{ $row->id }}" value="{{ $row->part_number()->unit_weight }}"></td>
+            <td>{{ $row->part_number()->part_number }} <input type="hidden" name="txtNumeroDePartePesoU_{{ $row->id }}_{{ $loop->index }}" id="txtNumeroDePartePesoU_{{ $row->id }}_{{ $loop->index }}" value="{{ $row->part_number()->unit_weight }}"></td>
             <td>
-                <input type="number" class="form-control" id="txtCantidad_{{ $row->id }}" name="units[]" value="{{ $row->units }}" max="{{ $row->units }}" onchange="validarCantidad(this,{{ $row->units }})" readonly>
-                <input type="hidden" id="txtUM_{{ $row->id }}" name="ump[]" value="{{ $row->ump }}">
+                <input type="number" class="form-control" id="txtCantidad_{{ $row->id }}_{{ $loop->index }}" name="units[]" value="{{ $row->units }}" max="{{ $row->units }}" onchange="validarCantidad(this,{{ $row->units }},'{{ $loop->index }}')" readonly>
+                <input type="hidden" id="txtUM_{{ $row->id }}_{{ $loop->index }}" name="ump[]" value="{{ $row->ump }}">
             </td>
-            <td><input type="number" class="form-control" id="txtBultos_{{ $row->id }}" name="bundles[]" value="{{ $row->bundles }}" readonly onchange="calcularPesoBruto({{ $row->id }})"></td>
+            <td><input type="number" class="form-control" id="txtBultos_{{ $row->id }}_{{ $loop->index }}" name="bundles[]" value="{{ $row->bundles }}" readonly onchange="calcularPesoBruto({{ $row->id }},'{{ $loop->index }}')"></td>
             <td>
-                <select class="form-select" id = "txtUMB_{{ $row->id }}" name = "umb[]" disabled onchange="tipoBultoChange({{ $row->id }})">
+                <select class="form-select" id = "txtUMB_{{ $row->id }}_{{ $loop->index }}" name = "umb[]" disabled onchange="tipoBultoChange({{ $row->id }},'{{ $loop->index }}')">
                     @php 
                     $peso_bulto = 0;
                     foreach ($tipos_de_bulto as $tipos_de_bultoOp)
@@ -72,23 +72,16 @@
                     @endphp
                 </select>
                 @php
-                echo "<input type='hidden' name='txtUMBPeso_".$row->id."' id='txtUMBPeso_".$row->id."' value='".$peso_bulto."'>";
+                echo "<input type='hidden' name='txtUMBPeso_".$row->id."' id='txtUMBPeso_".$row->id."_".$loop->index."' value='".$peso_bulto."'>";
                 @endphp
             </td>
-            <td><input type="number" class="form-control" id="txtPesoNeto_{{ $row->id }}" name="net_weight[]" value="{{ $row->part_number()->unit_weight * $row->units }}" readonly  onchange="calcularPesoBruto({{ $row->id }})"></td>
-            <td><input type="number" class="form-control" id="txtPesoBruto_{{ $row->id }}" name="gross_weight[]" value="{{ $row->gross_weight }}" readonly></td>
+            <td><input type="number" class="form-control" id="txtPesoNeto_{{ $row->id }}_{{ $loop->index }}" name="net_weight[]" value="{{ $row->part_number()->unit_weight * $row->units }}" readonly  onchange="calcularPesoBruto({{ $row->id }},'{{ $loop->index }}')"></td>
+            <td><input type="number" class="form-control" id="txtPesoBruto_{{ $row->id }}_{{ $loop->index }}" name="gross_weight[]" value="{{ $row->gross_weight }}" readonly></td>
             <td style="font-size: 0.9em;">{{ $row->desc_ing }}</td>
         </tr>
         @endforeach
     </tbody>
 </table>
-
-tipoBultoChange
-calcularPesoNeto
-calcularPesoBruto
-
-
-
 
 
 

@@ -250,7 +250,6 @@ class OutcomeController extends Controller
         $regimes = Regime::All();
         $tipos_de_bulto = BundleType::All();
         
-        
         return view('intern.salidas.create', [
             'outcome' => $outcome,
             'numero_de_salida' => "",
@@ -260,6 +259,12 @@ class OutcomeController extends Controller
             'tipos_de_bulto' => $tipos_de_bulto,
             'load_order' => $load_order,
         ]);
+    }
+
+    public function set_oc_status(LoadOrder $load_order, string $outcome_number)
+    {
+        $load_order->status = $outcome_number;
+        $load_order->save();
     }
 
     

@@ -12,6 +12,8 @@ use App\Models\Customer;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\InventoryExport;
 
+use App\Models\LoadOrder;
+
 use Illuminate\Http\Request;
 
 class InventoryController extends Controller
@@ -42,6 +44,26 @@ class InventoryController extends Controller
             'tipos_de_bulto' => $umb,
         ]);
     }
+
+    public function get_oc_partidas_html(LoadOrder $load_order)
+    {
+        $load_order_rows = $load_order->load_order_rows;
+        $income_rows = array();
+        foreach ($load_order_rows as $load_order_row) 
+        {
+            $income_row = $load_order_row->income_row;
+            $income_row->units = $load_order_row->units;
+            array_push($income_rows,$income_row);
+        }
+
+        $umb = BundleType::All();
+        return view('intern.salidas.tblGetInventory', [
+            'inventory' => $income_rows,
+            'tipos_de_bulto' => $umb,
+        ]);
+    }
+
+    //esta funcion trae el inventario para poder GENERAR ordenes de carga en modulo de orden de carga
     public function get_for_oc(string $days_range)
     {
         $customer = explode(",",Auth::user()->customer_ids)[0];//solo se puede para un cliente a la vez

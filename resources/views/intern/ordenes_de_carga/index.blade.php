@@ -29,9 +29,9 @@
 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 <div class="p-6 bg-white border-b border-gray-200">
 
-        <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
+        <!-- <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
             <a href="/int/ordenes_de_carga/create" class="btn btn-success" role="button">Crear orden <i class="fas fa-plus"></i></a>    
-        </div>
+        </div>-->
         <br>
         <br>
 
