@@ -6,6 +6,15 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Ecex') }}</title>
+        <style>
+            body
+            {
+ 
+                /*background-image: url("{{ asset('storage/images/background.jpg') }}");
+                background-repeat: repeat;
+                background-size: 40px 40px;*/
+            }
+        </style>
 
         <!-- Fonts -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
