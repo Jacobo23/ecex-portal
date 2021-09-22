@@ -113,7 +113,7 @@
                     <td>@if ($income->reviewed) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td>@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
                     <td>@if ($income->onhold) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td><i class="fas fa-balance-scale"></i></td>
+                    <td><a class="btn " href="/int/balance?entrada={{ $income->getIncomeNumber() }}"><i class="fas fa-balance-scale"></i></a></td>
                     <td><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_income_{{ $income->id }}')"><i class="far fa-folder-open"></i></button></td>
                     <td id="adjuntos_income_{{ $income->id }}" style="display:none">
                         @php

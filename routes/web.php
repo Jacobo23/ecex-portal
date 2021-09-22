@@ -117,5 +117,6 @@ Route::post('/ext/ordenes_de_carga','LoadOrderController@store')->middleware(['a
 Route::get('/sendemail/{numero_de_entrada}/entrada','EmailController@sendEmailEntrada');
 Route::get('/sendemail/{outcome}/salida','EmailController@sendEmailSalida');
 
-Route::get('/test/{outcome}','OutcomeController@test')->middleware(['auth','allow.only:user']);
+Route::get('/int/balance','IncomeController@getBalance')->middleware(['auth','allow.only:user']);
+Route::get('/int/balance_pdf/{income}','IncomeController@getBalancePDF')->middleware(['auth','allow.only:user']);
 require __DIR__.'/auth.php';

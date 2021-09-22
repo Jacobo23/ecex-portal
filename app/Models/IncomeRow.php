@@ -45,5 +45,12 @@ class IncomeRow extends Model
         }
         return $outcome_numbers;
     }
+
+    public function get_discounting_outcomes_rows()
+    {
+        //esta funcion regresa las outcome_rows que descuentan a esta income_row
+        $outcome_rows = OutcomeRow::where('outcome_rows.income_row_id', '=', $this->id)->get();
+        return $outcome_rows;
+    }
     
 }

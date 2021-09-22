@@ -365,4 +365,49 @@ class IncomeController extends Controller
         $pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
         return $pdf->download($numero_de_entrada.'.pdf');
     }
+
+    public function getBalance(Request $request)
+    {
+        $numero_de_entrada = $request->entrada ?? "";
+        if($numero_de_entrada != "")
+        {
+            $yearInc=substr($numero_de_entrada,0,-5);
+            $numInc=substr($numero_de_entrada,4);
+            $income = Income::where('year', $yearInc)->where('number', $numInc)->first();
+
+            if($income)
+            {
+                return view('intern.entradas.balance', [
+                    'income' => $income,
+                ]);
+            }
+            else
+            {
+                abort(404);
+            }
+        }
+        else
+        {
+            return view('intern.entradas.balance');
+        }
+    }
+
+    public function getBalancePDF(Income $income)
+    {
+        $numero_de_entrada = $income->year.str_pad($income->number,5,"0",STR_PAD_LEFT);
+        $income->income_rows; //<- se llama esta linea con el fin de cargar las partidas de esta entrada
+
+        foreach ($income->income_rows as $income_row) 
+        {
+            $descuentos = $income_row->get_discounted_units();
+            $income_row->units -= $descuentos;
+            // calculamos el peso neto tomando en cuenta los descuentos
+            $row_part_number = $income_row->part_number();
+            $income_row->net_weight = $income_row->units * $row_part_number->unit_weight;
+            $income_row->income; // <- invocamos esta propiedad para que el objeto final cuente con informacion de su entrada
+        }
+
+        $pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
+        return $pdf->download($numero_de_entrada.'.pdf');
+    }
 }
