@@ -15,6 +15,28 @@ class Outcome extends Model
     {
         return $this->hasMany(OutcomeRow::class);
     }
+
+    public function getIncomes()
+    {
+        $rows = $this->outcome_rows;
+        $incomes = array();
+        foreach ($rows as $row)
+        {
+            $income_aux = $row->income_row->income->getIncomeNumber();
+            array_push($incomes,$income_aux);
+        }
+        $incomes=array_unique($incomes);
+        $uniques = array();
+        foreach ($incomes as $income) 
+        {
+            if($income)
+            {
+                array_push($uniques,$income);
+            }
+        }
+        return $uniques;
+    }
+
     public function getOutcomeNumber($regime)
     {
         $posfix = "";
@@ -65,5 +87,27 @@ class Outcome extends Model
             $i++;
         }
         return $umb;
+    }
+
+    public function getPesoNeto()
+    {
+        $rows = $this->outcome_rows;
+        $count = 0;
+        foreach ($rows as $row)
+        {
+            $count += $row->net_weight;
+        }
+        return $count;
+    }
+
+    public function getPesoBruto()
+    {
+        $rows = $this->outcome_rows;
+        $count = 0;
+        foreach ($rows as $row)
+        {
+            $count += $row->gross_weight;
+        }
+        return $count;
     }
 }

@@ -95,6 +95,30 @@ class Income extends Model
         }
         return $umb;
     }
+    public function getCantidadPartidas()
+    {
+        return count($this->income_rows);
+    }
+    public function getPesoNeto()
+    {
+        $rows = $this->income_rows;
+        $count = 0;
+        foreach ($rows as $row)
+        {
+            $count += $row->net_weight;
+        }
+        return $count;
+    }
+    public function getPesoBruto()
+    {
+        $rows = $this->income_rows;
+        $count = 0;
+        foreach ($rows as $row)
+        {
+            $count += $row->gross_weight;
+        }
+        return $count;
+    }
     public function get_color_fila_estado()
     {
         //en la lista de entradas pintaremos usando clases de bootstrap dependiendo del estado de la entrada

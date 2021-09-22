@@ -83,7 +83,6 @@
                     <th scope="col">Referencia</th>
                     <th scope="col">Bultos</th>
                     <th scope="col">Tipo-bulto</th>
-                    <th scope="col">Enviada</th>
                     <th scope="col">Folder</th>
                     @if ($can_delete) <th scope="col">Eliminar</th> @endif
                 </tr>
@@ -99,7 +98,6 @@
                     <td>{{ $outcome->reference }}</td>
                     <td>{{ $outcome->getBultos() }}</td>
                     <td>{{ $outcome->getTipoBultos() }}</td>
-                    <td>@if ($outcome->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_outcome_{{ $outcome->id }}')"><i class="far fa-folder-open"></i></button></td>
                     <td id="adjuntos_outcome_{{ $outcome->id }}" style="display:none">
                         @php

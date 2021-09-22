@@ -11,6 +11,8 @@ use App\Models\Carrier;
 use App\Models\Supplier;
 use App\Models\MeasurementUnit;
 use App\Models\BundleType;
+
+use App\Http\Controllers\EmailController;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use PDF;
@@ -37,7 +39,7 @@ class IncomeController extends Controller
         $tracking = $request->txtTracking ?? "";
         $en_inventario = isset($request->chkInventario);
 
-        $entradas = $this->get_Incomes_obj($cliente_ids,$rango,$tracking,$en_inventario);
+        $entradas = $this->get_Incomes_obj($cliente_ids,$rango,$tracking,$en_inventario,false);
         
         return view('intern.entradas.index', [
             'incomes' => $entradas,
@@ -58,7 +60,7 @@ class IncomeController extends Controller
         $tracking = $request->txtTracking ?? "";
         $en_inventario = isset($request->chkInventario);
 
-        $entradas = $this->get_Incomes_obj($cliente_ids,$rango,$tracking,$en_inventario);
+        $entradas = $this->get_Incomes_obj($cliente_ids,$rango,$tracking,$en_inventario,false);
         foreach ($entradas as $income) {
             $income->income_rows;
         }
@@ -73,7 +75,7 @@ class IncomeController extends Controller
         $tracking = $request->txtTracking ?? "";
         $en_inventario = true;
 
-        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario);
+        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario,true);
         //foreach ($entradas as $income) {
         //    $income->income_rows;
         //}
@@ -90,7 +92,7 @@ class IncomeController extends Controller
         $tracking = $request->txtTracking ?? "";
         $en_inventario = true;
 
-        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario);
+        $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario,true);
 
         return view('customer.entradas.index', [
             'incomes' => $entradas,
@@ -100,7 +102,7 @@ class IncomeController extends Controller
         ]);
     }
 
-    public function get_Incomes_obj(array $cliente, string $rango, string $tracking, bool $en_inventario)
+    public function get_Incomes_obj(array $cliente, string $rango, string $tracking, bool $en_inventario, bool $enviada)
     {
         // '$cliente' en realidad es un array de los customer_id que vamos a filtrar NINGUNO DEBE SER CERO 0
         $entradas = Income::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString())
@@ -131,8 +133,14 @@ class IncomeController extends Controller
                     $entrada->id = 0;
                 }
             }
-            //discriminar las entradas con id = 0 porque no tienen inventario restante
-            $entradas = $entradas->where('id', '>', 0);
+        }
+        
+        //discriminar las entradas con id = 0 porque no tienen inventario restante
+        $entradas = $entradas->where('id', '>', 0);
+        // obneter solo las enviadas (para modulo cliente)
+        if($enviada)
+        {
+            $entradas = $entradas->where('sent', '==', true);
         }
         
         return $entradas;
@@ -194,7 +202,7 @@ class IncomeController extends Controller
         $entrada->invoice = $request->txtFactura ?? "";
         $entrada->tracking = $request->txtTracking ?? "";
         $entrada->po = $request->txtPO ?? "";
-        $entrada->sent = false;
+        
         $entrada->user = Auth::user()->name;
         $entrada->reviewed = isset($request->chkRev);
         $entrada->reviewed_by = $request->txtActualizadoPor ?? "";
@@ -208,6 +216,7 @@ class IncomeController extends Controller
             $entrada->year = date("Y");
             $number = Income::where('year',$entrada->year)->max('number');
             $entrada->number = (is_null($number)) ? 1 : $number + 1;
+            $entrada->sent = false;
         }
         $entrada->save();
         $numero_de_entrada = $entrada->year.str_pad($entrada->number,5,"0",STR_PAD_LEFT);
@@ -294,6 +303,13 @@ class IncomeController extends Controller
         //
     }
 
+    public function quitarOnHold(Income $income)
+    {
+        $income->onhold = false;
+        $income->save();
+        EmailController::onHoldNotification($income);
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -342,11 +358,11 @@ class IncomeController extends Controller
         $numero_de_entrada = $income->year.str_pad($income->number,5,"0",STR_PAD_LEFT);
         $income->income_rows; //<- se llama esta linea con el fin de cargar las partidas de esta entrada
 
-        return view('intern.entradas.pdf', [
-            'income' => $income,
-        ]);
+        //return view('intern.entradas.pdf', [
+        //    'income' => $income,
+        //]);
 
-        //$pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
-        //return $pdf->download($numero_de_entrada.'.pdf');
+        $pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
+        return $pdf->download($numero_de_entrada.'.pdf');
     }
 }

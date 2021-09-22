@@ -386,15 +386,15 @@ class IncomeRowController extends Controller
         $income_row->gross_weight = $request->gross_weight;
         $income_row->fraccion = $request->fraccion;
         $income_row->nico = $request->nico;
-        $income_row->po = $request->po;
-        $income_row->brand = $request->brand;
-        $income_row->model = $request->model;
-        $income_row->serial = $request->serial;
-        $income_row->location = $request->location;
-        $income_row->regime = $request->regime;
-        $income_row->lot = $request->lot;
-        $income_row->skids = $request->skids;
-        $income_row->imex = $request->imex;
+        $income_row->po = $request->po ?? "";
+        $income_row->brand = $request->brand ?? "";
+        $income_row->model = $request->model ?? "";
+        $income_row->serial = $request->serial ?? "";
+        $income_row->location = $request->location ?? "";
+        $income_row->regime = $request->regime ?? "";
+        $income_row->lot = $request->lot ?? "";
+        $income_row->skids = $request->skids ?? "";
+        $income_row->imex = $request->imex ?? "";
         $income_row->income_id = $request->income_id;
         $income_row->part_number_id = $request->part_number_id;
         //si el numero de parte no existe hay que crearlo

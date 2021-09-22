@@ -125,7 +125,7 @@
                     </td>
                     
                     <td>@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
-                    <td>@if ($income->onhold) <button id="btn_onhold_{{ $income->id }}" class="btn btn-primary">on hold</button> @endif</td>
+                    <td>@if ($income->onhold) <button id="btn_onhold_{{ $income->id }}" class="btn btn-primary" onclick="quitarOnhold({{ $income->id }})">on hold</button> @endif</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -148,6 +148,19 @@ function showAdjuntos(content_row)
 {
     var html = $("#"+content_row).html();   
     showModal("Adjuntos",html);
+}
+
+function quitarOnhold(income_id)
+{
+    if(!confirm("Desea quitar el estado 'on hold' de esta entrada"))
+    {
+        return;
+    }
+    $.ajax({url: "/quitar_on_hold/" + income_id,context: document.body}).done(function(response) 
+        {
+            showModal("Notificación","Se ha enviado la notificación a almacén.");
+            $("#btn_onhold_"+income_id).remove();
+        });
 }
 </script>
 @endsection

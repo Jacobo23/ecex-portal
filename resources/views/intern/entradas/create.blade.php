@@ -66,7 +66,7 @@
             <select class="form-select" id = "txtCliente" name = "txtCliente" onchange="checkCampoCliente()">
             <option value=0 selected></option>
             @foreach ($clientes as $clienteOp)
-            <option value="{{ $clienteOp->id }}" @php if(isset($income)){if($income->customer_id === $clienteOp->id){echo "selected";}}@endphp >{{ $clienteOp->name }}</option>
+            <option value="{{ $clienteOp->id }}" @php if(isset($income)){if($income->customer_id == $clienteOp->id){echo "selected";}}@endphp >{{ $clienteOp->name }}</option>
             @endforeach
             </select>
         </div>
@@ -78,7 +78,7 @@
             <select class="form-select" id = "txtTransportista" name = "txtTransportista" onchange="agregarTransportista()">
             <option value=0 selected></option>
             @foreach ($transportistas as $transportistaOp)
-            <option value="{{ $transportistaOp->id }}" @php if(isset($income)){if($income->carrier_id === $transportistaOp->id){echo "selected";}}@endphp >{{ $transportistaOp->name }}</option>
+            <option value="{{ $transportistaOp->id }}" @php if(isset($income)){if($income->carrier_id == $transportistaOp->id){echo "selected";}}@endphp >{{ $transportistaOp->name }}</option>
             @endforeach
             <option value = "-2" id="option_new_transportista" >(Crear nuevo +)</option>
             </select>
@@ -88,7 +88,7 @@
             <select class="form-select" id = "txtProveedor" name = "txtProveedor" onchange="agregarProveedor()">
             <option value=0 selected></option>
             @foreach ($proveedores as $proveedoresOp)
-            <option value="{{ $proveedoresOp->id }}" @php if(isset($income)){if($income->supplier_id === $proveedoresOp->id){echo "selected";}}@endphp >{{ $proveedoresOp->name }}</option>
+            <option value="{{ $proveedoresOp->id }}" @php if(isset($income)){if($income->supplier_id == $proveedoresOp->id){echo "selected";}}@endphp >{{ $proveedoresOp->name }}</option>
             @endforeach
             <option value = "-2" id="option_new_proveedor" >(Crear nuevo +)</option>
             </select>
@@ -176,7 +176,7 @@
                     <input type="file" id="txtPacking" name="file" onchange="subirPacking()">
                     <input type="text" id="fileNumEntrada" name="fileNumEntrada">
                 </form>
-                <form id="packingDeleteForm" action="/delete_pakinglist/" method="post" enctype="multipart/form-data">
+                <form id="packingDeleteForm" action="/delete_pakinglist" method="post" enctype="multipart/form-data">
                     @csrf
                     <input type="text" id="fileDeleteNumEntrada" name="fileDeleteNumEntrada">
                 </form>
@@ -203,12 +203,14 @@
             <button type="button" class="btn btn-secondary" onclick="imgBtnClick()">Imagenes <i class="far fa-images"></i></button>
             <br>
             <div style="display:none">
-                <form id="IncomeImgForm" action="/upload_img_entrada/" method="post" enctype="multipart/form-data">
+                <form id="IncomeImgForm" action="/upload_img_entrada" method="POST" enctype="multipart/form-data">
                     @csrf
                     <input class="form-control" type="file" onchange="subirImagenes()" id="txtImagenes" name="filenames[]" multiple>
                     <input type="text" id="fileNumEntradaImg" name="fileNumEntradaImg">
+                    <button type="submit" form="IncomeImgForm" value="Submit" id="sbtIncomeImgForm">Submit</button>
+                    
                 </form>
-                <form id="IncomeImgDeleteForm" action="/delete_img_entrada/" method="post" enctype="multipart/form-data">
+                <form id="IncomeImgDeleteForm" action="/delete_img_entrada" method="post" enctype="multipart/form-data">
                     @csrf
                     <input type="text" id="ImgDeleteNumEntrada" name="ImgDeleteNumEntrada">
                     <input style="hidden" type="text" id="ImgNameDeleteNumEntrada" name="ImgNameDeleteNumEntrada">
@@ -247,7 +249,7 @@
 
         <div class="btn-group col-lg-2" role="group">
             <button type="button" class="btn btn-outline-primary" onclick="downloadPDF()">Imprimir</button>
-            <button type="button" class="btn btn-outline-primary">Terminar</button>
+            <button type="button" class="btn btn-outline-primary" id="btnTerminar" onclick="terminar()">Terminar</button>
         </div>
     </div>   
 
@@ -608,7 +610,8 @@ function subirImagenes()
     }
     
     $("#fileNumEntradaImg").val(NumEntrada);
-    $("#IncomeImgForm").submit();
+    //$("#IncomeImgForm").submit();
+    $("#sbtIncomeImgForm").click();
 }
 function guardarEntrada()
 {
@@ -963,6 +966,23 @@ function checkCampoCliente()
                 }
                 
             }
+        });
+}
+function terminar()
+{
+    let NumEntrada = $("#txtNumEntrada").val();
+    let income_id = $("#incomeID").val();
+    if(NumEntrada.length != 9 || income_id.length < 1)
+    {
+        showModal("Alerta!","Primero guarde la entrada.");
+        return;
+    }
+    $("#btnTerminar").prop("disabled",true);
+
+    $.ajax({url: "/sendemail/"+NumEntrada+"/entrada",context: document.body}).done(function(response) 
+        {
+            showModal("Notificación", "Enviada: " + NumEntrada);
+            $("#btnTerminar").prop("disabled",false);
         });
 }
 

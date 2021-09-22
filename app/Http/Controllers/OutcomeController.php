@@ -16,6 +16,7 @@ use App\Exports\OutcomesExport;
 use App\Exports\OutcomesCustomerExport;
 use App\Models\BundleType;
 use App\Models\LoadOrder;
+use PDF;
 
 class OutcomeController extends Controller
 {
@@ -327,5 +328,19 @@ class OutcomeController extends Controller
             'outcome_rows_count' => count($outcome_rows),
             'has_rows' => $has_rows,
         ]);
+    }
+
+    public function downloadPDF(Outcome $outcome)
+    {
+        $numero_de_salida = $outcome->getOutcomeNumber(true);
+        $outcome->outcome_rows; //<- se llama esta linea con el fin de cargar las partidas de esta salida
+
+        $pdf = PDF::loadView('intern.salidas.pdf', compact('outcome'))->setPaper('a4', 'landscape');
+        return $pdf->download($numero_de_salida.'.pdf');
+    }
+
+    public function test(Outcome $outcome)
+    {
+        return $outcome->getIncomes();
     }
 }

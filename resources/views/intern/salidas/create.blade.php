@@ -35,7 +35,7 @@
             <select class="form-select" id = "txtRegimen" name = "txtRegimen">
             <option value=0 selected></option>
             @foreach ($regimes as $regimeOp)
-            <option value="{{ $regimeOp->name }}" @php if(isset($outcome)){if($outcome->regime === $regimeOp->name){echo "selected";}}@endphp >{{ $regimeOp->name }}</option>
+            <option value="{{ $regimeOp->name }}" @php if(isset($outcome)){if($outcome->regime == $regimeOp->name){echo "selected";}}@endphp >{{ $regimeOp->name }}</option>
             @endforeach
             </select>
         </div>
@@ -51,7 +51,7 @@
             <select class="form-select" id = "txtCliente" name = "txtCliente" onchange="checkCampoCliente()">
             <option value=0 selected></option>
             @foreach ($clientes as $clienteOp)
-            <option value="{{ $clienteOp->id }}" @php if(isset($outcome)){if($outcome->customer_id === $clienteOp->id){echo "selected";}}@endphp >{{ $clienteOp->name }}</option>
+            <option value="{{ $clienteOp->id }}" @php if(isset($outcome)){if($outcome->customer_id == $clienteOp->id){echo "selected";}}@endphp >{{ $clienteOp->name }}</option>
             @endforeach
             </select>
         </div>
@@ -65,7 +65,7 @@
             <select class="form-select" id = "txtTransportista" name = "txtTransportista">
             <option value=0 selected></option>
             @foreach ($transportistas as $transportistaOp)
-            <option value="{{ $transportistaOp->id }}" @php if(isset($outcome)){if($outcome->carrier_id === $transportistaOp->id){echo "selected";}}@endphp >{{ $transportistaOp->name }}</option>
+            <option value="{{ $transportistaOp->id }}" @php if(isset($outcome)){if($outcome->carrier_id == $transportistaOp->id){echo "selected";}}@endphp >{{ $transportistaOp->name }}</option>
             @endforeach
             </select>
         </div>
@@ -135,7 +135,7 @@
                     <input type="file" id="txtPacking" name="file" onchange="subirPacking()">
                     <input type="text" id="fileNumSalida" name="fileNumSalida">
                 </form>
-                <form id="packingDeleteForm" action="/delete_pakinglist_outcome/" method="post" enctype="multipart/form-data">
+                <form id="packingDeleteForm" action="/delete_pakinglist_outcome" method="post" enctype="multipart/form-data">
                     @csrf
                     <input type="text" id="fileDeleteNumSalida" name="fileDeleteNumSalida">
                 </form>
@@ -162,12 +162,12 @@
             <button type="button" class="btn btn-secondary" onclick="imgBtnClick()">Imagenes <i class="far fa-images"></i></button>
             <br>
             <div style="display:none">
-                <form id="OutcomeImgForm" action="/upload_img_salida/" method="post" enctype="multipart/form-data">
+                <form id="OutcomeImgForm" action="/upload_img_salida" method="post" enctype="multipart/form-data">
                     @csrf
                     <input class="form-control" type="file" onchange="subirImagenes()" id="txtImagenes" name="filenames[]" multiple>
                     <input type="text" id="fileNumSalidaImg" name="fileNumSalidaImg">
                 </form>
-                <form id="OutcomeImgDeleteForm" action="/delete_img_salida/" method="post" enctype="multipart/form-data">
+                <form id="OutcomeImgDeleteForm" action="/delete_img_salida" method="post" enctype="multipart/form-data">
                     @csrf
                     <input type="text" id="ImgDeleteNumSalida" name="ImgDeleteNumSalida">
                     <input style="hidden" type="text" id="ImgNameDeleteNumSalida" name="ImgNameDeleteNumSalida">
@@ -205,7 +205,7 @@
 
         <div class="btn-group col-lg-2" role="group">
             <button type="button" class="btn btn-outline-primary" onclick="downloadPDF()">Imprimir</button>
-            <button type="button" class="btn btn-outline-primary">Terminar</button>
+            <button type="button" class="btn btn-outline-primary" id="btnTerminar" onclick="terminar()">Terminar</button>
         </div>
     </div>   
 
@@ -623,6 +623,34 @@ function calcularPesoBruto(row_id,index)
     let cantidad_bultos = Number($("#txtBultos_"+row_id+"_"+index).val());
     let peso_bulto = Number($("#txtUMBPeso_"+row_id+"_"+index).val());
     $("#txtPesoBruto_"+row_id+"_"+index).val(cantidad_bultos*peso_bulto+peso_neto);
+}
+
+function downloadPDF()
+{
+    let OutcomeID = $("#outcomeID").val();
+    if(OutcomeID.length < 1)
+    {
+        return;
+    }
+    window.open('/int/salidas/'+OutcomeID+'/download_pdf', '_blank').focus();
+}
+
+function terminar()
+{
+    let NumSalida = $("#txtNumSalida").val();
+    let outcome_id = $("#outcomeID").val();
+    if(NumSalida.length != 9 || outcome_id.length < 1)
+    {
+        return;
+    }
+    $("#btnTerminar").prop("disabled",true);
+    
+
+    $.ajax({url: "/sendemail/"+outcome_id+"/salida",context: document.body}).done(function(response) 
+        {
+            showModal("Notificación", "Enviada: " + NumSalida);
+            $("#btnTerminar").prop("disabled",false);
+        });
 }
 
 </script>

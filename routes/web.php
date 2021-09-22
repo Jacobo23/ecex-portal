@@ -67,7 +67,7 @@ Route::resource('/int/salidas', 'OutcomeController')->middleware('auth')->middle
 Route::get('/int/salidas/{outcome}/delete','OutcomeController@delete')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas_xls','OutcomeController@download_outcomes_xls')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas_can_change_customer/{outcome}','OutcomeController@can_change_customer')->middleware(['auth','allow.only:user']);
-
+Route::get('/int/salidas/{outcome}/download_pdf','OutcomeController@downloadPDF')->middleware('auth');
 
 //Outcome Rows internal
 Route::resource('/outcome_row', 'OutcomeRowController')->middleware(['auth','allow.only:user']);
@@ -77,6 +77,8 @@ Route::get('/int/inventory/{customer_id}/{days_before}','InventoryController@get
 Route::get('/int/inventory','InventoryController@index')->middleware(['auth','allow.only:user']);
 Route::get('/int/inventory_xls','InventoryController@downloadInventory')->middleware(['auth','allow.only:user']);
 Route::get('/int/inventory/{cliente}/{rango}/{others}/complete','InventoryController@getAll')->middleware(['auth','allow.only:user']);
+
+
 //                 Defaults->   0       /     30     / NO_FILTER       <- cuando llames esta ruta no dejes vacios los campos
 //Customer
 Route::resource('/int/catalog/customers', 'CustomerController')->middleware(['auth','allow.only:user']);
@@ -98,6 +100,7 @@ Route::get('/int/salidas_OC_set_status/{load_order}/{outcome_number}','OutcomeCo
 //INCOMES
 Route::get('/ext/entradas', 'IncomeController@index_customer')->middleware(['auth','allow.only:customer']);
 Route::get('/ext/entradas_xls','IncomeController@download_incomes_xls_customer')->middleware(['auth','allow.only:customer']);
+Route::get('/quitar_on_hold/{income}','IncomeController@quitarOnHold')->middleware(['auth','allow.only:customer']);
 //OUTCOMES
 Route::get('/ext/salidas', 'OutcomeController@index_customer')->middleware(['auth','allow.only:customer']);
 Route::get('/ext/salidas_xls','OutcomeController@download_outcomes_xls_customer')->middleware(['auth','allow.only:customer']);
@@ -110,4 +113,9 @@ Route::get('/ext/ordenes_de_carga/create','LoadOrderController@create')->middlew
 Route::get('/ext/inventory_oc/{days_before}','InventoryController@get_for_oc')->middleware(['auth','allow.only:customer']);
 Route::post('/ext/ordenes_de_carga','LoadOrderController@store')->middleware(['auth','allow.only:customer']);
 
+//E-MAIL
+Route::get('/sendemail/{numero_de_entrada}/entrada','EmailController@sendEmailEntrada');
+Route::get('/sendemail/{outcome}/salida','EmailController@sendEmailSalida');
+
+Route::get('/test/{outcome}','OutcomeController@test')->middleware(['auth','allow.only:user']);
 require __DIR__.'/auth.php';
