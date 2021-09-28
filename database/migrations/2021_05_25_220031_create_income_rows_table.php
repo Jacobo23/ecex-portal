@@ -17,12 +17,12 @@ class CreateIncomeRowsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('income_id');
             $table->unsignedBigInteger('part_number_id');
-            $table->decimal('units', 13, 4)->default(0);
+            $table->decimal('units', 16, 4)->default(0);
             $table->integer('bundles')->default(0);
             $table->string('umb');
             $table->string('ump');
-            $table->decimal('net_weight', 13, 4)->default(0);
-            $table->decimal('gross_weight', 13, 4)->default(0);
+            $table->decimal('net_weight', 16, 4)->default(0);
+            $table->decimal('gross_weight', 16, 4)->default(0);
             $table->string('po')->default("");
             $table->string('desc_ing')->default("");
             $table->string('desc_esp')->default("");

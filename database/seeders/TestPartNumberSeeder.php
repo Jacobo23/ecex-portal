@@ -23,7 +23,7 @@ class TestPartNumberSeeder extends Seeder
         // Create connection
         $conn = mysqli_connect($servername, $username, $password, $dbname);
 
-        $sql = "SELECT NumeroDeParte.id, NumeroDeParte.NumerodeParte, NumeroDeParte.Cliente, NumeroDeParte.UM, NumeroDeParte.PesoU, NumeroDeParte.Descripcion_Ing, NumeroDeParte.Descripcion_Esp, NumeroDeParte.PaisDeOrigen, NumeroDeParte.Fraccion, NumeroDeParte.nico, NumeroDeParte.Marca, NumeroDeParte.Modelo, NumeroDeParte.Serie, NumeroDeParte.IMMEX,NumeroDeParte.fraccion_especial, NumeroDeParte.Regimen, NumeroDeParte.alerta FROM NumeroDeParte where Cliente = 18;";
+        $sql = "SELECT NumeroDeParte.id, NumeroDeParte.NumerodeParte, NumeroDeParte.Cliente, NumeroDeParte.UM, NumeroDeParte.PesoU, NumeroDeParte.Descripcion_Ing, NumeroDeParte.Descripcion_Esp, NumeroDeParte.PaisDeOrigen, NumeroDeParte.Fraccion, NumeroDeParte.nico, NumeroDeParte.Marca, NumeroDeParte.Modelo, NumeroDeParte.Serie, NumeroDeParte.IMMEX,NumeroDeParte.fraccion_especial, NumeroDeParte.Regimen, NumeroDeParte.alerta FROM NumeroDeParte where Cliente > 0;";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) 
@@ -38,7 +38,7 @@ class TestPartNumberSeeder extends Seeder
                     if(Customer::find($row["Cliente"]) != null)
                     {
                         $part_number->id = $row["id"];
-                        $part_number->part_number = $row["NumerodeParte"];
+                        $part_number->part_number = utf8_encode($row["NumerodeParte"]);
                         $part_number->customer_id = $row["Cliente"];
                         $part_number->um = $row["UM"];
                         $part_number->unit_weight = $row["PesoU"];

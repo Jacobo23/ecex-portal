@@ -61,6 +61,13 @@
         <td width="170">
             <table style="margin 0 auto; text-align: center;">
                 <tbody >
+                    @if ($income->urgent)
+                    <tr>
+                        <td class="time">
+                            <strong>* Urgente *</strong> 
+                        </td>
+                    </tr>
+                    @endif
                     <tr>
                         <td class="time">
                             Entrada: <strong>{{ $income->getIncomeNumber() }}</strong> 

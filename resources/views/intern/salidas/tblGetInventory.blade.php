@@ -51,10 +51,10 @@
             <td>{{ explode(' ',$row->income->cdate)[0] }}</td>
             <td>{{ $row->part_number()->part_number }} <input type="hidden" name="txtNumeroDePartePesoU_{{ $row->id }}_{{ $loop->index }}" id="txtNumeroDePartePesoU_{{ $row->id }}_{{ $loop->index }}" value="{{ $row->part_number()->unit_weight }}"></td>
             <td>
-                <input type="number" class="form-control" id="txtCantidad_{{ $row->id }}_{{ $loop->index }}" name="units[]" value="{{ $row->units }}" max="{{ $row->units }}" onchange="validarCantidad(this,{{ $row->units }},'{{ $loop->index }}')" readonly>
+                <input type="number" class="form-control" id="txtCantidad_{{ $row->id }}_{{ $loop->index }}" name="units[]" value="{{ $row->units }}" max="{{ $row->units }}" min="0" onchange="validarCantidad(this,{{ $row->units }},'{{ $loop->index }}')" readonly>
                 <input type="hidden" id="txtUM_{{ $row->id }}_{{ $loop->index }}" name="ump[]" value="{{ $row->ump }}">
             </td>
-            <td><input type="number" class="form-control" id="txtBultos_{{ $row->id }}_{{ $loop->index }}" name="bundles[]" value="{{ $row->bundles }}" readonly onchange="calcularPesoBruto({{ $row->id }},'{{ $loop->index }}')"></td>
+            <td><input type="number" class="form-control" id="txtBultos_{{ $row->id }}_{{ $loop->index }}" name="bundles[]" value="{{ $row->bundles }}" min="0" readonly onchange="calcularPesoBruto({{ $row->id }},'{{ $loop->index }}')"></td>
             <td>
                 <select class="form-select" id = "txtUMB_{{ $row->id }}_{{ $loop->index }}" name = "umb[]" disabled onchange="tipoBultoChange({{ $row->id }},'{{ $loop->index }}')">
                     @php 
@@ -75,8 +75,8 @@
                 echo "<input type='hidden' name='txtUMBPeso_".$row->id."' id='txtUMBPeso_".$row->id."_".$loop->index."' value='".$peso_bulto."'>";
                 @endphp
             </td>
-            <td><input type="number" class="form-control" id="txtPesoNeto_{{ $row->id }}_{{ $loop->index }}" name="net_weight[]" value="{{ $row->part_number()->unit_weight * $row->units }}" readonly  onchange="calcularPesoBruto({{ $row->id }},'{{ $loop->index }}')"></td>
-            <td><input type="number" class="form-control" id="txtPesoBruto_{{ $row->id }}_{{ $loop->index }}" name="gross_weight[]" value="{{ $row->gross_weight }}" readonly></td>
+            <td><input type="number" class="form-control" id="txtPesoNeto_{{ $row->id }}_{{ $loop->index }}" min="0" name="net_weight[]" value="{{ $row->part_number()->unit_weight * $row->units }}" readonly  onchange="calcularPesoBruto({{ $row->id }},'{{ $loop->index }}')"></td>
+            <td><input type="number" class="form-control" id="txtPesoBruto_{{ $row->id }}_{{ $loop->index }}" min="0" name="gross_weight[]" value="{{ $row->gross_weight }}" readonly></td>
             <td style="font-size: 0.9em;">{{ $row->desc_ing }}</td>
         </tr>
         @endforeach

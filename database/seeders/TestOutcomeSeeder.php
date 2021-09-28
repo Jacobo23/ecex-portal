@@ -7,6 +7,7 @@ use App\Models\Outcome;
 use App\Models\Carrier;
 use App\Models\OutcomeRow;
 use App\Models\IncomeRow;
+use App\Models\Customer;
 
 
 class TestOutcomeSeeder extends Seeder
@@ -28,7 +29,7 @@ class TestOutcomeSeeder extends Seeder
 
 
         //////////////////ENCABEZADO
-        $sql = "select Salidas.Year, Salidas.Num, Salidas.Regimen, Salidas.Fecha, Salidas.Cliente, Transportista.Nombre as Transportista, Salidas.Caja_T, Salidas.Sello, Salidas.Observaciones, Salidas.Factura, Salidas.Pedimento, Salidas.Referencia, Salidas.Usuario, Salidas.RecibidoPor,Salidas.Placas, Salidas.Despacho, Salidas.Descontada from Salidas join Transportista on Transportista.id = Salidas.Transportista where Salidas.Cliente = 18";
+        $sql = "select Salidas.Year, Salidas.Num, Salidas.Regimen, Salidas.Fecha, Salidas.Cliente, Transportista.Nombre as Transportista, Salidas.Caja_T, Salidas.Sello, Salidas.Observaciones, Salidas.Factura, Salidas.Pedimento, Salidas.Referencia, Salidas.Usuario, Salidas.RecibidoPor,Salidas.Placas, Salidas.Despacho, Salidas.Descontada from Salidas join Transportista on Transportista.id = Salidas.Transportista where Salidas.Cliente > 0";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) 
@@ -36,6 +37,10 @@ class TestOutcomeSeeder extends Seeder
             // output data of each row
             while($row = $result->fetch_assoc()) 
             {
+                if(!Customer::find($row["Cliente"]))
+                {
+                    continue;
+                }
                 $salida = new Outcome;
                 $salida->year = $row["Year"];
                 $salida->number = $row["Num"];
@@ -44,15 +49,15 @@ class TestOutcomeSeeder extends Seeder
                 $salida->customer_id = $row["Cliente"];
                 $Transportista = Carrier::where("name",$row["Transportista"])->first();
                 $salida->carrier_id = $Transportista ? $Transportista->id : 1;
-                $salida->trailer = $row["Caja_T"] ?? "";
-                $salida->seal = $row["Sello"] ?? "";
-                $salida->observations = utf8_encode($row["Observaciones"] ?? "");
-                $salida->invoice = $row["Factura"] ?? "";
-                $salida->pediment = $row["Pedimento"] ?? "";
-                $salida->reference = $row["Referencia"] ?? "";
-                $salida->user = $row["Usuario"] ?? "";
-                $salida->received_by = $row["RecibidoPor"] ?? "";
-                $salida->plate = $row["Placas"] ?? "";
+                $salida->trailer = utf8_encode($row["Caja_T"] ?? "");
+                $salida->seal = utf8_encode($row["Sello"] ?? "");
+                $salida->observations = substr(utf8_encode($row["Observaciones"] ?? ""),0,1000);
+                $salida->invoice = utf8_encode($row["Factura"] ?? "");
+                $salida->pediment = utf8_encode($row["Pedimento"] ?? "");
+                $salida->reference = utf8_encode($row["Referencia"] ?? "");
+                $salida->user = utf8_encode($row["Usuario"] ?? "");
+                $salida->received_by = utf8_encode($row["RecibidoPor"] ?? "");
+                $salida->plate = utf8_encode($row["Placas"] ?? "");
                 $salida->leave = $row["Despacho"] ?? '2020-12-31 00:00:00';
                 $salida->discount = isset($row["Descontada"]);
 

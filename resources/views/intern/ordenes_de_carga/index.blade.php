@@ -34,6 +34,7 @@
         </div>-->
         <br>
         <br>
+        
 
         <h5 class="separtor">Lista:</h5>
 
@@ -52,7 +53,7 @@
             <tbody>
                 @foreach ($load_orders as $load_order)
                 <tr id="oc_row_{{ $load_order->id }}">
-                    <td><a href="/int/salidas_OC/{{ $load_order->id }}">OC-{{ $load_order->id }}</a></td>
+                    <td><button class="btn btn-link" onclick="goOC({{ $load_order->id }},'{{ $load_order->status }}')">OC-{{ $load_order->id }}</button></td>
                     <td>{{ $load_order->regimen }}</td>
                     <td>{{ $load_order->customer->name }}</td>
                     <td>{{ $load_order->cdate }}</td>
@@ -75,6 +76,18 @@ function descargarXLS()
 {
     let path = "/ext/entradas_xls?txtRango="+$("#txtRango").val()+"&txtTracking="+$("#txtTracking").val();
     location.href = path;   
+}
+function goOC(oc_id,status)
+{
+    if(status == '')
+    {
+        location.href = "/int/salidas_OC/"+oc_id;
+    }
+    else
+    {
+        showModal("Notificacion", "Esta orden de carga ya cuenta con salida.<br>Elija una opción:<br>ir a la salida: <a href='/int/salidas/"+status+"'>"+status+"</a><br>ir a la orden de carga: <a href='/int/salidas_OC/"+oc_id+"'>OC-"+oc_id+"</a>")
+    }
+    
 }
 
 </script>

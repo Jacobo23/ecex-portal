@@ -43,7 +43,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Fecha:</label>
-            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($outcome)){{ explode(' ',$outcome->cdate)[0] }}@endif">
+            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($outcome)){{ explode(' ',$outcome->cdate)[0] }}@endif" min="{{ date('Y-m-d') }}">
         </div>
 
         <div class="col-lg-3 controlDiv" >
@@ -132,27 +132,36 @@
             <div style="display:none">
                 <form id="packingForm" action="/upload_pakinglist_outcome" method="post" enctype="multipart/form-data">
                     @csrf
-                    <input type="file" id="txtPacking" name="file" onchange="subirPacking()">
+                    <input type="file" id="txtPacking" name="files[]" onchange="subirPacking()" accept="application/pdf" multiple>
                     <input type="text" id="fileNumSalida" name="fileNumSalida">
                 </form>
                 <form id="packingDeleteForm" action="/delete_pakinglist_outcome" method="post" enctype="multipart/form-data">
                     @csrf
                     <input type="text" id="fileDeleteNumSalida" name="fileDeleteNumSalida">
+                    <input type="hidden" id="fileDeleteNumSalida_filename" name="fileDeleteNumSalida_filename">
                 </form>
             </div>
             @php
             if(isset($numero_de_salida))
             {
-                $packinglist_path='/public/salidas/'.$numero_de_salida.'/packing_list/packing-list.pdf';
+                $packinglist_path='/public/salidas/'.$numero_de_salida.'/packing_list/';
                 if (Storage::exists($packinglist_path)) 
                 {
                     echo "<br>";
-                    echo "<div class='img_card col-lg-12' style='padding:10px'>";
-                    echo "    <div class='img_card_top'>";
-                    echo "        <h6><b>Packing list</b><button onclick='deletePacking()'><i class='fas fa-times'></i></button></h6>"; 
-                    echo "    </div>";
-                    echo "    <p><a href='/download_pakinglist_outcome/".$numero_de_salida."'><i class='fas fa-arrow-circle-down'></i></a><strong>Tamaño: </strong> ". round(Storage::size($packinglist_path)/1000000,2,PHP_ROUND_HALF_UP ) ." Mb</p>";
-                    echo "</div>";
+                    $packinglists = Storage::files($packinglist_path);
+                    foreach ($packinglists as $packinglist) 
+                    {
+                        $pck_file_name_array=explode('/',$packinglist);
+                        $pck_file_name=$pck_file_name_array[count($pck_file_name_array)-1];
+
+                        
+                        echo "<div class='img_card col-lg-12' style='padding:10px'>";
+                        echo "    <div class='img_card_top'>";
+                        echo "        <h6><b>".$pck_file_name."</b><button onclick='deletePacking(\"".$pck_file_name."\")'><i class='fas fa-times'></i></button></h6>"; 
+                        echo "    </div>";
+                        echo "    <p><a href='/download_pakinglist_outcome/".$numero_de_salida."/".$pck_file_name."'><i class='fas fa-arrow-circle-down'></i></a><strong>Tamaño: </strong> ". round(Storage::size($packinglist)/1000000,2,PHP_ROUND_HALF_UP ) ." Mb</p>";
+                        echo "</div>";
+                    }
                 }
             }
             @endphp
@@ -164,7 +173,7 @@
             <div style="display:none">
                 <form id="OutcomeImgForm" action="/upload_img_salida" method="post" enctype="multipart/form-data">
                     @csrf
-                    <input class="form-control" type="file" onchange="subirImagenes()" id="txtImagenes" name="filenames[]" multiple>
+                    <input class="form-control" type="file" onchange="subirImagenes()" accept="image/*" id="txtImagenes" name="filenames[]" multiple>
                     <input type="text" id="fileNumSalidaImg" name="fileNumSalidaImg">
                 </form>
                 <form id="OutcomeImgDeleteForm" action="/delete_img_salida" method="post" enctype="multipart/form-data">
@@ -227,10 +236,13 @@
                         <label class="form-label">Rango:</label>
                         <div class="input-group">
                             <select class="form-select" id = "txtRangoInv" name = "txtRangoInv">
-                                <option value=30 selected>30 días</option>
+                                <option value=5>5 días</option>
+                                <option value=15>15 días</option>
+                                <option value=30>30 días</option>
                                 <option value=90>90 días</option>
                                 <option value=190>6 meses</option>
                                 <option value=365>1 año</option>
+                                <option value=1095>3 años</option>
                             </select>
                             <button type="button" class="btn btn-outline-secondary" onclick="consultarInventario()">Consultar</button>
                         </div>
@@ -401,7 +413,7 @@ function guardarSalida()
                 @if (isset($load_order))
                     $.ajax({url: "/int/salidas_OC_set_status/{{ $load_order->id }}/"+response["numero_de_salida"],context: document.body}).done(function(result) 
                         {
-                            showModal("Notificación","Registrado con exito: '"+response["numero_de_salida"]+"' asgnada a OC-{{ $load_order->id }}");
+                            showModal("Notificación","Registrado con exito: '"+response["numero_de_salida"]+"' asignada a OC-{{ $load_order->id }}");
                         });
                 @endif
             } else
@@ -412,12 +424,14 @@ function guardarSalida()
     });
 }
 
-function deletePacking()
+function deletePacking(filename)
 {
+    
     let NumSalida = $("#txtNumSalida").val();
     if (confirm("Desea eliminar el packing list?"))
     {
         $("#fileDeleteNumSalida").val(NumSalida);
+        $("#fileDeleteNumSalida_filename").val(filename);
         $("#packingDeleteForm").submit();
     }
 }
@@ -571,6 +585,15 @@ function eliminarPartida(outcome_row_id)
 
 function checkCampoCliente()
 {
+    @if (isset($load_order))
+    if({{ $outcome->customer_id }} != $("#txtCliente").val())
+        {
+            showModal("Advertencia", "No se puede cambiar el cliente de una orden de carga.");
+            $("#txtCliente").val({{ $outcome->customer_id }});
+            return;
+        }
+    @endif
+
     let NumSalida = $("#txtNumSalida").val();
     let outcome_id = $("#outcomeID").val();
     if(NumSalida.length != 9 || outcome_id.length < 1)
@@ -643,6 +666,11 @@ function terminar()
     {
         return;
     }
+    if(!confirm("¿Desea enviar la salida por correo?"))
+    {
+        return;
+    }
+
     $("#btnTerminar").prop("disabled",true);
     
 

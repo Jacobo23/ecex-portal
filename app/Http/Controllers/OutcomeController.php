@@ -30,7 +30,7 @@ class OutcomeController extends Controller
         $clientes = Customer::All();
         $cliente = $request->txtCliente ?? 0;
         $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
-        $rango = $request->txtRango ?? 30;
+        $rango = $request->txtRango ?? 15;
         $otros = $request->txtOtros ?? "";
         $can_delete = Auth::user()->canDeleteOutcome();
         
@@ -49,7 +49,7 @@ class OutcomeController extends Controller
     public function index_customer(Request $request)
     {
         $cliente = explode(",",Auth::user()->customer_ids);
-        $rango = $request->txtRango ?? 30;
+        $rango = $request->txtRango ?? 15;
         $otros = $request->txtOtros ?? "";
         $salidas = $this->get_Outcomes_obj($cliente, $rango, $otros);
         
@@ -64,12 +64,6 @@ class OutcomeController extends Controller
     public function get_Outcomes_obj(array $cliente, string $rango, string $otros)
     {
         $salidas = Outcome::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString());
-        
-
-        //if(count($cliente) > 0)
-        //{
-        //    $salidas = $salidas->whereIn('customer_id',$cliente);
-        //}
 
         //en caso de el el campo "otros" sea un numeo de parte o de entrada buscaremos
         $partidas_filtradas = array();
@@ -93,13 +87,32 @@ class OutcomeController extends Controller
             $sql_whereIn = "or id IN(".implode(",",$partidas_filtradas).")";
         }
 
+        //en caso de el el campo "otros" sean una salida buscaremos
 
-        //
+        $yearOtc="";
+        $numOtc="";
 
+        if(strlen($otros) >= 9)
+        {
+            $yearOtc=substr($otros,0,4);
+            $numOtc=substr($otros,4,5);
+            if(!(is_numeric($yearOtc) && is_numeric($numOtc)))
+            {
+                $yearOtc="";
+                $numOtc="";
+            }
+        }
 
-        
-        $salidas = $salidas->whereRaw(' (invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%" '.$sql_whereIn.') ');
-        $salidas = $salidas->get();
+        if($yearOtc != "")
+        {
+            $salidas = $salidas->whereRaw(' ( (year = '.$yearOtc.' and number = '.$numOtc.' ) or invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%" '.$sql_whereIn.') ');
+        }
+        else
+        {
+            $salidas = $salidas->whereRaw(' (invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%" '.$sql_whereIn.') ');
+        }
+
+        $salidas = $salidas->orderBy('cdate', 'desc')->get();
         return $salidas;
     }
 
@@ -336,7 +349,21 @@ class OutcomeController extends Controller
         $outcome->outcome_rows; //<- se llama esta linea con el fin de cargar las partidas de esta salida
 
         $pdf = PDF::loadView('intern.salidas.pdf', compact('outcome'))->setPaper('a4', 'landscape');
-        return $pdf->download($numero_de_salida.'.pdf');
+        return $pdf->stream();
+        //return $pdf->download($numero_de_salida.'.pdf');
+    }
+    public function downloadPDFCustomer(Outcome $outcome)
+    {
+        $cliente = explode(",",Auth::user()->customer_ids)[0];
+        if($outcome->customer->id == $cliente)
+        {
+            $numero_de_salida = $outcome->getOutcomeNumber(true);
+            $outcome->outcome_rows; //<- se llama esta linea con el fin de cargar las partidas de esta salida
+
+            $pdf = PDF::loadView('intern.salidas.pdf', compact('outcome'))->setPaper('a4', 'landscape');
+            return $pdf->stream();
+            //return $pdf->download($numero_de_salida.'.pdf');
+        }
     }
 
     public function test(Outcome $outcome)

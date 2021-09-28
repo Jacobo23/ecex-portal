@@ -35,7 +35,7 @@ Route::post('/delete_img_entrada/','UploadFileController@deleteImgEntrada')->mid
   //outcomes
 Route::post('upload_pakinglist_outcome/','UploadFileController@uploadPakinglistOutcome')->middleware(['auth','allow.only:user']);
 Route::post('/delete_pakinglist_outcome/','UploadFileController@deletePackingOutcome')->middleware(['auth','allow.only:user']);
-Route::get('/download_pakinglist_outcome/{salida}','UploadFileController@downloadPackingOutcome')->middleware('auth');
+Route::get('/download_pakinglist_outcome/{salida}/{filename}','UploadFileController@downloadPackingOutcome')->middleware('auth');
 Route::post('/upload_img_salida/','UploadFileController@uploadImgSalida')->middleware(['auth','allow.only:user']);
 Route::post('/delete_img_salida/','UploadFileController@deleteImgOutcome')->middleware(['auth','allow.only:user']);
 
@@ -45,7 +45,7 @@ Route::post('/delete_img_salida/','UploadFileController@deleteImgOutcome')->midd
 Route::resource('/int/entradas', 'IncomeController')->middleware(['auth','allow.only:user']);
 Route::get('/int/entradas_can_change_customer/{income}','IncomeController@can_change_customer')->middleware(['auth','allow.only:user']);
 
-Route::get('/int/entradas/{income}/download_pdf','IncomeController@downloadPDF')->middleware('auth');
+Route::get('/int/entradas/{income}/download_pdf','IncomeController@downloadPDF')->middleware(['auth','allow.only:user']);
 Route::get('/int/entradas/{income}/delete','IncomeController@delete')->middleware(['auth','allow.only:user']);
 Route::get('/int/entradas_xls','IncomeController@download_incomes_xls')->middleware(['auth','allow.only:user']);
 
@@ -67,7 +67,7 @@ Route::resource('/int/salidas', 'OutcomeController')->middleware('auth')->middle
 Route::get('/int/salidas/{outcome}/delete','OutcomeController@delete')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas_xls','OutcomeController@download_outcomes_xls')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas_can_change_customer/{outcome}','OutcomeController@can_change_customer')->middleware(['auth','allow.only:user']);
-Route::get('/int/salidas/{outcome}/download_pdf','OutcomeController@downloadPDF')->middleware('auth');
+Route::get('/int/salidas/{outcome}/download_pdf','OutcomeController@downloadPDF')->middleware(['auth','allow.only:user']);
 
 //Outcome Rows internal
 Route::resource('/outcome_row', 'OutcomeRowController')->middleware(['auth','allow.only:user']);
@@ -101,9 +101,11 @@ Route::get('/int/salidas_OC_set_status/{load_order}/{outcome_number}','OutcomeCo
 Route::get('/ext/entradas', 'IncomeController@index_customer')->middleware(['auth','allow.only:customer']);
 Route::get('/ext/entradas_xls','IncomeController@download_incomes_xls_customer')->middleware(['auth','allow.only:customer']);
 Route::get('/quitar_on_hold/{income}','IncomeController@quitarOnHold')->middleware(['auth','allow.only:customer']);
-//OUTCOMES
+Route::get('/ext/entradas/{income}/download_pdf','IncomeController@downloadPDFCustomer')->middleware(['auth','allow.only:customer']);
 Route::get('/ext/salidas', 'OutcomeController@index_customer')->middleware(['auth','allow.only:customer']);
 Route::get('/ext/salidas_xls','OutcomeController@download_outcomes_xls_customer')->middleware(['auth','allow.only:customer']);
+Route::get('/ext/salidas/{outcome}/download_pdf','OutcomeController@downloadPDFCustomer')->middleware(['auth','allow.only:customer']);
+
 //INVENTARIO
 Route::get('/ext/inventario','InventoryController@index_customer')->middleware(['auth','allow.only:customer']);
 Route::get('/ext/inventory_xls','InventoryController@downloadInventory_customer')->middleware(['auth','allow.only:customer']);

@@ -79,7 +79,7 @@
             <tbody>
                 @foreach ($incomes as $income)
                 <tr id="inc_row_{{ $income->id }}" @if ( $income->get_color_fila_estado() != '') class="table-{{ $income->get_color_fila_estado() }}" @endif>
-                    <td><a href="">{{ $income->getIncomeNumber() }}</a></td>
+                    <td><a href="/ext/entradas/{{ $income->id }}/download_pdf">{{ $income->getIncomeNumber() }}</a></td>
                     <td>{{ explode(" ", $income->cdate)[0] }}</td>
                     <td>@if ($income->reviewed) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td>{{ $income->getBultos() }} {{ $income->getTipoBultos() }}</td>

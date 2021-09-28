@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Database\File;
 use App\Models\Income;
 use App\Models\Carrier;
+use App\Models\Customer;
 use App\Models\Supplier;
 use App\Models\IncomeRow;
 use App\Models\PartNumber;
@@ -31,7 +32,7 @@ class TestIncomeSeeder extends Seeder
 
 
         //////////////////ENCABEZADO
-        $sql = "SELECT Entradas.Year, Entradas.Num, Entradas.Fecha, Entradas.Cliente, Transportista.Nombre AS Transportista, Proveedores.Nombre AS Proveedor, Entradas.Referencia, Entradas.Caja, Entradas.Sello, Entradas.Observaciones, Entradas.ImpoExpo, Entradas.Factura, Entradas.Tracking, Entradas.PO, Entradas.Enviada, Entradas.Usuario, Entradas.Revisada_por, Entradas.Cerrada, Entradas.Urgente, Entradas.OnHold, Entradas.clasificacion FROM Entradas JOIN Transportista ON Transportista.id = Entradas.Transportista JOIN Proveedores ON Entradas.Proveedor = Proveedores.id where Entradas.Cliente = 18;";
+        $sql = "SELECT Entradas.Year, Entradas.Num, Entradas.Fecha, Entradas.Cliente, Transportista.Nombre AS Transportista, Proveedores.Nombre AS Proveedor, Entradas.Referencia, Entradas.Caja, Entradas.Sello, Entradas.Observaciones, Entradas.ImpoExpo, Entradas.Factura, Entradas.Tracking, Entradas.PO, Entradas.Enviada, Entradas.Usuario, Entradas.Revisada_por, Entradas.Cerrada, Entradas.Urgente, Entradas.OnHold, Entradas.clasificacion FROM Entradas JOIN Transportista ON Transportista.id = Entradas.Transportista JOIN Proveedores ON Entradas.Proveedor = Proveedores.id where Entradas.Cliente > 0;";
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) 
@@ -39,6 +40,10 @@ class TestIncomeSeeder extends Seeder
             // output data of each row
             while($row = $result->fetch_assoc()) 
             {
+                if(!Customer::find($row["Cliente"]))
+                {
+                    continue;
+                }
                 $entrada = new Income;
                 $entrada->year = $row["Year"];
                 $entrada->number = $row["Num"];
@@ -48,18 +53,18 @@ class TestIncomeSeeder extends Seeder
                 $entrada->carrier_id = $Transportista ? $Transportista->id : 1;
                 $Proveedor = Supplier::where("name",$row["Proveedor"])->first();
                 $entrada->supplier_id = $Proveedor ? $Proveedor->id : 1;
-                $entrada->reference = $row["Referencia"];
-                $entrada->trailer = $row["Caja"] ;
-                $entrada->seal = $row["Sello"] ;
-                $entrada->observations = $row["Observaciones"] ;
+                $entrada->reference = utf8_encode($row["Referencia"]);
+                $entrada->trailer = utf8_encode($row["Caja"]) ;
+                $entrada->seal = utf8_encode($row["Sello"]) ;
+                $entrada->observations = utf8_encode($row["Observaciones"]) ;
                 $entrada->impoExpo = $row["ImpoExpo"] ;
-                $entrada->invoice = $row["Factura"] ;
-                $entrada->tracking = $row["Tracking"] ;
-                $entrada->po = $row["PO"];
+                $entrada->invoice = utf8_encode($row["Factura"]) ;
+                $entrada->tracking = utf8_encode($row["Tracking"]) ;
+                $entrada->po = utf8_encode($row["PO"]);
                 $entrada->sent = is_numeric($row["Enviada"]) ? $row["Enviada"] : 0;
-                $entrada->user =  $row["Usuario"] ;
+                $entrada->user =  utf8_encode($row["Usuario"]) ;
                 $entrada->reviewed = isset($row["Revisada_por"]);
-                $entrada->reviewed_by = $row["Revisada_por"] ?? "";
+                $entrada->reviewed_by = utf8_encode($row["Revisada_por"] ?? "");
                 $entrada->closed = $row["Cerrada"] ?? 0;
                 $entrada->urgent = $row["Urgente"] ?? 0;
                 $entrada->onhold = $row["OnHold"] ?? 0;
@@ -82,6 +87,10 @@ class TestIncomeSeeder extends Seeder
                         {
                             $part_n = PartNumber::where('id',$row2["NumeroDeParteID"])->first();
                         }
+                        if(IncomeRow::find($row2["id"]))
+                        {
+                            continue;
+                        }
                         $incomeRow->id = $row2["id"];
                         $incomeRow->part_number_id = $part_n ? $part_n->id : 130373;
                         $incomeRow->income_id = $entrada->id;
@@ -91,21 +100,21 @@ class TestIncomeSeeder extends Seeder
                         $incomeRow->ump = $row2["UMPiezas"] ;
                         $incomeRow->net_weight = $row2["PesoNeto"] ;
                         $incomeRow->gross_weight = $row2["PesoBruto"] ;
-                        $incomeRow->po = $row2["PO"] ?? "";
-                        $incomeRow->desc_ing = $row2["Descripcion_Ing"] ;
-                        $incomeRow->desc_esp = $row2["Descripcion_Esp"] ;
-                        $incomeRow->origin_country = $row2["PaisDeOrigen"] ;
-                        $incomeRow->fraccion = $row2["Fraccion"] ;
-                        $incomeRow->nico = $row2["nico"] ?? "";
-                        $incomeRow->location = $row2["Locacion"] ?? "";
-                        $incomeRow->observations = $row2["observacion_partida"] ?? "";
-                        $incomeRow->brand = $row2["Marca"] ?? "";
-                        $incomeRow->model = $row2["Modelo"] ?? "";
-                        $incomeRow->serial = $row2["Serie"] ?? "";
-                        $incomeRow->lot = $row2["lote"] ?? "";
-                        $incomeRow->imex = $row2["IMEX"] ?? "";
+                        $incomeRow->po = utf8_encode($row2["PO"] ?? "");
+                        $incomeRow->desc_ing = utf8_encode($row2["Descripcion_Ing"]) ;
+                        $incomeRow->desc_esp = utf8_encode($row2["Descripcion_Esp"]) ;
+                        $incomeRow->origin_country = utf8_encode($row2["PaisDeOrigen"]) ;
+                        $incomeRow->fraccion = utf8_encode($row2["Fraccion"]) ;
+                        $incomeRow->nico = utf8_encode($row2["nico"] ?? "");
+                        $incomeRow->location = utf8_encode($row2["Locacion"] ?? "");
+                        $incomeRow->observations = utf8_encode($row2["observacion_partida"] ?? "");
+                        $incomeRow->brand = utf8_encode($row2["Marca"] ?? "");
+                        $incomeRow->model = utf8_encode($row2["Modelo"] ?? "");
+                        $incomeRow->serial = utf8_encode($row2["Serie"] ?? "");
+                        $incomeRow->lot = utf8_encode($row2["lote"] ?? "");
+                        $incomeRow->imex = utf8_encode($row2["IMEX"] ?? "");
                         $incomeRow->regime = "";
-                        $incomeRow->skids = $row2["SKID"] ?? "";
+                        $incomeRow->skids = utf8_encode($row2["SKID"] ?? "");
                         $incomeRow->save();
                         //registrar bultos en inventario
                         $inv_bundle = new InventoryBundle;

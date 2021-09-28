@@ -23,7 +23,7 @@ class CreateOutcomesTable extends Migration
             $table->unsignedBigInteger('carrier_id');
             $table->string('trailer')->default("");
             $table->string('seal')->default("");
-            $table->string('observations',512)->default("");
+            $table->string('observations',1024)->default("");
             $table->string('invoice')->default("");
             $table->string('pediment')->default("");
             $table->string('reference')->default("");

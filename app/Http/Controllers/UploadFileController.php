@@ -14,7 +14,14 @@ class UploadFileController extends Controller
     }
     public function uploadPakinglistOutcome(Request $request)
     {
-        Storage::put('/public/salidas/'.$request->fileNumSalida.'/packing_list/packing-list.pdf', file_get_contents($request->file('file')));
+        $i = 0;
+        foreach ($request->file('files') as $file) 
+        {
+            $i++;
+            Storage::put('/public/salidas/'.$request->fileNumSalida.'/packing_list/'.time().'_'.$i.'.'.$file->extension(), file_get_contents($file));
+        }
+        //return redirect('/int/entradas/'.$request->fileNumEntradaImg);  
+        //Storage::put('/public/salidas/'.$request->fileNumSalida.'/packing_list/packing-list.pdf', file_get_contents($request->file('file')));
         return redirect('/int/salidas/'.$request->fileNumSalida);        
     }
 
@@ -22,9 +29,9 @@ class UploadFileController extends Controller
     {
         return Storage::download('public/entradas/'.$entrada.'/packing_list/packing-list.pdf');
     }
-    public function downloadPackingOutcome($salida)
+    public function downloadPackingOutcome($salida, $filename)
     {
-        return Storage::download('public/salidas/'.$salida.'/packing_list/packing-list.pdf');
+        return Storage::download('public/salidas/'.$salida.'/packing_list/'.$filename);
     }
 
     public function deletePacking(Request $request)
@@ -34,7 +41,7 @@ class UploadFileController extends Controller
     }
     public function deletePackingOutcome(Request $request)
     {
-        Storage::delete('public/salidas/'.$request->fileDeleteNumSalida.'/packing_list/packing-list.pdf');
+        Storage::delete('public/salidas/'.$request->fileDeleteNumSalida.'/packing_list/'.$request->fileDeleteNumSalida_filename);
         return redirect('/int/salidas/'.$request->fileDeleteNumSalida); 
     }
 

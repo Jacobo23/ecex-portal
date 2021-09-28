@@ -50,7 +50,7 @@
             <td>{{ explode(' ',$row->income->cdate)[0] }}</td>
             <td>{{ $row->part_number()->part_number }}</td>
             <td>
-                <input type="number" class="form-control" style="width:150px" id="txtCantidad_{{ $row->id }}" name="units[]" value="{{ $row->units }}" max="{{ $row->units }}" onchange="validarCantidad(this,{{ $row->units }})" readonly>
+                <input type="number" class="form-control" style="width:150px" id="txtCantidad_{{ $row->id }}" name="units[]" value="{{ $row->units }}" min="0" max="{{ $row->units }}" onchange="validarCantidad(this,{{ $row->units }})" readonly>
             </td>
             <td>{{ $row->ump }}</td>
             <td>{{ $row->bundles }} {{ $row->umb }}</td>

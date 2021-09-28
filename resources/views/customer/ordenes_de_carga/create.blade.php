@@ -118,6 +118,25 @@ function selectGroup(control,income_id)
 
 function guardarOC()
 {
+    let partidas = 0;
+    let partidas_obj = $(".chkSingle");
+    if(partidas_obj.length < 1)
+    {
+        showModal("Notificacion", "No hay partidas seleccionadas.");
+        return;
+    }
+    $(".chkSingle").each(function(){
+        if ($(this).prop('checked'))
+        {
+            partidas++;
+        }
+    });
+    if(partidas < 1)
+    {
+        showModal("Notificacion", "No hay partidas seleccionadas.");
+        return;
+    }
+
     if(!confirm("Desea guardar las partidas seleccionadas? es la informacion correcta?"))
     {
         return;

@@ -17,7 +17,7 @@ class CreateLoadOrderRowsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('load_order_id');
             $table->unsignedBigInteger('income_row_id');
-            $table->decimal('units', 8, 2)->default(0);
+            $table->decimal('units', 16, 4)->default(0);
             $table->timestamps();
         });
     }

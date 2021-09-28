@@ -17,12 +17,12 @@ class CreateOutcomeRowsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('outcome_id');
             $table->unsignedBigInteger('income_row_id');
-            $table->decimal('units', 13, 4)->default(0);
+            $table->decimal('units', 16, 4)->default(0);
             $table->integer('bundles')->default(0);
             $table->string('ump');
             $table->string('umb');
-            $table->decimal('net_weight', 13, 4)->default(0);
-            $table->decimal('gross_weight', 13, 4)->default(0);
+            $table->decimal('net_weight', 16, 4)->default(0);
+            $table->decimal('gross_weight', 16, 4)->default(0);
             $table->timestamps();
         });
     }

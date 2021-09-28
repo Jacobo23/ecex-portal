@@ -40,7 +40,7 @@ class IncomeController extends Controller
         $en_inventario = isset($request->chkInventario);
 
         $entradas = $this->get_Incomes_obj($cliente_ids,$rango,$tracking,$en_inventario,false);
-        
+                
         return view('intern.entradas.index', [
             'incomes' => $entradas,
             'can_delete' => $can_delete,
@@ -102,17 +102,24 @@ class IncomeController extends Controller
         ]);
     }
 
-    public function get_Incomes_obj(array $cliente, string $rango, string $tracking, bool $en_inventario, bool $enviada)
+    public function get_Incomes_obj(array $cliente, string $rango, string $busqueda, bool $en_inventario, bool $enviada)
     {
         // '$cliente' en realidad es un array de los customer_id que vamos a filtrar NINGUNO DEBE SER CERO 0
         $entradas = Income::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString())
-            ->where('tracking', 'like', '%'.$tracking.'%');
+            ->where('tracking', 'like', '%'.$busqueda.'%');
+
+        if(strlen($busqueda) == 9)
+        {
+            $yearInc=substr($busqueda,0,-5);
+            $numInc=substr($busqueda,4);
+            $entradas = $entradas->orWhere('year', $yearInc)->where('number', $numInc);
+        }
         
         if(count($cliente) > 0)
         {
             $entradas = $entradas->whereIn('customer_id',$cliente);
         }
-        $entradas = $entradas->get();
+        $entradas = $entradas->orderBy('cdate', 'desc')->get();
 
         if($en_inventario)
         {
@@ -326,9 +333,9 @@ class IncomeController extends Controller
         //TO DO: falta verificar que las partidas no tengan salida.
         $partidas = $income->income_rows;
         $lista_de_salidas = "";
-        foreach ($partidas as $partidas) 
+        foreach ($partidas as $partida) 
         {
-            $outcomes = $partidas->get_discounting_outcomes();
+            $outcomes = $partida->get_discounting_outcomes();
             foreach ($outcomes as $outcome) 
             {
                 $lista_de_salidas .= " '".$outcome."'";
@@ -363,8 +370,28 @@ class IncomeController extends Controller
         //]);
 
         $pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
-        return $pdf->download($numero_de_entrada.'.pdf');
+        return $pdf->stream();
+        //return $pdf->download($numero_de_entrada.'.pdf');
     }
+    public function downloadPDFCustomer(Income $income)
+    {
+        $cliente = explode(",",Auth::user()->customer_ids)[0];
+        if($income->customer->id == $cliente)
+        {
+            $numero_de_entrada = $income->year.str_pad($income->number,5,"0",STR_PAD_LEFT);
+            $income->income_rows; //<- se llama esta linea con el fin de cargar las partidas de esta entrada
+
+            $pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
+            return $pdf->stream();
+            //return $pdf->download($numero_de_entrada.'.pdf');
+        }
+        else
+        {
+            abort(404);
+        }
+    }
+
+    
 
     public function getBalance(Request $request)
     {

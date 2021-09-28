@@ -44,7 +44,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Fecha:</label>
-            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@endif" >
+            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@endif" min="{{ date('Y-m-d') }}">
         </div>
 
         <div class="col-lg-3 controlDiv" >
@@ -173,7 +173,7 @@
             <div style="display:none">
                 <form id="packingForm" action="/upload_pakinglist" method="post" enctype="multipart/form-data">
                     @csrf
-                    <input type="file" id="txtPacking" name="file" onchange="subirPacking()">
+                    <input type="file" id="txtPacking" name="file" onchange="subirPacking()" accept="application/pdf">
                     <input type="text" id="fileNumEntrada" name="fileNumEntrada">
                 </form>
                 <form id="packingDeleteForm" action="/delete_pakinglist" method="post" enctype="multipart/form-data">
@@ -205,7 +205,7 @@
             <div style="display:none">
                 <form id="IncomeImgForm" action="/upload_img_entrada" method="POST" enctype="multipart/form-data">
                     @csrf
-                    <input class="form-control" type="file" onchange="subirImagenes()" id="txtImagenes" name="filenames[]" multiple>
+                    <input class="form-control" type="file" onchange="subirImagenes()" accept="image/*" id="txtImagenes" name="filenames[]" multiple>
                     <input type="text" id="fileNumEntradaImg" name="fileNumEntradaImg">
                     <button type="submit" form="IncomeImgForm" value="Submit" id="sbtIncomeImgForm">Submit</button>
                     
@@ -309,7 +309,7 @@
     <div class="row">
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">Cantidad:</label>
-            <input type="number" class="form-control" id="txtCantidad" name="txtCantidad" value="" onchange="calcularPesoNeto()">       
+            <input type="number" class="form-control" id="txtCantidad" name="txtCantidad" value="" min=0 onchange="calcularPesoNeto()">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">UM:</label>
@@ -321,7 +321,7 @@
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">Bultos:</label>
-            <input type="number" class="form-control" id="txtBultos" name="txtBultos" value="" onchange="calcularPesoBruto()">       
+            <input type="number" class="form-control" id="txtBultos" name="txtBultos" value="" min=0 onchange="calcularPesoBruto()">       
         </div>
         <div class="col-lg-2 controlDiv" >
             <label class="form-label">Tipo bulto:</label>
@@ -796,7 +796,6 @@ function createPartida()
     $("#txtLote").val("");
     $("#txtRegimen").val("");
     $("#txtSkids").val("");
-    $("#txtPO").val("");
     $("#txtObservacionesPartida").val("");
     $("#fraccionAlert").removeAttr("style").hide();
     $("#fraccionAlert").html("");
@@ -839,7 +838,6 @@ function goPartida(id)
             $("#txtLote").val(response.income_row.lot);
             $("#txtRegimen").val(response.income_row.regime);
             $("#txtSkids").val(response.income_row.skids);
-            $("#txtPO").val(response.income_row.po);
             $("#txtObservacionesPartida").val(response.income_row.observations);
             $("#fraccionAlert").html("");
             if(response.part_number.fraccion_especial != "")
@@ -867,6 +865,33 @@ function guardarPartida()
         showModal("Alerta!","Número de parte no valido.");
         return;
     }
+
+    if($("#txtCantidad").val() <= 0)
+    {
+        showModal("Alerta!","'Cantidad' no puede ser 0.");
+        return;
+    }
+    if($("#txtBultos").val() <= 0)
+    {
+        showModal("Alerta!","'Bultos' no puede ser 0.");
+        return;
+    }
+    if($("#txtUMB").val() <= 0)
+    {
+        showModal("Alerta!","'Tipo de Bultos' inválido.");
+        return;
+    }
+    if($("#txtPesoNeto").val() <= 0)
+    {
+        showModal("Alerta!","'Peso neto' inválido.");
+        return;
+    }
+    if($("#txtPesoBruto").val() <= 0)
+    {
+        showModal("Alerta!","'Peso bruto' inválido.");
+        return;
+    }
+
     //$("#formIncomeRow").submit();
     
     $.ajax({
@@ -977,6 +1002,19 @@ function terminar()
         showModal("Alerta!","Primero guarde la entrada.");
         return;
     }
+
+    let enviada = "";
+    @if (isset($income))
+    @if ($income->sent)
+    enviada = "Esta partida ya ha sido enviada ";
+    @endif
+    @endif
+
+    if(!confirm(enviada + "¿Desea enviar la entrada por correo?"))
+    {
+        return;
+    }
+
     $("#btnTerminar").prop("disabled",true);
 
     $.ajax({url: "/sendemail/"+NumEntrada+"/entrada",context: document.body}).done(function(response) 

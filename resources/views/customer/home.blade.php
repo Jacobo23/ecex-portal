@@ -20,14 +20,14 @@
                     <div class="col-lg-6">
                         <h4 class="separtor">Principal</h4>
                         <a class="selectMenu" href="/ext/entradas/">Entradas <i class="fas fa-sign-in-alt"></i></a>
-                        <a class="selectMenu" href="/ext/salidas/">Salidas <i class="fas fa-sign-out-alt"></i></a>
-                        <a class="selectMenu " href="/ext/ordenes_de_carga/">Ordenes de carga<i class="fas fa-shopping-cart"></i></a>
+                        <a class="selectMenu" href="/ext/inventario/">Inventario <i class="fas fa-pallet"></i></a>
                     </div>
                     <div class="col-lg-6">
-                        <h4 class="separtor">Reportes</h4>
-                        <a class="selectMenu" href="/ext/inventario/">Inventario <i class="fas fa-pallet"></i></a>
-                        <a class="selectMenu" href="/ext/capacidad/">Capacidad <i class="fas fa-chart-pie"></i></a>
-                        <a class="selectMenu " href="/ext/cajas">Cajas <i class="fas fa-trailer"></i></a>
+                        <h4 class="separtor">&nbsp;</h4>
+                        <a class="selectMenu" href="/ext/salidas/">Salidas <i class="fas fa-sign-out-alt"></i></a>
+                        <a class="selectMenu " href="/ext/ordenes_de_carga/">Ordenes de carga<i class="fas fa-shopping-cart"></i></a>
+                        <!--<a class="selectMenu" href="/ext/capacidad/">Capacidad <i class="fas fa-chart-pie"></i></a>
+                        <a class="selectMenu " href="/ext/cajas">Cajas <i class="fas fa-trailer"></i></a> -->
                     </div>                    
                 </div>
             </div>
