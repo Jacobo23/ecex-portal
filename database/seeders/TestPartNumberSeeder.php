@@ -17,7 +17,7 @@ class TestPartNumberSeeder extends Seeder
     {
         $servername = "test123.cegsylsiwyfd.us-west-1.rds.amazonaws.com";
         $username = "root";
-        $password = "Jakoloco16";
+        $password = "EcexOVJR3875";
         $dbname = "test";
 
         // Create connection
@@ -32,11 +32,18 @@ class TestPartNumberSeeder extends Seeder
             
             while($row = $result->fetch_assoc()) 
             {
-                $part_number = new PartNumber;
+                
                 if(!is_null($row["NumerodeParte"]) && $row["NumerodeParte"] != "" && $row["Cliente"] != 0)
                 {
                     if(Customer::find($row["Cliente"]) != null)
                     {
+                        $part_number = PartNumber::where('part_number',$row["NumerodeParte"])->where('customer_id',$row["Cliente"])->first();
+                        if($part_number)
+                        {
+                            continue;
+                        }
+                        $part_number = new PartNumber;
+
                         $part_number->id = $row["id"];
                         $part_number->part_number = utf8_encode($row["NumerodeParte"]);
                         $part_number->customer_id = $row["Cliente"];

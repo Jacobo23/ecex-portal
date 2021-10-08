@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Regime;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LoadorderExport;
 
 class LoadOrderController extends Controller
 {
@@ -21,9 +23,11 @@ class LoadOrderController extends Controller
         $clientes = explode(",",Auth::user()->customer_ids);
 
         $load_orders = $this->get_load_orders_obj($clientes);
+        $can_create_oc = Auth::user()->canCreateOC();
 
         return view('customer.ordenes_de_carga.index', [
             'load_orders' => $load_orders,
+            'can_create_oc' => $can_create_oc,
         ]);
     }
 
@@ -64,7 +68,6 @@ class LoadOrderController extends Controller
      */
     public function create()
     {
-        //
         $regimes = Regime::All();
         return view('customer.ordenes_de_carga.create', [
             'regimes' => $regimes,
@@ -104,6 +107,14 @@ class LoadOrderController extends Controller
         }
 
         return $load_order_rows_ids;
+    }
+
+    public function downloadOC(LoadOrder $oc)
+    {
+        //return "hola";
+        $oc_rows = $oc->load_order_rows;
+        $export = new LoadorderExport($oc_rows);
+        return Excel::download($export, 'OC-'.$oc->id.'.xlsx');
     }
 
     /**

@@ -30,7 +30,7 @@
 <div class="p-6 bg-white border-b border-gray-200">
 
         <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">
-            <a href="/ext/ordenes_de_carga/create" class="btn btn-success" role="button">Crear orden <i class="fas fa-plus"></i></a>    
+        @if ($can_create_oc) <a href="/ext/ordenes_de_carga/create" class="btn btn-success" role="button">Crear orden <i class="fas fa-plus"></i></a> @endif
         </div>
         <br>
         <br>
@@ -46,6 +46,7 @@
                     <th scope="col">Peso Neto</th>
                     <th scope="col">Notas</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Descargar</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,6 +58,7 @@
                     <td>{{ $load_order->get_peso_neto() }}</td>
                     <td>{{ $load_order->notes }}</td>
                     <td>{{ $load_order->status }}</td>
+                    <td><a href="/ext/download_oc/{{ $load_order->id }}" class="btn" role="button"><i style="color:#34a338" class="fas fa-file-excel"></i></a></td>
                 </tr>
                 @endforeach
             </tbody>

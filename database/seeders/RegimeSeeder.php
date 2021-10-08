@@ -20,5 +20,6 @@ class RegimeSeeder extends Seeder
         DB::table('regimes')->insert(['name' => 'V1']);
         DB::table('regimes')->insert(['name' => 'R1']);
         DB::table('regimes')->insert(['name' => 'NA']);
+        DB::table('regimes')->insert(['name' => 'DI']);
     }
 }

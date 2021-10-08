@@ -27,8 +27,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             TestPartNumberSeeder::class,
             TestIncomeSeeder::class,
-            TestOutcomeSeeder::class,
-            TestOutcomeSeeder::class,
+            //TestOutcomeSeeder::class,
+            //TestOutcomeSeeder::class,
         ]);
     }
 }

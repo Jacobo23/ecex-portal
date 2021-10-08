@@ -36,7 +36,8 @@
             <div class="col-lg-2 controlDiv" >
                 <label class="form-label">Rango:</label>
                 <select class="form-select" id = "txtRango" name = "txtRango">
-                    <option value="30" selected>30 días</option>
+                    <option value="15" selected>15 días</option>
+                    <option value="30" @if ( $rango == 30) selected @endif >30 días</option>
                     <option value="90" @if ( $rango == 90) selected @endif >90 días</option>
                     <option value="190" @if ( $rango == 190) selected @endif >6 meses</option>
                     <option value="365" @if ( $rango == 365) selected @endif >1 año</option>
@@ -59,12 +60,21 @@
 
         <h5 class="separtor">Lista:</h5>
 
+        <div class="row">
+            <div class="col-lg-10">
+            </div>
+            <div class="col-lg-2">
+                <input type="text" class="form-control" id="txtQuickSearch" placeholder="Busca rapida">       
+            </div>
+        </div>
+        <br>
+
         <table class="table table-sm table-striped table-bordered table-hover">
             <thead>
                 <tr>
                     <th scope="col">Entrada #</th>
                     <th scope="col">Fecha</th>
-                    <th scope="col">Revisada</th>
+                    <th scope="col"><input type="checkbox" class="form-check-input" id="chkRevisada" onclick="filtrarRevisadas()"> Revisada</th>
                     <th scope="col">Bultos</th>
                     <th scope="col">Dias</th>
                     <th scope="col">Proveedor</th>
@@ -72,17 +82,17 @@
                     <th scope="col">Tracking</th>
                     <th scope="col">Impo/Expo</th>
                     <th scope="col">Adjuntos</th>
-                    <th scope="col">Urgente</th>
-                    <th scope="col">On-hold</th>
+                    <th scope="col"><input type="checkbox" class="form-check-input" id="chkUrgente" onclick="filtrarUrgentes()"> Urgente</th>
+                    <th scope="col"><input type="checkbox" class="form-check-input" id="chkOnhold" onclick="filtrarOnhold()"> On-hold</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="tbl_Incomes">
                 @foreach ($incomes as $income)
-                <tr id="inc_row_{{ $income->id }}" @if ( $income->get_color_fila_estado() != '') class="table-{{ $income->get_color_fila_estado() }}" @endif>
+                <tr id="inc_row_{{ $income->id }}" @if ( $income->get_color_fila_estado() != '') class="tr_tbl table-{{ $income->get_color_fila_estado() }}" @endif>
                     <td><a href="/ext/entradas/{{ $income->id }}/download_pdf">{{ $income->getIncomeNumber() }}</a></td>
                     <td>{{ explode(" ", $income->cdate)[0] }}</td>
-                    <td>@if ($income->reviewed) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td>{{ $income->getBultos() }} {{ $income->getTipoBultos() }}</td>
+                    <td id="tdRevisada_{{ $income->id }}">@if ($income->reviewed) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
+                    <td>{{ $income->getBultosOriginales() }} {{ $income->getTipoBultos() }}</td>
                     <td>{{ $income->getDiasTrascurridos() }}</td>
                     <td>{{ $income->supplier->name }}</td>
                     <td>{{ $income->po }}</td>
@@ -123,9 +133,8 @@
                         }
                         @endphp
                     </td>
-                    
-                    <td>@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
-                    <td>@if ($income->onhold) <button id="btn_onhold_{{ $income->id }}" class="btn btn-primary" onclick="quitarOnhold({{ $income->id }})">on hold</button> @endif</td>
+                    <td id="tdUrgente_{{ $income->id }}">@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
+                    <td id="tdOnhold_{{ $income->id }}">@if ($income->onhold) @if ($can_quit_onhold) <button id="btn_onhold_{{ $income->id }}" class="btn btn-primary" onclick="quitarOnhold({{ $income->id }})">on hold</button> @else on hold @endif @endif</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -162,5 +171,85 @@ function quitarOnhold(income_id)
             $("#btn_onhold_"+income_id).remove();
         });
 }
+
+
+function filtrarRevisadas()
+{
+    $(".tr_tbl").each(function()
+        {
+            $(this).show();
+        });
+
+    $('#chkUrgente').prop('checked', false);
+    $('#chkOnhold').prop('checked', false);
+
+    if($('#chkRevisada').prop('checked'))
+    {        
+        $(".tr_tbl").each(function()
+        {
+            var index = $(this).attr('id').split("_")[2];
+            if( $("#tdRevisada_"+index).html() == "")
+            {
+                $("#inc_row_"+index).hide();
+            }
+        });
+    }
+}
+
+function filtrarUrgentes()
+{
+    $(".tr_tbl").each(function()
+        {
+            $(this).show();
+        });
+
+    $('#chkRevisada').prop('checked', false);
+    $('#chkOnhold').prop('checked', false);
+
+    if($('#chkUrgente').prop('checked'))
+    {        
+        $(".tr_tbl").each(function()
+        {
+            var index = $(this).attr('id').split("_")[2];
+            if( $("#tdUrgente_"+index).html() == "")
+            {
+                $("#inc_row_"+index).hide();
+            }
+        });
+    }
+}
+
+function filtrarOnhold()
+{
+    $(".tr_tbl").each(function()
+        {
+            $(this).show();
+        });
+
+    $('#chkRevisada').prop('checked', false);
+    $('#chkUrgente').prop('checked', false);
+
+    if($('#chkOnhold').prop('checked'))
+    {        
+        $(".tr_tbl").each(function()
+        {
+            var index = $(this).attr('id').split("_")[2];
+            if( $("#tdOnhold_"+index).html() == "")
+            {
+                $("#inc_row_"+index).hide();
+            }
+        });
+    }
+}
+
+
+$(document).ready(function(){
+  $("#txtQuickSearch").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#tbl_Incomes tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
 </script>
 @endsection

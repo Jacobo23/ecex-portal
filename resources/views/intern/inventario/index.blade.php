@@ -8,7 +8,7 @@
     }
     .oversized-col
     {
-        max-width:150px;
+        min-width:150px;
         overflow:hidden;
     }
 </style>
@@ -105,7 +105,7 @@
                     <td>{{ $partida->income->type }}</td>
                     <td>{{ $partida->part_number()->part_number }}</td>
                     <td>{{ $partida->units }}</td>
-                    <td>{{ $partida->income->getBultos() }} {{ $partida->income->getTipoBultos() }}</td>
+                    <td class="oversized-col"><input style="text-align:center; border: 1px solid #ccd; border-radius:4px; height: 30px; width:60px;" type="number" id="txtBultosInv_{{ $partida->id }}" min="0" value="{{ $partida->getBultos() }}" onfocusout="editarBultos({{ $partida->id }},{{ $partida->getBultos() }})"> {{ $partida->umb }}</td>
                     <td>{{ $partida->net_weight }}</td>
                     <td>{{ $partida->location }}</td>
                     <td>{{ $partida->desc_ing }}</td>
@@ -128,23 +128,26 @@
 @section('scripts')
 <script>
 
-function editarBultos(id,control)
-{return;
-    if(!confirm("¿Desea eliminar la entrada '"+num_entrada+"'?"))
+function editarBultos(row_id,original)
+{
+    let cantidad = $("#txtBultosInv_"+row_id).val();
+    if(isNaN(cantidad))
     {
+        $("#txtBultosInv_"+row_id).val(original);
         return;
     }
-    $.ajax({url: "/int/entradas/"+id+"/delete",context: document.body}).done(function(result) 
+    if(cantidad == '')
+    {
+        $("#txtBultosInv_"+row_id).val(original);
+        return;
+    }
+    if(cantidad < 0)
+    {
+        $("#txtBultosInv_"+row_id).val(original);
+        return;
+    }
+    $.ajax({url: "/bultos_inventario_edit/"+row_id+"/"+cantidad,context: document.body}).done(function(result) 
         {
-            if(result != "")
-            {
-                showModal("Notificación",result);
-            }
-            else
-            {
-                showModal("Notificación","Entrada '" + num_entrada + "' eliminada");
-                $("#inc_row_"+id).remove();
-            }
             
         });
 }

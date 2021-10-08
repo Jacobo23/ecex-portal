@@ -121,7 +121,7 @@
     <tr style="">
       <td style="text-align:center">{{ $income_row->part_number()->part_number }}</td>
       <td style="text-align:center">{{ $income_row->units }}</td>
-      <td style="text-align:center">{{ $income_row->bundles }} {{ $income_row->bundle_type }}</td>
+      <td style="text-align:center">{{ $income_row->bundles }} {{ $income_row->umb }}</td>
       <td style="text-align:center">{{ $income_row->net_weight }} Lbs / {{ round($income_row->net_weight *  0.453592,2,PHP_ROUND_HALF_UP )}} Kg</td>
       <td style="text-align:center">{{ $income_row->gross_weight }} Lbs / {{ round($income_row->gross_weight *  0.453592,2,PHP_ROUND_HALF_UP )}} Kg</td>
       <td style="text-align:center">{{ $income_row->origin_country }}</td>
@@ -188,7 +188,7 @@
       <td></td>
     </tr>
     <tr>
-      <td>Total de Bultos: {{ $income->getBultos() }} {{ $income->getTipoBultos() }}</td>
+      <td>Total de Bultos: {{ $income->getBultosOriginales() }} {{ $income->getTipoBultos() }}</td>
     </tr>
   </tbody>
 </table>

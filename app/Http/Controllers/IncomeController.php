@@ -92,6 +92,8 @@ class IncomeController extends Controller
         $tracking = $request->txtTracking ?? "";
         $en_inventario = true;
 
+        $can_quit_onhold = Auth::user()->canQuitOnhold();
+
         $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario,true);
 
         return view('customer.entradas.index', [
@@ -99,6 +101,7 @@ class IncomeController extends Controller
             'cliente' => $cliente,
             'rango' => $rango,
             'tracking' => $tracking,
+            'can_quit_onhold' => $can_quit_onhold,
         ]);
     }
 
@@ -119,7 +122,7 @@ class IncomeController extends Controller
         {
             $entradas = $entradas->whereIn('customer_id',$cliente);
         }
-        $entradas = $entradas->orderBy('cdate', 'desc')->get();
+        $entradas = $entradas->orderBy('id', 'desc')->get();
 
         if($en_inventario)
         {
@@ -435,6 +438,6 @@ class IncomeController extends Controller
         }
 
         $pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
-        return $pdf->download($numero_de_entrada.'.pdf');
+        return $pdf->download('balance_'.$numero_de_entrada.'.pdf');
     }
 }

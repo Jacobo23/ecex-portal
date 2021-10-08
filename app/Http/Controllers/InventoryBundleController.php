@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\InventoryBundle;
+use App\Models\IncomeRow;
 use Illuminate\Http\Request;
 
 class InventoryBundleController extends Controller
@@ -15,6 +16,19 @@ class InventoryBundleController extends Controller
     public function index()
     {
         //
+    }
+    
+    public function edit_cantidad_bultos(IncomeRow $income_row, string $cantidad)
+    {
+        $inv_bundle = InventoryBundle::where('income_row_id',$income_row->id)->first();
+        if($inv_bundle === null)
+        {
+            $inv_bundle = new InventoryBundle;
+            $inv_bundle->income_row_id = $income_row->id;
+        }
+        $inv_bundle->quantity = $cantidad;
+        $inv_bundle->save();
+        return;
     }
 
     /**

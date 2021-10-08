@@ -4,9 +4,6 @@
     td
     {
         text-align:center;
-    }
-    .oversized-col
-    {
         max-width:150px;
         overflow:hidden;
     }
@@ -25,7 +22,7 @@
 <!-- Page Content -->
 
 <div class="py-12">
-<div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
+<div class="max-w-9xl mx-auto sm:px-6 lg:px-8">
 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 <div class="p-6 bg-white border-b border-gray-200">
 
@@ -45,10 +42,12 @@
             <div class="col-lg-2 controlDiv" >
                 <label class="form-label">Rango:</label>
                 <select class="form-select" id = "txtRango" name = "txtRango">
-                    <option value="30" selected>30 días</option>
+                    <option value="15" selected>15 días</option>
+                    <option value="30" @if ( $rango == 30) selected @endif >30 días</option>
                     <option value="90" @if ( $rango == 90) selected @endif >90 días</option>
                     <option value="190" @if ( $rango == 190) selected @endif >6 meses</option>
                     <option value="365" @if ( $rango == 365) selected @endif >1 año</option>
+                    <option value="1095" @if ( $rango == 1095) selected @endif >3 años</option>
                 </select>
             </div>
             
@@ -73,7 +72,15 @@
 
         <h5 class="separtor">Lista:</h5>
 
-
+        
+        <div class="row">
+            <div class="col-lg-10">
+            </div>
+            <div class="col-lg-2">
+                <input type="text" class="form-control" id="txtQuickSearch" placeholder="Busca rapida">       
+            </div>
+        </div>
+        <br>
 
         <!-- como esta pantalla no contiene formularios debemos agregar uno para tener un token csrf-->
         <form method="DELETE">
@@ -86,33 +93,37 @@
                     <th scope="col">Fecha</th>
                     <th scope="col">Dias</th>
                     <th scope="col">Cliente</th>
+                    <th scope="col">Proveedor</th>
                     <th scope="col">Tracking</th>
+                    <th scope="col">PO</th>
                     <th scope="col">Bultos</th>
                     <th scope="col">Materia/Equipo</th>
-                    <th scope="col">Enviada</th>
-                    <th scope="col">Revisada</th>
-                    <th scope="col">Urgente</th>
-                    <th scope="col">On-hold</th>
+                    <th scope="col"><input type="checkbox" class="form-check-input" id="chkEnviada" onclick="filtrarEnviadas()"> Enviada</th>
+                    <th scope="col"><input type="checkbox" class="form-check-input" id="chkRevisada" onclick="filtrarRevisadas()"> Revisada</th>
+                    <th scope="col"><input type="checkbox" class="form-check-input" id="chkUrgente" onclick="filtrarUrgentes()"> Urgente</th>
+                    <th scope="col"><input type="checkbox" class="form-check-input" id="chkOnhold" onclick="filtrarOnhold()"> On-hold</th>
                     <th scope="col">Balance</th>
                     <th scope="col">Folder</th>
                     <th scope="col" style="display:none">adjuntos</th>
                     @if ($can_delete) <th scope="col">Eliminar</th> @endif
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="tbl_Incomes">
                 @foreach ($incomes as $income)
-                <tr id="inc_row_{{ $income->id }}" @if ( $income->get_color_fila_estado() != '') class="table-{{ $income->get_color_fila_estado() }}" @endif>
+                <tr id="inc_row_{{ $income->id }}" @if ( $income->get_color_fila_estado() != '') class="tr_tbl table-{{ $income->get_color_fila_estado() }}" @endif>
                     <td><a href="/int/entradas/{{ $income->getIncomeNumber() }}">{{ $income->getIncomeNumber() }}</a></td>
                     <td>{{ explode(" ", $income->cdate)[0] }}</td>
                     <td>{{ $income->getDiasTrascurridos() }}</td>
                     <td>{{ $income->customer->name }}</td>
-                    <td class="oversized-col">{{ $income->tracking }}</td>
-                    <td>{{ $income->getBultos() }} {{ $income->getTipoBultos() }}</td>
+                    <td>{{ $income->supplier->name }}</td>
+                    <td>{{ $income->po }}</td>
+                    <td>{{ $income->tracking }}</td>
+                    <td>{{ $income->getBultosOriginales() }} {{ $income->getTipoBultos() }}</td>
                     <td>{{ $income->type }}</td>
-                    <td>@if ($income->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td>@if ($income->reviewed) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
-                    <td>@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
-                    <td>@if ($income->onhold) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
+                    <td id="tdEnviada_{{ $income->id }}">@if ($income->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
+                    <td id="tdRevisada_{{ $income->id }}">@if ($income->reviewed) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
+                    <td id="tdUrgente_{{ $income->id }}">@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
+                    <td id="tdOnhold_{{ $income->id }}">@if ($income->onhold) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td><a class="btn " href="/int/balance?entrada={{ $income->getIncomeNumber() }}"><i class="fas fa-balance-scale"></i></a></td>
                     <td><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_income_{{ $income->id }}')"><i class="far fa-folder-open"></i></button></td>
                     <td id="adjuntos_income_{{ $income->id }}" style="display:none">
@@ -198,5 +209,113 @@ function showAdjuntos(content_row)
     showModal("Adjuntos",html);
 }
 
+function filtrarEnviadas()
+{
+    $(".tr_tbl").each(function()
+        {
+            $(this).show();
+        });
+
+    $('#chkRevisada').prop('checked', false);
+    $('#chkUrgente').prop('checked', false);
+    $('#chkOnhold').prop('checked', false);
+
+    if($('#chkEnviada').prop('checked'))
+    {        
+
+        $(".tr_tbl").each(function()
+        {
+            var index = $(this).attr('id').split("_")[2];
+            if( $("#tdEnviada_"+index).html() == "")
+            {
+                $("#inc_row_"+index).hide();
+            }
+        });
+    }
+}
+
+function filtrarRevisadas()
+{
+    $(".tr_tbl").each(function()
+        {
+            $(this).show();
+        });
+
+    $('#chkEnviada').prop('checked', false);
+    $('#chkUrgente').prop('checked', false);
+    $('#chkOnhold').prop('checked', false);
+
+    if($('#chkRevisada').prop('checked'))
+    {        
+        $(".tr_tbl").each(function()
+        {
+            var index = $(this).attr('id').split("_")[2];
+            if( $("#tdRevisada_"+index).html() == "")
+            {
+                $("#inc_row_"+index).hide();
+            }
+        });
+    }
+}
+
+function filtrarUrgentes()
+{
+    $(".tr_tbl").each(function()
+        {
+            $(this).show();
+        });
+
+    $('#chkEnviada').prop('checked', false);
+    $('#chkRevisada').prop('checked', false);
+    $('#chkOnhold').prop('checked', false);
+
+    if($('#chkUrgente').prop('checked'))
+    {        
+        $(".tr_tbl").each(function()
+        {
+            var index = $(this).attr('id').split("_")[2];
+            if( $("#tdUrgente_"+index).html() == "")
+            {
+                $("#inc_row_"+index).hide();
+            }
+        });
+    }
+}
+
+function filtrarOnhold()
+{
+    $(".tr_tbl").each(function()
+        {
+            $(this).show();
+        });
+
+    $('#chkEnviada').prop('checked', false);
+    $('#chkRevisada').prop('checked', false);
+    $('#chkUrgente').prop('checked', false);
+
+    if($('#chkOnhold').prop('checked'))
+    {        
+        $(".tr_tbl").each(function()
+        {
+            var index = $(this).attr('id').split("_")[2];
+            if( $("#tdOnhold_"+index).html() == "")
+            {
+                $("#inc_row_"+index).hide();
+            }
+        });
+    }
+}
+
+$(document).ready(function(){
+  $("#txtQuickSearch").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#tbl_Incomes tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
+
 </script>
+
+
 @endsection

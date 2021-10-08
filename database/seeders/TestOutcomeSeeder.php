@@ -21,7 +21,7 @@ class TestOutcomeSeeder extends Seeder
     {
         $servername = "test123.cegsylsiwyfd.us-west-1.rds.amazonaws.com";
         $username = "root";
-        $password = "Jakoloco16";
+        $password = "EcexOVJR3875";
         $dbname = "test";
 
         // Create connection
@@ -41,6 +41,15 @@ class TestOutcomeSeeder extends Seeder
                 {
                     continue;
                 }
+                if($row["Cliente"] == '22' || $row["Cliente"] == '20')
+                {
+                    continue;
+                }
+                if($row["Cliente"] == 22 || $row["Cliente"] == 20)
+                {
+                    continue;
+                }
+
                 $salida = new Outcome;
                 $salida->year = $row["Year"];
                 $salida->number = $row["Num"];
@@ -63,7 +72,7 @@ class TestOutcomeSeeder extends Seeder
 
                 $salida->save();
                 //////////////////PARTIDAS
-                $sql2 = "select Entradas_Salida.PE, Entradas_Salida.CantidadPiezas, Entradas_Salida.Bultos, Entradas_Salida.UMPiezas, Entradas_Salida.UMBultos, Entradas_Salida.PesoNeto, Entradas_Salida.PesoBruto from Entradas_Salida where Entradas_Salida.YearSalida = " . $salida->year . " and Entradas_Salida.NumSalida = ". $salida->number;
+                $sql2 = "select Entradas_Salida.PE, Entradas_Salida.CantidadPiezas, Entradas_Salida.Bultos, Entradas_Salida.UMPiezas, Entradas_Salida.UMBultos, Entradas_Salida.PesoNeto, Entradas_Salida.PesoBruto from Entradas_Salida where Entradas_Salida.Cliente = " . $salida->customer_id . " and Entradas_Salida.YearSalida = " . $salida->year . " and Entradas_Salida.NumSalida = ". $salida->number;
                 //Storage::put('example.txt', $sql2);
                 $result2 = $conn->query($sql2);
 

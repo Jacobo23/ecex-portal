@@ -9,7 +9,7 @@ use App\Models\Income;
 use App\Models\Outcome;
 
 
-
+//php artisan db:seed --class=TestFilesSeeder
 class TestFilesSeeder extends Seeder
 {
     /**
@@ -22,7 +22,9 @@ class TestFilesSeeder extends Seeder
         $incomes = Income::where('year','=','2021')->get();
         foreach ($incomes as $income) 
         {
+            
             $numero_de_entrada = $income->getIncomeNumber();
+            echo $numero_de_entrada . " -> ";
             //limpiar
             Storage::delete('/public/entradas/'.$numero_de_entrada);
             //PACKINGLISTS
@@ -32,59 +34,43 @@ class TestFilesSeeder extends Seeder
             {
                 $file = file_get_contents($paking_list_url);
                 Storage::put('/public/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf', $file);
+                echo " packinglist OK ";
             }
-
-            $income_imgs_paths='public/filezilla/entradas/'.$numero_de_entrada.'/';
-            if(file_exists($income_imgs_paths))
+            //images https://ecex-intranet.dx.am/Entradas-Salidas/imgUPLOAD/202112198/img2.png
+            //$income_imgs_paths='public/filezilla/entradas/'.$numero_de_entrada.'/';
+            $income_imgs_paths = file_get_contents("https://ecex-intranet.dx.am/common_Functions/UploadFile/getfiles.php?Entrada=".$numero_de_entrada);
+            if($income_imgs_paths == "")
             {
-                $income_imgs = Storage::files($income_imgs_paths);
-                foreach ($income_imgs as $income_img) 
-                {
-                    $img_file_name_array=explode('/',$income_img);
-                    $img_file_name=$img_file_name_array[count($img_file_name_array)-1];
-                    Storage::put('/public/entradas/'.$numero_de_entrada.'/images/'.$img_file_name, file_get_contents($income_img), 'public');
-                }
+                echo "Sin imagenes \n";
+                continue;
             }
+            $income_imgs_paths = explode(",",$income_imgs_paths);
+            // if(file_exists($income_imgs_paths))
+            // {
+                //$income_imgs = Storage::files($income_imgs_paths);
+                $img_count = 0;
+                foreach ($income_imgs_paths as $income_img) 
+                {
+                    if($this->file_contents_exist($income_img))
+                    {
+                        
+                        $img_file_name_array=explode('/',$income_img);
+                        $img_file_name=$img_file_name_array[count($img_file_name_array)-1];
+                        Storage::put('/public/entradas/'.$numero_de_entrada.'/images/'.$img_file_name, file_get_contents($income_img), 'public');
+                        //echo " img ";
+                        $img_count++;
+                        echo ".";
+                    }
+                }
+                echo "Imagenes: " .$img_count;
+            //}
             }
             catch(Exception $e) {
                 echo 'error con: ' . $numero_de_entrada;
               }
 
-        }
-        //salidas
+              echo "\n";
 
-        $outcomes = Outcome::all();
-        foreach ($outcomes as $outcome) 
-        {
-            $numero_de_salida = $outcome->getOutcomeNumber(false);
-            //limpiar
-            Storage::delete('/public/salidas/'.$numero_de_salida);
-            //PACKINGLISTS
-
-            $outcome_packing='public/filezilla/salidas_packing/'.$numero_de_salida.'/';
-            if(file_exists($outcome_packing))
-            {
-                $outcome_packs = Storage::files($outcome_packing);
-                foreach ($outcome_packs as $outcome_pack) 
-                {
-                    $pack_file_name_array=explode('/',$outcome_pack);
-                    $pack_file_name=$pack_file_name_array[count($pack_file_name_array)-1];
-                    Storage::put('/public/salidas/'.$numero_de_salida.'/packing_list/'.$pack_file_name, file_get_contents($outcome_pack));
-                }
-            }
-            
-            //imagenes
-            $outcome_imgs_paths='public/filezilla/salidas/'.$outcome->getOutcomeNumber(true).'/';
-            if(file_exists($outcome_imgs_paths))
-            {
-                $outcome_imgs = Storage::files($outcome_imgs_paths);
-                foreach ($outcome_imgs as $outcome_img) 
-                {
-                    $img_file_name_array=explode('/',$outcome_img);
-                    $img_file_name=$img_file_name_array[count($img_file_name_array)-1];
-                    Storage::put('/public/salidas/'.$numero_de_salida.'/images/'.$img_file_name, file_get_contents($outcome_img), 'public');
-                }
-            }
         }
 
     }

@@ -52,5 +52,17 @@ class IncomeRow extends Model
         $outcome_rows = OutcomeRow::where('outcome_rows.income_row_id', '=', $this->id)->get();
         return $outcome_rows;
     }
+    public function getBultos()
+    {
+        $inv_bundle = InventoryBundle::where('income_row_id',$this->id)->first();
+        if($inv_bundle === null)
+        {
+            $inv_bundle = new InventoryBundle;
+            $inv_bundle->income_row_id = $this->id;
+            $inv_bundle->quantity = $this->bundles;
+            $inv_bundle->save();
+        }
+        return $inv_bundle->quantity;
+    }
     
 }

@@ -44,8 +44,8 @@
             <td>{{ $partida->income->type }}</td>
             <td>{{ $partida->part_number()->part_number }}</td>
             <td>{{ $partida->units }}</td>
-            <td>{{ $partida->income->getBultos() }}</td>
-            <td>{{ $partida->income->getTipoBultos() }}</td>
+            <td>{{ $partida->getBultos() }}</td>
+            <td>{{ $partida->umb }}</td>
             <td>{{ $partida->net_weight }}</td>
             <td>{{ $partida->location }}</td>
             <td>{{ $partida->desc_ing }}</td>

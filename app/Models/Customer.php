@@ -10,11 +10,6 @@ class Customer extends Model
     use HasFactory;
     public $timestamps = false;
 
-    public function emails1()
-    {
-        return explode(";",$this->emails);
-    }
-
     
 
 }

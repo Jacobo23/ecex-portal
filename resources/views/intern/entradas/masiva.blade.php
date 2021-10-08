@@ -33,7 +33,7 @@
         <div style="display:none">
             <form id="frm_Cargar" action="/income_row_massive_load" method="post" enctype="multipart/form-data">
                 @csrf
-                <input type="file" id="txtArchivo" name="file" onchange="subirArchivo()">
+                <input type="file" id="txtArchivo" name="file" accept=".xlsx" onchange="subirArchivo()">
                 <input type="text" id="fileNumEntrada" name="fileNumEntrada" value="{{$income_number}}">
             </form>
         </div>
@@ -231,6 +231,7 @@ function guardar()
                                             color = "green";
                                         }
                                         showModal("Notificación", "Se cargaron <strong style='color:"+color+"'>"+ successful_rows +"</strong> de <strong style='color:"+color+"'>"+row_count+"</strong> partidas.");
+                                        location.href = "/int/entradas/{{$income_number}}";
                                     }
                                 });;
                     }

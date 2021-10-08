@@ -22,6 +22,8 @@
         </tr>
     </table>
 </div>
+
+{{ $body }}
     
 </body>
 </html>

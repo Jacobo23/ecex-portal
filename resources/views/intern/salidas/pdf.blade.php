@@ -116,7 +116,7 @@
     <tr style="">
       <td style="text-align:center">{{ $outcome_row->income_row->part_number()->part_number }}</td>
       <td style="text-align:center">{{ $outcome_row->units }}</td>
-      <td style="text-align:center">{{ $outcome_row->bundles }} {{ $outcome_row->bundle_type }}</td>
+      <td style="text-align:center">{{ $outcome_row->bundles }} {{ $outcome_row->umb }}</td>
       <td style="text-align:center">{{ $outcome_row->net_weight }} Lbs / {{ round($outcome_row->net_weight *  0.453592,2,PHP_ROUND_HALF_UP )}} Kg</td>
       <td style="text-align:center">{{ $outcome_row->gross_weight }} Lbs / {{ round($outcome_row->gross_weight *  0.453592,2,PHP_ROUND_HALF_UP )}} Kg</td>
       <td style="text-align:center">{{ $outcome_row->income_row->origin_country }}</td>

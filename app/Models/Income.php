@@ -8,6 +8,7 @@ use App\Models\IncomeRow;
 use App\Models\Customer;
 use App\Models\Carrier;
 use App\Models\Supplier;
+use App\Models\InventoryBundle;
 use Illuminate\Support\Facades\Storage;
 
 class Income extends Model
@@ -64,6 +65,28 @@ class Income extends Model
         return $dias;
     }
     public function getBultos()
+    {
+        $rows = $this->income_rows;
+        $count = 0;
+        foreach ($rows as $row)
+        {
+            $inv_bundle = InventoryBundle::where('income_row_id',$row->id)->first();
+            if($inv_bundle === null)
+            {
+                $inv_bundle = new InventoryBundle;
+                $inv_bundle->income_row_id = $row->id;
+                $inv_bundle->quantity = $row->bundles;
+                $inv_bundle->save();
+            }
+            //
+            $count += $inv_bundle->quantity;
+        }
+        return $count;
+
+        
+
+    }
+    public function getBultosOriginales()
     {
         $rows = $this->income_rows;
         $count = 0;

@@ -12,12 +12,25 @@ use PDF;
 class EmailController extends Controller
 {
 
-    public function sendEmailEntrada(string $numero_de_entrada)
+    public function FormatoEmailEntrada(string $numero_de_entrada)
     {
         $yearInc=substr($numero_de_entrada,0,-5);
         $numInc=substr($numero_de_entrada,4);
         $income = Income::where('year', $yearInc)->where('number', $numInc)->first();
-        $emails = $income->customer->emails1();
+        //$emails = $income->customer->emails1();
+        
+        if($income)
+        {
+            return view('emails.formatos.entrada', [
+                'income' => $income
+            ]);
+        }
+    }
+
+    public function sendEmailEntrada(Request $request)
+    {
+        $income = Income::find($request->incomeID);
+        $numero_de_entrada = $income->getIncomeNumber();
         
         if($income)
         {
@@ -26,6 +39,10 @@ class EmailController extends Controller
             $income->save();
             $files_path = 'public/entradas/'.$numero_de_entrada.'/';
 
+            if (!Storage::exists($files_path)) 
+            {
+                Storage::makeDirectory($files_path);
+            }
             //generar PDF
             $income->income_rows; //<- se llama esta linea con el fin de cargar las partidas de esta entrada
             $pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
@@ -33,36 +50,92 @@ class EmailController extends Controller
             //borrar un archivo innecesario que podria estar presente
             Storage::delete($files_path."temp_massive.xlsx");
 
-            //Enviar correo
-            Mail::send('emails.entrada', ['income' => $income], function ($m) use ($income, $numero_de_entrada,$emails, $files_path) {
+            //Enviar correo 
+            Mail::send('emails.entrada', ['income' => $income, 'body' => $request->txtObservaciones], function ($m) use ($income, $numero_de_entrada, $files_path, $request) {
                 $m->from('do-not-reply@ecex-portal.org', 'Ecex Notification');
+                $emails = explode(";",$request->txtTo);
+                $emails2 = explode(";",$request->txtCc);
+                
                 foreach ($emails as $email) 
                 {
                     $email = trim($email," ");
                     if($email != "")
                     {
-                        $m->to($email,null)->subject('Entrada '. $numero_de_entrada);
+                        $m->to($email,null)->subject($request->txtSubject);
+                    }
+                }
+
+                foreach ($emails2 as $email) 
+                {
+                    $email = trim($email," ");
+                    if($email != "")
+                    {
+                        $m->cc($email,null)->subject($request->txtSubject);
                     }
                 }
                 
                 if (Storage::exists($files_path)) 
                 {
-                    $files = Storage::allFiles($files_path);
-                    foreach ($files as $file) 
+                    //PDF entrada
+                    $pdf_url = $files_path;
+                    if(isset($request->chkPDF) && Storage::exists($pdf_url))
                     {
-                        $m->attach(public_path(Storage::url($file)));
+                        $pdfs = Storage::files($pdf_url);
+                        foreach ($pdfs as $pdf) 
+                        {
+                            if (Storage::exists($pdf))
+                            {
+                                $m->attach(public_path(Storage::url($pdf)));
+                            }
+                        }
+                    }
+                    //packing list
+                    $packing_list_url = $files_path . "packing_list/packing-list.pdf";
+                    if(isset($request->chkPck) && Storage::exists($packing_list_url))
+                    {
+                        if (Storage::exists($packing_list_url))
+                        {
+                            $m->attach(public_path(Storage::url($packing_list_url)));
+                        }
+                    }
+                    //imagenes
+                    $images_url = $files_path . "images/";
+
+                    if(isset($request->chkImgs) && Storage::exists($images_url))
+                    {
+                        $images = Storage::allFiles($images_url);
+                        foreach ($images as $image) 
+                        {
+                            if (Storage::exists($image))
+                            {
+                                $m->attach(public_path(Storage::url($image)));
+                            }
+                        }
                     }
                 }
             });
         }
+        return redirect('/int/entradas/'.$numero_de_entrada);
     }
 
-    public function sendEmailSalida(Outcome $outcome)
+    public function FormatoEmailSalida(Outcome $outcome)
     {
+        return view('emails.formatos.salida', [
+            'outcome' => $outcome
+        ]);
+    }
+
+    public function sendEmailSalida(Request $request)
+    {
+        $outcome = Outcome::find($request->outcomeID);
         $numero_de_salida = $outcome->getOutcomeNumber(false);
-        $emails = $outcome->customer->emails1();
     
         $files_path = 'public/salidas/'.$numero_de_salida.'/';
+
+        if (!Storage::exists($files_path)) 
+        {
+            Storage::makeDirectory($files_path);
+        }
 
         //generar PDF
 
@@ -72,50 +145,107 @@ class EmailController extends Controller
         $pdf->save(public_path('/storage/salidas/'.$numero_de_salida.'/'.$numero_de_salida.'.pdf'));
         
         //Enviar correo
-        Mail::send('emails.salida', ['outcome' => $outcome], function ($m) use ($outcome, $numero_de_salida,$emails, $files_path) {
+        Mail::send('emails.salida', ['outcome' => $outcome, 'body' => $request->txtObservaciones], function ($m) use ($outcome, $numero_de_salida, $request, $files_path) {
             $m->from('do-not-reply@ecex-portal.org', 'Ecex Notification');
+
+            $emails = explode(";",$request->txtTo);
+            $emails2 = explode(";",$request->txtCc);
+
             foreach ($emails as $email) 
             {
                 $email = trim($email," ");
                 if($email != "")
                 {
-                    $m->to($email,null)->subject('Salida '. $numero_de_salida);
+                    $m->to($email,null)->subject($request->txtSubject);
+                }
+            }
+
+            foreach ($emails2 as $email) 
+            {
+                $email = trim($email," ");
+                if($email != "")
+                {
+                    $m->cc($email,null)->subject($request->txtSubject);
                 }
             }
             
             if (Storage::exists($files_path)) 
             {
-                $files = Storage::allFiles($files_path);
-                foreach ($files as $file) 
+                //PDF salida
+                $pdf_url = $files_path;
+                if(isset($request->chkPDF) && Storage::exists($pdf_url))
                 {
-                    $m->attach(public_path(Storage::url($file)));
+                    $pdfs = Storage::files($pdf_url);
+                    foreach ($pdfs as $pdf) 
+                    {
+                        if (Storage::exists($pdf))
+                        {
+                            $m->attach(public_path(Storage::url($pdf)));
+                        }
+                    }
+                }
+                //packing lists
+                $packing_list_urls = $files_path . "packing_list/";
+
+                if(isset($request->chkPck) && Storage::exists($packing_list_urls))
+                {
+                    $packings = Storage::allFiles($packing_list_urls);
+                    foreach ($packings as $packing) 
+                    {
+                        if (Storage::exists($packing))
+                        {
+                            $m->attach(public_path(Storage::url($packing)));
+                        }
+                    }
+                }
+                //imagenes
+                $images_url = $files_path . "images/";
+
+                if(isset($request->chkImgs) && Storage::exists($images_url))
+                {
+                    $images = Storage::allFiles($images_url);
+                    foreach ($images as $image) 
+                    {
+                        if (Storage::exists($image))
+                        {
+                            $m->attach(public_path(Storage::url($image)));
+                        }
+                    }
                 }
             }
             //archivos de las entradas de esta salida
-            $incomes = $outcome->getIncomes();
-            foreach ($incomes as $income) 
+            
+            if(isset($request->chkIncome))
             {
-                $income_path = 'public/entradas/'.$income.'/';
-                if (Storage::exists($income_path)) 
+                $incomes = $outcome->getIncomes();
+                foreach ($incomes as $income) 
                 {
-                    //borrar un archivo innecesario que podria estar presente
-                    Storage::delete($income_path."temp_massive.xlsx");
-
-                    $files = Storage::allFiles($income_path);
-                    foreach ($files as $file) 
+                    $income_path = 'public/entradas/'.$income.'/';
+                    if (Storage::exists($income_path)) 
                     {
-                        $m->attach(public_path(Storage::url($file)));
+                        //borrar un archivo innecesario que podria estar presente
+                        Storage::delete($income_path."temp_massive.xlsx");
+
+                        $files = Storage::allFiles($income_path);
+                        foreach ($files as $file) 
+                        {
+                            if (Storage::exists($file))
+                            {
+                                $m->attach(public_path(Storage::url($file)));
+                            }
+                        }
                     }
                 }
             }
 
         });
+        return redirect('/int/salidas/'.$numero_de_salida);
         
     }
 
     public static function onHoldNotification(Income $income)
     {
-        $emails = $income->customer->emails1();
+        $emails = explode(';', $income->customer->emails);
         $numero_de_entrada = $income->getIncomeNumber();
         Mail::send('emails.onhold', ['income' => $income], function ($m) use ($income, $numero_de_entrada, $emails) {
             $m->from('do-not-reply@ecex-portal.org', 'Ecex Notification');

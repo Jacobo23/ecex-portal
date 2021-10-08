@@ -670,15 +670,15 @@ function terminar()
     {
         return;
     }
-
-    $("#btnTerminar").prop("disabled",true);
+    location.href = "/sendemail/"+outcome_id+"/salida";
+    // $("#btnTerminar").prop("disabled",true);
     
 
-    $.ajax({url: "/sendemail/"+outcome_id+"/salida",context: document.body}).done(function(response) 
-        {
-            showModal("Notificación", "Enviada: " + NumSalida);
-            $("#btnTerminar").prop("disabled",false);
-        });
+    // $.ajax({url: "/sendemail/"+outcome_id+"/salida",context: document.body}).done(function(response) 
+    //     {
+    //         showModal("Notificación", "Enviada: " + NumSalida);
+    //         $("#btnTerminar").prop("disabled",false);
+    //     });
 }
 
 </script>

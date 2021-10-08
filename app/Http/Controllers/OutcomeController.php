@@ -112,7 +112,7 @@ class OutcomeController extends Controller
             $salidas = $salidas->whereRaw(' (invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%" '.$sql_whereIn.') ');
         }
 
-        $salidas = $salidas->orderBy('cdate', 'desc')->get();
+        $salidas = $salidas->orderBy('id', 'desc')->get();
         return $salidas;
     }
 

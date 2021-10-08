@@ -77,4 +77,12 @@ class User extends Authenticatable
     {
         return str_contains(Auth::user()->permits, 'edit_carrier');
     }
+    public function canQuitOnhold()
+    {
+        return str_contains(Auth::user()->permits, 'quit_onhold');
+    }
+    public function canCreateOC()
+    {
+        return str_contains(Auth::user()->permits, 'create_oc');
+    }
 }

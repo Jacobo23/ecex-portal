@@ -34,6 +34,17 @@ class InventoryController extends Controller
         {
             $descuentos = $available_row->get_discounted_units();
             $available_row->units -= $descuentos;
+            //debemos obtener tambien la cantidad de bultos en inventario
+            $inv_bundle = InventoryBundle::where('income_row_id',$available_row->id)->first();
+            if($inv_bundle === null)
+            {
+                $inv_bundle = new InventoryBundle;
+                $inv_bundle->income_row_id = $available_row->id;
+                $inv_bundle->quantity = $available_row->bundles;
+                $inv_bundle->save();
+            }
+            $available_row->bundles = $inv_bundle->quantity;
+            //
         }
         //remover las que queden en cero units
         $available_rows = $available_rows->where('units', '>', 0);
@@ -76,6 +87,17 @@ class InventoryController extends Controller
         {
             $descuentos = $available_row->get_discounted_units();
             $available_row->units -= $descuentos;
+            //debemos obtener tambien la cantidad de bultos en inventario
+            $inv_bundle = InventoryBundle::where('income_row_id',$available_row->id)->first();
+            if($inv_bundle === null)
+            {
+                $inv_bundle = new InventoryBundle;
+                $inv_bundle->income_row_id = $available_row->id;
+                $inv_bundle->quantity = $available_row->bundles;
+                $inv_bundle->save();
+            }
+            $available_row->bundles = $inv_bundle->quantity;
+            //
         }
         //remover las que queden en cero units
         $available_rows = $available_rows->where('units', '>', 0);
@@ -111,6 +133,17 @@ class InventoryController extends Controller
             // calculamos el peso neto tomando en cuenta los descuentos
             $row_part_number = $available_row->part_number();
             $available_row->net_weight = $available_row->units * $row_part_number->unit_weight;
+            //debemos obtener tambien la cantidad de bultos en inventario
+            $inv_bundle = InventoryBundle::where('income_row_id',$available_row->id)->first();
+            if($inv_bundle === null)
+            {
+                $inv_bundle = new InventoryBundle;
+                $inv_bundle->income_row_id = $available_row->id;
+                $inv_bundle->quantity = $available_row->bundles;
+                $inv_bundle->save();
+            }
+            $available_row->bundles = $inv_bundle->quantity;
+            //
             $available_row->income; // <- invocamos esta propiedad para que el objeto final cuente con informacion de su entrada
         }
         //remover las que queden en cero units
@@ -165,6 +198,7 @@ class InventoryController extends Controller
         $export = new InventoryExport($partidas);
         return Excel::download($export, 'inventory.xlsx');
     }
+
     public function downloadInventory_customer(Request $request)
     {
         $cliente = explode(",",Auth::user()->customer_ids);
