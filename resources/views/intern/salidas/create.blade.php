@@ -1,5 +1,11 @@
 @extends('layouts.common')
 @section('headers')
+<style>
+    .oversized
+    {
+        min-width: 100px;
+    }
+</style>
 @endsection
 @section('content')
 <!-- Page Heading -->
@@ -323,6 +329,8 @@ function loadOC()
             $(".chkSingle").each(function(){
                 $( this ).click();
             });
+
+            
         });
     @else
     return;

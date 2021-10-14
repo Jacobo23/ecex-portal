@@ -110,7 +110,7 @@
             </thead>
             <tbody id="tbl_Incomes">
                 @foreach ($incomes as $income)
-                <tr id="inc_row_{{ $income->id }}" @if ( $income->get_color_fila_estado() != '') class="tr_tbl table-{{ $income->get_color_fila_estado() }}" @endif>
+                <tr id="inc_row_{{ $income->id }}" class="tr_tbl @if ( $income->get_color_fila_estado() != '') table-{{ $income->get_color_fila_estado() }} @endif ">
                     <td><a href="/int/entradas/{{ $income->getIncomeNumber() }}">{{ $income->getIncomeNumber() }}</a></td>
                     <td>{{ explode(" ", $income->cdate)[0] }}</td>
                     <td>{{ $income->getDiasTrascurridos() }}</td>
@@ -125,8 +125,8 @@
                     <td id="tdUrgente_{{ $income->id }}">@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
                     <td id="tdOnhold_{{ $income->id }}">@if ($income->onhold) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td><a class="btn " href="/int/balance?entrada={{ $income->getIncomeNumber() }}"><i class="fas fa-balance-scale"></i></a></td>
-                    <td><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_income_{{ $income->id }}')"><i class="far fa-folder-open"></i></button></td>
-                    <td id="adjuntos_income_{{ $income->id }}" style="display:none">
+                    <td id="adjuntos_btn_{{ $income->id }}"><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_income_{{ $income->id }}')"><i class="far fa-folder-open"></i></button></td>
+                    <td id="adjuntos_income_{{ $income->id }}" class="td_adjuntos" style="display:none">
                         @php
                         $packinglist_path='/public/entradas/'.$income->getIncomeNumber().'/packing_list/packing-list.pdf';
                         if (Storage::exists($packinglist_path)) 
@@ -234,6 +234,20 @@ function filtrarEnviadas()
     }
 }
 
+
+
+function showFolderIcon()
+{
+    $(".td_adjuntos").each(function()
+        {
+            if($(this).html().trim() == "<br>")
+            {
+                var id = $(this).attr('id').split("_")[2];
+                $("#adjuntos_btn_"+id).html("");
+            }
+        });
+}
+
 function filtrarRevisadas()
 {
     $(".tr_tbl").each(function()
@@ -313,6 +327,7 @@ $(document).ready(function(){
       $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
     });
   });
+  showFolderIcon();
 });
 
 </script>

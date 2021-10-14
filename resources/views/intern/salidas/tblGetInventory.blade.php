@@ -1,3 +1,10 @@
+@if (isset($inventario_suficiente))
+    @if (!$inventario_suficiente)
+        <div id="fraccionAlert" class="alert alert-warning" role="alert">
+            Algunas partidas ya no cuentan con el inventario señalado en la OC. Se mostrará el valor restante en esas partidas.
+        </div>
+    @endif
+@endif
 <table class="table table-sm table-bordered table-hover">
     <thead>
         <tr>
@@ -48,10 +55,11 @@
                 </div>
             </td>
             <td>{{ $row->income->getIncomeNumber() }}<input type="hidden" id="txtIncomeRowId_{{ $row->id }}_{{ $loop->index }}" name="income_row_id[]" value="{{ $row->id }}"></td>
-            <td>{{ explode(' ',$row->income->cdate)[0] }}</td>
+            <td class="oversized">{{ explode(' ',$row->income->cdate)[0] }}</td>
             <td>{{ $row->part_number()->part_number }} <input type="hidden" name="txtNumeroDePartePesoU_{{ $row->id }}_{{ $loop->index }}" id="txtNumeroDePartePesoU_{{ $row->id }}_{{ $loop->index }}" value="{{ $row->part_number()->unit_weight }}"></td>
-            <td>
+            <td class="oversized">
                 <input type="number" class="form-control" id="txtCantidad_{{ $row->id }}_{{ $loop->index }}" name="units[]" value="{{ $row->units }}" max="{{ $row->units }}" min="0" onchange="validarCantidad(this,{{ $row->units }},'{{ $loop->index }}')" readonly>
+                <!-- {{ $row->ump }} -->
                 <input type="hidden" id="txtUM_{{ $row->id }}_{{ $loop->index }}" name="ump[]" value="{{ $row->ump }}">
             </td>
             <td><input type="number" class="form-control" id="txtBultos_{{ $row->id }}_{{ $loop->index }}" name="bundles[]" value="{{ $row->bundles }}" min="0" readonly onchange="calcularPesoBruto({{ $row->id }},'{{ $loop->index }}')"></td>

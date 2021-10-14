@@ -60,17 +60,36 @@ class InventoryController extends Controller
     {
         $load_order_rows = $load_order->load_order_rows;
         $income_rows = array();
+        $inventario_suficiente = true;
         foreach ($load_order_rows as $load_order_row) 
         {
             $income_row = $load_order_row->income_row;
-            $income_row->units = $load_order_row->units;
+            $unidades_reales = $income_row->units - $income_row->get_discounted_units();
+            if($unidades_reales < $load_order_row->units)
+            {
+                $income_row->units = $unidades_reales < 0 ? 0 : $unidades_reales;
+                $inventario_suficiente = false;
+            }
+            else
+            {
+                $income_row->units = $load_order_row->units;
+            }
+            $income_row->net_weight = $income_row->units * $income_row->part_number()->unit_weight;
+            $current_umb = BundleType::where('desc',$income_row->umb)->first();
+            if($current_umb)
+            {
+                $income_row->gross_weight = $income_row->net_weight + ($current_umb->weight * $income_row->bundles);
+            }
+             
+
             array_push($income_rows,$income_row);
         }
-
+        
         $umb = BundleType::All();
         return view('intern.salidas.tblGetInventory', [
             'inventory' => $income_rows,
             'tipos_de_bulto' => $umb,
+            'inventario_suficiente' => $inventario_suficiente,
         ]);
     }
 

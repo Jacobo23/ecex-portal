@@ -100,8 +100,8 @@
                     <td>{{ $outcome->reference }}</td>
                     <td>{{ $outcome->getBultos() }}</td>
                     <td>{{ $outcome->getTipoBultos() }}</td>
-                    <td><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_outcome_{{ $outcome->id }}')"><i class="far fa-folder-open"></i></button></td>
-                    <td id="adjuntos_outcome_{{ $outcome->id }}" style="display:none">
+                    <td id="adjuntos_btn_{{ $outcome->id }}" ><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_outcome_{{ $outcome->id }}')"><i class="far fa-folder-open"></i></button></td>
+                    <td id="adjuntos_outcome_{{ $outcome->id }}" class="td_adjuntos" style="display:none">
                         @php
                         $packinglist_path='/public/salidas/'.$outcome->getOutcomeNumber(false).'/packing_list/packing-list.pdf';
                         if (Storage::exists($packinglist_path)) 
@@ -172,6 +172,22 @@ function showAdjuntos(content_row)
     var html = $("#"+content_row).html();   
     showModal("Adjuntos",html);
 }
+
+function showFolderIcon()
+{
+    $(".td_adjuntos").each(function()
+        {
+            if($(this).html().trim() == "<br>")
+            {
+                var id = $(this).attr('id').split("_")[2];
+                $("#adjuntos_btn_"+id).html("");
+            }
+        });
+}
+
+$(document).ready(function(){
+  showFolderIcon();
+});
 
 </script>
 @endsection

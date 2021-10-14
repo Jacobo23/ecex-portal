@@ -61,8 +61,8 @@
             <td>{{ $outcome_row->income_row->income->getIncomeNumber() }}</td>
             <td>{{ explode(" ", $outcome_row->income_row->income->cdate)[0] }}</td>
             <td>{{ $outcome_row->income_row->part_number()->part_number }}</td>
-            <td>{{ $outcome_row->desc_ing }}</td>
-            <td>{{ $outcome_row->desc_esp }}</td>
+            <td>{{ $outcome_row->income_row->desc_ing }}</td>
+            <td>{{ $outcome_row->income_row->desc_esp }}</td>
             <td>{{ $outcome_row->units }}</td>
             <td>{{ $outcome_row->ump }}</td>
             <td>{{ $outcome_row->bundles }}</td>

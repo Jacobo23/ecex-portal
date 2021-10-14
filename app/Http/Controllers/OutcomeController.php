@@ -65,6 +65,11 @@ class OutcomeController extends Controller
     {
         $salidas = Outcome::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString());
 
+        if(count($cliente) > 0)
+        {
+            $salidas = $salidas->whereIn('customer_id',$cliente);
+        }
+
         //en caso de el el campo "otros" sea un numeo de parte o de entrada buscaremos
         $partidas_filtradas = array();
         $salidas_aux = $salidas;
@@ -134,12 +139,12 @@ class OutcomeController extends Controller
     }
     public function download_outcomes_xls_customer(Request $request)
     {
-        $cliente = $request->txtCliente ?? 0;
-        $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
+
+        $cliente = explode(",",Auth::user()->customer_ids);
         $rango = $request->txtRango ?? 30;
         $otros = $request->txtOtros ?? "";
 
-        $salidas = $this->get_Outcomes_obj($cliente_ids, $rango, $otros);
+        $salidas = $this->get_Outcomes_obj($cliente, $rango, $otros);
 
         //foreach ($salidas as $salida) {
         //    $salida->outcome_rows;
@@ -318,10 +323,17 @@ class OutcomeController extends Controller
     }
     public function delete(Outcome $outcome)
     {
-        $path = 'public/salidas/'.$outcome->getOutcomeNumber(false);
+        $outcome_numer = $outcome->getOutcomeNumber(false);
+        $path = 'public/salidas/'.$outcome_numer;
         if($outcome->delete())
         {
             Storage::deleteDirectory($path);
+            $ocs = LoadOrder::where('status',$outcome_numer)->get();
+            foreach ($ocs as $oc) 
+            {
+                $oc->status = "";
+                $oc->save();
+            }
         }
     }
 
