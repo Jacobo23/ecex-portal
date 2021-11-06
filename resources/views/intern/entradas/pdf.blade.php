@@ -20,11 +20,21 @@
         font-weight: bold;
     }
     .page_break { page-break-before: always; }
+    footer {
+                /* position: fixed;  */
+                bottom: -40px; 
+                left: 0px; 
+                right: 0px;
+                height: 50px; 
+
+                text-align: center;
+                line-height: 35px;
+            }
 </style>
 </head>
 <body>
-<div style="margin-top: 10px;">
-    <table style="position:relative; top:-10px; " >
+<div style="margin-top: 1px;">
+    <table style="position:relative; top:-20px; " >
     <tbody>
     <tr>
         <td width="50">
@@ -104,6 +114,22 @@
 
 </div>
 <!--de aqui hasta el siguiente comentario!-->
+@php
+$break = 4;
+$pages = 1;
+$it = 0;
+foreach ($income->income_rows as $income_row) 
+{
+  $it++;
+  if ($it % $break == 0)
+  {
+    $pages++;
+    $it = 0;
+  }
+}
+
+$page = 1;
+@endphp
 @foreach($income->income_rows as $income_row)
 <div>
 <table width="1000px" style="font-size: 11px; " class="arial"  >
@@ -120,10 +146,10 @@
     </tr>
     <tr style="">
       <td style="text-align:center">{{ $income_row->part_number()->part_number }}</td>
-      <td style="text-align:center">{{ $income_row->units }}</td>
+      <td style="text-align:center">{{ $income_row->units * 1 }}  {{ $income_row->ump }}</td>
       <td style="text-align:center">{{ $income_row->bundles }} {{ $income_row->umb }}</td>
-      <td style="text-align:center">{{ $income_row->net_weight }} Lbs / {{ round($income_row->net_weight *  0.453592,2,PHP_ROUND_HALF_UP )}} Kg</td>
-      <td style="text-align:center">{{ $income_row->gross_weight }} Lbs / {{ round($income_row->gross_weight *  0.453592,2,PHP_ROUND_HALF_UP )}} Kg</td>
+      <td style="text-align:center">{{ $income_row->net_weight * 1 }} Lbs / {{ round($income_row->net_weight *  0.453592,2,PHP_ROUND_HALF_UP )}} Kg</td>
+      <td style="text-align:center">{{ $income_row->gross_weight * 1 }} Lbs / {{ round($income_row->gross_weight *  0.453592,2,PHP_ROUND_HALF_UP )}} Kg</td>
       <td style="text-align:center">{{ $income_row->origin_country }}</td>
       <td style="text-align:center">{{ $income_row->fraccion }}-{{ $income_row->nico }}</td>
       <td style="text-align:center">{{ $income_row->po }}</td>
@@ -166,8 +192,15 @@
 </div>
 <hr  width="1000" style="border-top: 1px solid	" size="3">
 
-@if ($loop->iteration % 4 == 0)
+@if ($loop->iteration % $break == 0)
+
+<footer style="text-align:center; font-size: small">
+    Usuario: {{ $income->user }} - page: {{ $page }} of {{ $pages }}
+</footer>
 <div class="page_break"></div>
+@php
+$page++;
+@endphp
 @endif
 
 @endforeach
@@ -181,20 +214,26 @@
     </tr>
   </tbody>
 </table>
-<table class="arial" width="1000px" style="font-size: small" >							
-  <tbody>
+<table class="arial" width="1000px" style="font-size: small">
     <tr>
-      <td style="background: #eee;"><b>Totales</b></td>
-      <td></td>
+        <td><strong> Peso Neto </strong></td>
+        <td><strong> Peso Bruto </strong></td>
+        <td><strong> Piezas UM </strong></td>
+        <td><strong> Bultos UM </strong></td>
     </tr>
     <tr>
-      <td>Total de Bultos: {{ $income->getBultosOriginales() }} {{ $income->getTipoBultos() }}</td>
+        <td id="tdPesoNeto">{{ $income->getPesoNeto() }} lbs / {{ round( $income->getPesoNeto() * 0.453592,2,PHP_ROUND_HALF_EVEN) }} kg</td>
+        <td id="tdPesoBruto">{{ $income->getPesoBruto() }} lbs / {{ round( $income->getPesoBruto() * 0.453592,2, PHP_ROUND_HALF_EVEN) }} kg</td>
+        <td id="tdPiezas">{!! str_replace("<br>","<br>",$income->getPiezasSum()) !!}</td>
+        <td id="tdBultos">{!! str_replace("<br>","<br>",$income->getBultosSum()) !!}</td>
     </tr>
-  </tbody>
 </table>
+
 <br>
-	<footer style="text-align:center; font-size: small">
-        Usuario: {{ $income->user }}
-    </footer>
+<footer style="text-align:center; font-size: small">
+    Usuario: {{ $income->user }} - page: {{ $page }} of {{ $pages }}
+</footer>
+
+
 </body>
 </html>

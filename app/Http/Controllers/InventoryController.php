@@ -32,7 +32,7 @@ class InventoryController extends Controller
         //obtener salidas para las income_rows seleccionadas
         foreach ($available_rows as $available_row) 
         {
-            $descuentos = $available_row->get_discounted_units();
+            $descuentos = $available_row->get_discounted_units_for_new();
             $available_row->units -= $descuentos;
             //debemos obtener tambien la cantidad de bultos en inventario
             $inv_bundle = InventoryBundle::where('income_row_id',$available_row->id)->first();
@@ -64,7 +64,7 @@ class InventoryController extends Controller
         foreach ($load_order_rows as $load_order_row) 
         {
             $income_row = $load_order_row->income_row;
-            $unidades_reales = $income_row->units - $income_row->get_discounted_units();
+            $unidades_reales = $income_row->units - $income_row->get_discounted_units_for_new();
             if($unidades_reales < $load_order_row->units)
             {
                 $income_row->units = $unidades_reales < 0 ? 0 : $unidades_reales;
@@ -104,7 +104,7 @@ class InventoryController extends Controller
         //obtener salidas para las income_rows seleccionadas
         foreach ($available_rows as $available_row) 
         {
-            $descuentos = $available_row->get_discounted_units();
+            $descuentos = $available_row->get_discounted_units_for_new();
             $available_row->units -= $descuentos;
             //debemos obtener tambien la cantidad de bultos en inventario
             $inv_bundle = InventoryBundle::where('income_row_id',$available_row->id)->first();

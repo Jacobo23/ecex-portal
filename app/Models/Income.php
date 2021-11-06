@@ -160,13 +160,37 @@ class Income extends Model
         }
         if($this->onhold)
         {
-            $color = "sencondary";
+            $color = "secondary";
         }
-        
-
-
-
         return $color;
+    }
+
+    public function getPiezasSum()
+    {
+        $piezas_sum = IncomeRow::where('income_id',$this->id)
+            ->selectRaw("SUM(units) as sum, ump")
+            ->groupBy("ump")
+            ->get();
+        $res = "";
+        foreach ($piezas_sum as $row) 
+        {
+            $res .= ($row["sum"] * 1) . " " . $row["ump"] . ($row["sum"] > 1 ? "(s)" : "") . "<br>";
+        }
+        return $res;
+    }
+
+    public function getBultosSum()
+    {
+        $piezas_sum = IncomeRow::where('income_id',$this->id)
+            ->selectRaw("SUM(bundles) as sum, umb")
+            ->groupBy("umb")
+            ->get();
+        $res = "";
+        foreach ($piezas_sum as $row) 
+        {
+            $res .= ($row["sum"] * 1) . " " . $row["umb"] . "<br>";
+        }
+        return $res;
     }
 
 

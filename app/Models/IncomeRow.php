@@ -33,6 +33,14 @@ class IncomeRow extends Model
             ->sum('outcome_rows.units');
         return $descuentos;
     }
+    public function get_discounted_units_for_new()
+    {
+        //esta funcion regresa un numero de las unitades que se han descontado a la income_row
+        $descuentos = OutcomeRow::where('outcome_rows.income_row_id', '=', $this->id)
+            ->join('outcomes', 'outcomes.id', '=', 'outcome_rows.outcome_id')
+            ->sum('outcome_rows.units');
+        return $descuentos;
+    }
     public function get_discounting_outcomes()
     {
         //esta funcion regresa las salidas que descuentan a esta income_row

@@ -44,7 +44,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Fecha:</label>
-            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@endif" min="{{ date('Y-m-d') }}">
+            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@endif">
         </div>
 
         <div class="col-lg-3 controlDiv" >
@@ -413,9 +413,40 @@
         <input type="button" class="col-lg-1 btn btn-danger " value="Eliminar" onclick="eliminarPartida()">
     </div>  
 
+     
+
 </div>
 </div>
 </div>
+</div>
+
+
+<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+<div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+<div class="p-6 bg-white border-b border-gray-200">
+
+<div class="row" style="margin-top:20px;">
+        <div class="col-lg-6 controlDiv">
+            <table class="table table-sm">
+                <tr>
+                    <td><strong> Peso Neto </strong></td>
+                    <td><strong> Peso Bruto </strong></td>
+                    <td><strong> Piezas UM </strong></td>
+                    <td><strong> Bultos UM </strong></td>
+                </tr>
+                <tr>
+                    <td id="tdPesoNeto">0</td>
+                    <td id="tdPesoBruto">0</td>
+                    <td id="tdPiezas">0</td>
+                    <td id="tdBultos">0</td>
+                </tr>
+            </table>
+        </div>
+    </div> 
+
+    </div>
+</div>
+</div>   
 </div>
 
 
@@ -1106,6 +1137,9 @@ function guardarPartida()
         showModal("Alerta!","Primero guarde la entrada.");
         return;
     }
+
+    actualizarSumario();
+
     if($("#txtNumeroDeParteID").val().length < 1)
     {
         showModal("Alerta!","Número de parte no valido.");
@@ -1117,11 +1151,11 @@ function guardarPartida()
         showModal("Alerta!","'Cantidad' no puede ser 0.");
         return;
     }
-    if($("#txtBultos").val() <= 0)
-    {
-        showModal("Alerta!","'Bultos' no puede ser 0.");
-        return;
-    }
+    // if($("#txtBultos").val() <= 0)
+    // {
+    //     showModal("Alerta!","'Bultos' no puede ser 0.");
+    //     return;
+    // }
     if($("#txtUMB").val() <= 0)
     {
         showModal("Alerta!","'Tipo de Bultos' inválido.");
@@ -1186,6 +1220,7 @@ function eliminarPartida()
                 },
                 success: function (){
                     showModal("Notificación","Partida Eliminada");
+                    actualizarSumario();
                     let index_ultima_partida = 1;
                     $(".btnIncomeRow").each(function(){
                         
@@ -1271,6 +1306,28 @@ function terminar()
         });
     */
 }
+
+function actualizarSumario()
+{
+    let income_id = $("#incomeID").val();
+    if(income_id.length < 1)
+    {
+        return;
+    }
+    $.ajax({url: "/int/entradas_get_sums/" + income_id,context: document.body}).done(function(response) 
+        {
+            $("#tdPesoNeto").html(response["peso_neto"]);
+            $("#tdPesoBruto").html(response["peso_bruto"]);
+            $("#tdPiezas").html(response["piezas"]);
+            $("#tdBultos").html(response["bultos"]);
+        });
+
+    
+}
+
+$(document).ready(function(){
+    actualizarSumario();
+});
 
 </script>
 @endsection

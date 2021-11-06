@@ -110,4 +110,31 @@ class Outcome extends Model
         }
         return $count;
     }
+    public function getPiezasSum()
+    {
+        $piezas_sum = OutcomeRow::where('outcome_id',$this->id)
+            ->selectRaw("SUM(units) as sum, ump")
+            ->groupBy("ump")
+            ->get();
+        $res = "";
+        foreach ($piezas_sum as $row) 
+        {
+            $res .= ($row["sum"] * 1) . " " . $row["ump"] . ($row["sum"] > 1 ? "(s)" : "") . "<br>";
+        }
+        return $res;
+    }
+
+    public function getBultosSum()
+    {
+        $piezas_sum = OutcomeRow::where('outcome_id',$this->id)
+            ->selectRaw("SUM(bundles) as sum, umb")
+            ->groupBy("umb")
+            ->get();
+        $res = "";
+        foreach ($piezas_sum as $row) 
+        {
+            $res .= ($row["sum"] * 1) . " " . $row["umb"] . "<br>";
+        }
+        return $res;
+    }
 }

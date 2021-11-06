@@ -42,8 +42,8 @@
             </div>
 
             <div class="col-lg-2 controlDiv" style="">
-                <label class="form-label">Descripción:</label>
-                <input type="text" class="form-control" id="txtDesc" name="txtDesc" value="{{ $desc ?? '' }}" placeholder="Inglés / Español">       
+                <label class="form-label">#NP / Descripción:</label>
+                <input type="text" class="form-control" id="txtDesc" name="txtDesc" value="{{ $desc ?? '' }}" placeholder="#NP / Desc. Inglés / Español">       
             </div>
 
             <div class="col-lg-2 controlDiv" style="position:relative;top:30px;">

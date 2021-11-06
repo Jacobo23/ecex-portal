@@ -47,7 +47,7 @@ class PartNumberController extends Controller
 
     public function index_object(string $cliente, string $desc, string $offset, string $items)
     {
-        $obj = PartNumber::whereRaw(" ( desc_ing like '%".$desc."%' or desc_esp like '%".$desc."%' ) ");
+        $obj = PartNumber::whereRaw(" ( desc_ing like '%".$desc."%' or desc_esp like '%".$desc."%' or part_number like '%".$desc."%' ) ");
         if($cliente != "0")
         {
             $obj->where('customer_id',$cliente);
@@ -100,8 +100,8 @@ class PartNumberController extends Controller
         $part_number->customer_id = $request->txtCliente;
         $part_number->um = $request->txtUM;
         $part_number->unit_weight = $request->txtPesoUnitario;
-        $part_number->desc_ing = $request->txtDescIng;
-        $part_number->desc_esp = $request->txtDescEsp;
+        $part_number->desc_ing = $request->txtDescIng ?? "";
+        $part_number->desc_esp = $request->txtDescEsp ?? "";
         $part_number->origin_country = $request->txtPais;
         $part_number->fraccion = $request->txtFraccion;
         $part_number->nico = $request->txtNico;

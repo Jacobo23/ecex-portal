@@ -67,7 +67,7 @@
         <div class="row">
             <div class="col-lg-10 controlDiv" style="">
                 <label class="form-label">Asunto:</label>
-                <input type="text" class="form-control" id="txtSubject" name="txtSubject" value="Entrada: {{ $income->getIncomeNumber() }}">       
+                <input type="text" class="form-control" id="txtSubject" name="txtSubject" value="Entrada: {{ $income->getIncomeNumber() }} Proveedor: {{ $income->supplier->name }} Tracking: {{ $income->tracking }} Cliente: {{ $income->customer->name }}">       
             </div>
         </div>
 

@@ -29,17 +29,20 @@ class IncomeController extends Controller
      */
     public function index(Request $request)
     {
-        
+        $date1 = date_format(date_create(now()->subDays(intval(30))->toDateTimeString()), "m/d/Y");
+        $date2 = date("m/d/Y");
+
         $can_delete = Auth::user()->canDeleteIncome();
         $clientes = Customer::All();
 
         $cliente = $request->txtCliente ?? 0;
         $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
-        $rango = $request->txtRango ?? 30;
+
+        $rango = $request->txtRango ?? $date1 . " - " . $date2;
         $tracking = $request->txtTracking ?? "";
         $en_inventario = isset($request->chkInventario);
 
-        $entradas = $this->get_Incomes_obj($cliente_ids,$rango,$tracking,$en_inventario,false);
+        $entradas = $this->get_Incomes_obj_range_dates($cliente_ids,$rango,$tracking,$en_inventario,false);
                 
         return view('intern.entradas.index', [
             'incomes' => $entradas,
@@ -54,13 +57,16 @@ class IncomeController extends Controller
 
     public function download_incomes_xls(Request $request)
     {
+        $date1 = date_format(date_create(now()->subDays(intval(30))->toDateTimeString()), "m/d/Y");
+        $date2 = date("m/d/Y");
+
         $cliente = $request->txtCliente ?? 0;
         $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
-        $rango = $request->txtRango ?? 30;
+        $rango = $request->txtRango ?? $date1 . " - " . $date2;
         $tracking = $request->txtTracking ?? "";
         $en_inventario = isset($request->chkInventario);
 
-        $entradas = $this->get_Incomes_obj($cliente_ids,$rango,$tracking,$en_inventario,false);
+        $entradas = $this->get_Incomes_obj_range_dates($cliente_ids,$rango,$tracking,$en_inventario,false);
         foreach ($entradas as $income) {
             $income->income_rows;
         }
@@ -156,6 +162,69 @@ class IncomeController extends Controller
         return $entradas;
     }
 
+    public function get_Incomes_obj_range_dates(array $cliente, string $rango, string $busqueda, bool $en_inventario, bool $enviada)
+    {
+        // '$cliente' en realidad es un array de los customer_id que vamos a filtrar NINGUNO DEBE SER CERO 0
+        // lo que se recive en rango 10/08/2021 - 11/12/2021
+        $date1 = trim(explode("-",$rango)[0]);
+        $date1 = explode("/",$date1);
+        $date1 = $date1[2] . "-" . $date1[0] . "-" . $date1[1];
+
+        $date2 = trim(explode("-",$rango)[1]);
+        $date2 = explode("/",$date2);
+        $date2 = $date2[2] . "-" . $date2[0] . "-" . $date2[1];
+
+        $from = date($date1);
+        $to = date($date2);
+
+        $entradas = Income::whereBetween('cdate', [$from, $to])
+            ->where('tracking', 'like', '%'.$busqueda.'%');
+
+        if(strlen($busqueda) == 9)
+        {
+            $yearInc=substr($busqueda,0,-5);
+            $numInc=substr($busqueda,4);
+            $entradas = $entradas->orWhere('year', $yearInc)->where('number', $numInc);
+        }
+        
+        if(count($cliente) > 0)
+        {
+            $entradas = $entradas->whereIn('customer_id',$cliente);
+        }
+        $entradas = $entradas->orderBy('id', 'desc')->get();
+
+        if($en_inventario)
+        {
+            foreach ($entradas as $key => $entrada) 
+            {
+                $partidas = $entrada->income_rows;
+                $count = 0;
+                foreach ($partidas as $partida) 
+                {
+                    $count += ($partida->units - $partida->get_discounted_units());
+                    if($count > 0)
+                    {
+                        break;
+                    }
+                }
+                if($count == 0)
+                {
+                    $entrada->id = 0;
+                }
+            }
+        }
+        
+        //discriminar las entradas con id = 0 porque no tienen inventario restante
+        $entradas = $entradas->where('id', '>', 0);
+        // obneter solo las enviadas (para modulo cliente)
+        if($enviada)
+        {
+            $entradas = $entradas->where('sent', '==', true);
+        }
+        
+        return $entradas;
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -164,8 +233,8 @@ class IncomeController extends Controller
     public function create()
     {
         $clientes = Customer::All();
-        $transportistas = Carrier::All();
-        $proveedores = Supplier::All();
+        $transportistas = Carrier::orderBy('name')->get();
+        $proveedores = Supplier::orderBy('name')->get();
         $ums = MeasurementUnit::All();
         $umb = BundleType::All();
         return view('intern.entradas.create', [
@@ -268,8 +337,8 @@ class IncomeController extends Controller
         $income = Income::where('year', $yearInc)->where('number', $numInc)->first();
 
         $clientes = Customer::All();
-        $transportistas = Carrier::All();
-        $proveedores = Supplier::All();
+        $transportistas = Carrier::orderBy('name')->get();
+        $proveedores = Supplier::orderBy('name')->get();
         $ums = MeasurementUnit::All();
         $umb = BundleType::All();
         $part_number = null;
@@ -439,5 +508,19 @@ class IncomeController extends Controller
 
         $pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
         return $pdf->download('balance_'.$numero_de_entrada.'.pdf');
+    }
+
+    public function get_income_sums(Income $income)
+    {
+        $peso_neto = $income->getPesoNeto();
+        $peso_bruto = $income->getPesoBruto();
+        $piezas = $income->getPiezasSum();
+        $bultos = $income->getBultosSum();
+        return response()->json([
+            'peso_neto' => $peso_neto,
+            'peso_bruto' => $peso_bruto,
+            'piezas' => $piezas,
+            'bultos' => $bultos,
+        ]);
     }
 }

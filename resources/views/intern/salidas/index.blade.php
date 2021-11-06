@@ -1,5 +1,6 @@
 @extends('layouts.common')
 @section('headers')
+<script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
 <style>
     td
     {
@@ -37,16 +38,9 @@
                 @endforeach
                 </select>
             </div>
-            <div class="col-lg-2 controlDiv" >
+            <div class="col-lg-3 controlDiv" >
                 <label class="form-label">Rango:</label>
-                <select class="form-select" id = "txtRango" name = "txtRango">
-                    <option value="15" selected>15 días</option>
-                    <option value="30" @if ( $rango == 30) selected @endif >30 días</option>
-                    <option value="90" @if ( $rango == 90) selected @endif >90 días</option>
-                    <option value="190" @if ( $rango == 190) selected @endif >6 meses</option>
-                    <option value="365" @if ( $rango == 365) selected @endif >1 año</option>
-                    <option value="1095" @if ( $rango == 1095) selected @endif >3 años</option>
-                </select>
+                <input class="form-select" type="text" name="txtRango" id="txtRango" />
             </div>
             
             <div class="col-lg-4 controlDiv" style="">
@@ -187,6 +181,23 @@ function showFolderIcon()
 
 $(document).ready(function(){
   showFolderIcon();
+
+  const date1 = new Date();
+  const date2 = new Date();
+  date1.setDate(date1.getDate() - 30);
+
+  const picker = new Litepicker({ 
+    element: document.getElementById('txtRango'),
+    singleMode: false,
+    format: 'MM/DD/YYYY',
+    startDate: date1,
+    endDate: date2,
+    numberOfMonths: 2,
+    numberOfColumns: 2,
+    scrollToDate: false,
+    
+  });
+  
 });
 
 </script>

@@ -27,8 +27,8 @@ class CreateForeignkeys extends Migration
         Schema::table('truck_logs', function (Blueprint $table) {$table->foreign('customer_id')->references('id')->on('customers');});
         Schema::table('part_numbers', function (Blueprint $table) {$table->foreign('customer_id')->references('id')->on('customers');});
         Schema::table('load_orders', function (Blueprint $table) {$table->foreign('customer_id')->references('id')->on('customers');});
-        Schema::table('load_order_rows', function (Blueprint $table) {$table->foreign('load_order_id')->references('id')->on('load_orders');});
-        Schema::table('load_order_rows', function (Blueprint $table) {$table->foreign('income_row_id')->references('id')->on('income_rows');});
+        Schema::table('load_order_rows', function (Blueprint $table) {$table->foreign('load_order_id')->references('id')->on('load_orders')->onDelete('cascade');});
+        Schema::table('load_order_rows', function (Blueprint $table) {$table->foreign('income_row_id')->references('id')->on('income_rows')->onDelete('cascade');});
     }
 
     /**

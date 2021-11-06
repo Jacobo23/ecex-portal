@@ -27,14 +27,17 @@ class OutcomeController extends Controller
      */
     public function index(Request $request)
     {
+        $date1 = date_format(date_create(now()->subDays(intval(30))->toDateTimeString()), "m/d/Y");
+        $date2 = date("m/d/Y");
+
         $clientes = Customer::All();
         $cliente = $request->txtCliente ?? 0;
         $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
-        $rango = $request->txtRango ?? 15;
+        $rango = $request->txtRango ?? $date1 . " - " . $date2;
         $otros = $request->txtOtros ?? "";
         $can_delete = Auth::user()->canDeleteOutcome();
         
-        $salidas = $this->get_Outcomes_obj($cliente_ids, $rango, $otros);
+        $salidas = $this->get_Outcomes_obj_range_dates($cliente_ids, $rango, $otros);
         
         return view('intern.salidas.index', [
             'outcomes' => $salidas,
@@ -121,14 +124,88 @@ class OutcomeController extends Controller
         return $salidas;
     }
 
+    public function get_Outcomes_obj_range_dates(array $cliente, string $rango, string $otros)
+    {
+        $date1 = trim(explode("-",$rango)[0]);
+        $date1 = explode("/",$date1);
+        $date1 = $date1[2] . "-" . $date1[0] . "-" . $date1[1];
+
+        $date2 = trim(explode("-",$rango)[1]);
+        $date2 = explode("/",$date2);
+        $date2 = $date2[2] . "-" . $date2[0] . "-" . $date2[1];
+
+        $from = date($date1);
+        $to = date($date2);
+
+        $salidas = Outcome::whereBetween('cdate', [$from, $to]);
+
+        if(count($cliente) > 0)
+        {
+            $salidas = $salidas->whereIn('customer_id',$cliente);
+        }
+
+        //en caso de el el campo "otros" sea un numeo de parte o de entrada buscaremos
+        $partidas_filtradas = array();
+        $salidas_aux = $salidas;
+        $salidas_aux = $salidas_aux->get();
+        foreach ($salidas_aux as $salida) 
+        {
+            $outcome_rows = $salida->outcome_rows;
+            foreach ($outcome_rows as $outcome_row) 
+            {
+                $income_row = $outcome_row->income_row;
+                if($income_row->part_number()->name == $otros || $income_row->income->getIncomeNumber() == $otros)
+                {
+                    array_push($partidas_filtradas, $outcome_row->outcome_id);
+                }
+            }
+        }
+        $sql_whereIn = "";
+        if(count($partidas_filtradas) > 0)
+        {
+            $sql_whereIn = "or id IN(".implode(",",$partidas_filtradas).")";
+        }
+
+        //en caso de el el campo "otros" sean una salida buscaremos
+
+        $yearOtc="";
+        $numOtc="";
+
+        if(strlen($otros) >= 9)
+        {
+            $yearOtc=substr($otros,0,4);
+            $numOtc=substr($otros,4,5);
+            if(!(is_numeric($yearOtc) && is_numeric($numOtc)))
+            {
+                $yearOtc="";
+                $numOtc="";
+            }
+        }
+
+        if($yearOtc != "")
+        {
+            $salidas = $salidas->whereRaw(' ( (year = '.$yearOtc.' and number = '.$numOtc.' ) or invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%" '.$sql_whereIn.') ');
+        }
+        else
+        {
+            $salidas = $salidas->whereRaw(' (invoice LIKE "%'.$otros.'%" or pediment LIKE "%'.$otros.'%" or reference LIKE "%'.$otros.'%" '.$sql_whereIn.') ');
+        }
+
+        $salidas = $salidas->orderBy('id', 'desc')->get();
+        return $salidas;
+    }
+
     public function download_outcomes_xls(Request $request)
     {
+        $date1 = date_format(date_create(now()->subDays(intval(30))->toDateTimeString()), "m/d/Y");
+        $date2 = date("m/d/Y");
+
         $cliente = $request->txtCliente ?? 0;
         $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
-        $rango = $request->txtRango ?? 30;
+        $rango = $request->txtRango ?? $date1 . " - " . $date2;
         $otros = $request->txtOtros ?? "";
 
-        $salidas = $this->get_Outcomes_obj($cliente_ids, $rango, $otros);
+        $salidas = $this->get_Outcomes_obj_range_dates($cliente_ids, $rango, $otros);
 
         foreach ($salidas as $salida) {
             $salida->outcome_rows;
@@ -162,7 +239,7 @@ class OutcomeController extends Controller
     public function create()
     {
         $clientes = Customer::All();
-        $transportistas = Carrier::All();
+        $transportistas = Carrier::orderBy('name')->get();
         $regimes = Regime::All();
         $tipos_de_bulto = BundleType::All();
 
@@ -242,7 +319,7 @@ class OutcomeController extends Controller
         $outcome = Outcome::where('year', $yearOtc)->where('number', $numOtc)->first();
 
         $clientes = Customer::All();
-        $transportistas = Carrier::All();
+        $transportistas = Carrier::orderBy('name')->get();
         $regimes = Regime::All();
         $tipos_de_bulto = BundleType::All();
         
@@ -265,7 +342,7 @@ class OutcomeController extends Controller
         $outcome->customer_id = $load_order->customer_id;
 
         $clientes = Customer::All();
-        $transportistas = Carrier::All();
+        $transportistas = Carrier::orderBy('name')->get();
         $regimes = Regime::All();
         $tipos_de_bulto = BundleType::All();
         

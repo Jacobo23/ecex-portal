@@ -44,7 +44,11 @@
     <div class="row" style="margin-top:20px;">
         <div class="col-lg-10 controlDiv"></div>
         <input type="button" class="col-lg-2 btn btn-success" onclick="guardarOC()" value="Registrar">
-    </div>   
+    </div>
+
+    
+    
+    
 
     <h5 class="separtor">Partidas</h5>
 
@@ -125,22 +129,37 @@ function guardarOC()
         showModal("Notificacion", "No hay partidas seleccionadas.");
         return;
     }
+    let tbl = "<table class='table'><tr> <td></td><td><strong>Entrada</strong></td><td><strong>Numero de parte</strong></td><td><strong>Cantidad</strong></td></tr>";
+
     $(".chkSingle").each(function(){
         if ($(this).prop('checked'))
         {
             partidas++;
+            let id_current = $(this).attr('id').split("_")[1];
+
+            tbl += "<tr>";
+            tbl += "<td>"+ partidas +"</td>";
+            tbl += "<td>"+ $("#lblIncome_"+id_current).html() +"</td>";
+            tbl += "<td>"+ $("#tdPN_"+id_current).html() +"</td>";
+            tbl += "<td>"+ $("#txtCantidad_"+id_current).val() +"</td>";
+            tbl += "</tr>";
+            
         }
     });
+    tbl += "</table>";
     if(partidas < 1)
     {
         showModal("Notificacion", "No hay partidas seleccionadas.");
         return;
     }
 
-    if(!confirm("Desea guardar las partidas seleccionadas? es la informacion correcta?"))
-    {
-        return;
-    }
+    showModal("Notificacion", tbl + " <br> <input type='button' class='col-lg-4 btn btn-primary' onclick='guardarOC2()' value='Confirmar'>");
+    
+
+}
+
+function guardarOC2()
+{
     $(".chkSingle").each(function(){
         if ($(this).prop('checked'))
         {

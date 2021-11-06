@@ -18,6 +18,8 @@
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Fecha</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Cliente</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Materia/Equipo</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">On hold</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Proveedor</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:20px">Numero_de_parte</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Piezas</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:8px">Bultos</th>
@@ -42,6 +44,8 @@
             <td>{{ explode(" ", $partida->income->cdate)[0] }}</td>
             <td>{{ $partida->income->customer->name }}</td>
             <td>{{ $partida->income->type }}</td>
+            <td>{{ $partida->income->onhold }}</td>
+            <td>{{ $partida->income->supplier->name }}</td>
             <td>{{ $partida->part_number()->part_number }}</td>
             <td>{{ $partida->units }}</td>
             <td>{{ $partida->getBultos() }}</td>

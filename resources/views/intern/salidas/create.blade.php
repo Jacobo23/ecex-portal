@@ -20,7 +20,7 @@
 <!-- Page Content -->
 
 <div class="py-12">
-<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+<div class="max-w-8xl mx-auto sm:px-6 lg:px-8">
 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 <div class="p-6 bg-white border-b border-gray-200">
 
@@ -49,7 +49,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Fecha:</label>
-            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($outcome)){{ explode(' ',$outcome->cdate)[0] }}@endif" min="{{ date('Y-m-d') }}">
+            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($outcome)){{ explode(' ',$outcome->cdate)[0] }}@endif">
         </div>
 
         <div class="col-lg-3 controlDiv" >
@@ -258,7 +258,17 @@
                         <button type="button" class="btn btn-success" onclick="guardarPartidas()">Guardar nuevas partidas</button>
                     </div>
                 </div>
+
                 <br>
+                <div class="row">
+                    <div class="col-lg-10">
+                    </div>
+                    <div class="col-lg-2">
+                        <input type="text" class="form-control" id="txtQuickSearch" placeholder="Busca rapida">       
+                    </div>
+                </div>
+                <br>
+
                 <div id = "tbl_inv" class="row">
                 
                 </div>
@@ -285,6 +295,7 @@
                             <th scope="col" style="text-align:center">Bultos</th>
                             <th scope="col" style="text-align:center">Peso_neto</th>
                             <th scope="col" style="text-align:center">Peso_bruto</th>
+                            <th scope="col" style="text-align:center">PO</th>
                             <th scope="col" style="text-align:center">Eliminar</th>
                         </tr>
                     </thead>
@@ -297,11 +308,27 @@
                             <td style="text-align:center">{{ $outcome_row_item->bundles }} {{ $outcome_row_item->umb }}</td>
                             <td style="text-align:center">{{ $outcome_row_item->net_weight }}</td>
                             <td style="text-align:center">{{ $outcome_row_item->gross_weight }}</td>
+                            <td style="text-align:center">{{ $outcome_row_item->income_row->po }}</td>
                             <td style="text-align:center"><button onclick="eliminarPartida({{ $outcome_row_item->id }})"><i class="fas fa-times" style="color:red"></i></button></td>
                         </tr>
                     @endforeach
                     </tbody>
                 </table>
+                <br>
+                <table class="table table-sm">
+                <tr>
+                    <td><strong> Peso Neto </strong></td>
+                    <td><strong> Peso Bruto </strong></td>
+                    <td><strong> Piezas UM </strong></td>
+                    <td><strong> Bultos UM </strong></td>
+                </tr>
+                <tr>
+                    <td id="tdPesoNeto">{{ $outcome->getPesoNeto() }}</td>
+                    <td id="tdPesoBruto">{{ $outcome->getPesoBruto() }}</td>
+                    <td id="tdPiezas">{!! str_replace("<br>","<br>",$outcome->getPiezasSum()) !!}</td>
+                    <td id="tdBultos">{!! str_replace("<br>","<br>",$outcome->getBultosSum()) !!}</td>
+                </tr>
+            </table>
                 @endif
             </div>
             </div>
@@ -688,6 +715,15 @@ function terminar()
     //         $("#btnTerminar").prop("disabled",false);
     //     });
 }
+
+$(document).ready(function(){
+  $("#txtQuickSearch").on("keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#tbl_inv tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
+  });
+});
 
 </script>
 @endsection

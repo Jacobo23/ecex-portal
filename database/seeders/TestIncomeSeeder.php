@@ -49,9 +49,9 @@ class TestIncomeSeeder extends Seeder
                 $entrada->number = $row["Num"];
                 $entrada->cdate = $row["Fecha"];
                 $entrada->customer_id = $row["Cliente"];
-                $Transportista = Carrier::where("name",$row["Transportista"])->first();
+                $Transportista = Carrier::where("name",utf8_encode($row["Transportista"]))->first();
                 $entrada->carrier_id = $Transportista ? $Transportista->id : 1;
-                $Proveedor = Supplier::where("name",$row["Proveedor"])->first();
+                $Proveedor = Supplier::where("name",utf8_encode($row["Proveedor"]))->first();
                 $entrada->supplier_id = $Proveedor ? $Proveedor->id : 1;
                 $entrada->reference = utf8_encode($row["Referencia"]);
                 $entrada->trailer = utf8_encode($row["Caja"]) ;

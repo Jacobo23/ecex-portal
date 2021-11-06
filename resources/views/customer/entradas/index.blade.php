@@ -81,6 +81,7 @@
                     <th scope="col">PO</th>
                     <th scope="col">Tracking</th>
                     <th scope="col">Impo/Expo</th>
+                    <th scope="col">Materia/Equipo</th>
                     <th scope="col">Adjuntos</th>
                     <th scope="col"><input type="checkbox" class="form-check-input" id="chkUrgente" onclick="filtrarUrgentes()"> Urgente</th>
                     <th scope="col"><input type="checkbox" class="form-check-input" id="chkOnhold" onclick="filtrarOnhold()"> On-hold</th>
@@ -98,6 +99,7 @@
                     <td>{{ $income->po }}</td>
                     <td class="oversized-col">{{ $income->tracking }}</td>
                     <td>{{ $income->impoExpo }}</td>
+                    <td>{{ $income->type }}</td>
                     <td><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_income_{{ $income->id }}')"><i class="far fa-folder-open"></i></button></td>
 
                     <td id="adjuntos_income_{{ $income->id }}" style="display:none">

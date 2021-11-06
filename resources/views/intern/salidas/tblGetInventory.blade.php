@@ -18,6 +18,7 @@
             <th scope="col" style="text-align:center">Peso_neto</th>
             <th scope="col" style="text-align:center">Peso_bruto</th>
             <th scope="col" style="text-align:center; min-width:200px;">Description</th>
+            <th scope="col" style="text-align:center">PO</th>
         </tr>
     </thead>
     <tbody>
@@ -86,6 +87,7 @@
             <td><input type="number" class="form-control" id="txtPesoNeto_{{ $row->id }}_{{ $loop->index }}" min="0" name="net_weight[]" value="{{ $row->part_number()->unit_weight * $row->units }}" readonly  onchange="calcularPesoBruto({{ $row->id }},'{{ $loop->index }}')"></td>
             <td><input type="number" class="form-control" id="txtPesoBruto_{{ $row->id }}_{{ $loop->index }}" min="0" name="gross_weight[]" value="{{ $row->gross_weight }}" readonly></td>
             <td style="font-size: 0.9em;">{{ $row->desc_ing }}</td>
+            <td>{{ $row->po }}</td>
         </tr>
         @endforeach
     </tbody>

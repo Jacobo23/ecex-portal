@@ -39,6 +39,7 @@
             <th style="background-color: #fcba03; text-align:center; font-weight:bold">UM. Bulto</th>
             <th style="background-color: #fcba03; text-align:center; font-weight:bold">Peso neto</th>
             <th style="background-color: #fcba03; text-align:center; font-weight:bold">Peso bruto</th>
+            <th style="background-color: #fcba03; text-align:center; font-weight:bold">Locacion</th>
         </tr>
     </thead>
     <tbody>
@@ -69,6 +70,7 @@
             <td>{{ $outcome_row->umb }}</td>
             <td>{{ $outcome_row->net_weight }}</td>
             <td>{{ $outcome_row->gross_weight }}</td>
+            <td>{{ $outcome_row->income_row->location }}</td>
         </tr>
         @endforeach
         @endforeach

@@ -97,9 +97,9 @@ class IncomeRowController extends Controller
         $incomeRow->net_weight = $request->txtPesoNeto ;
         $incomeRow->gross_weight = $request->txtPesoBruto ;
         $incomeRow->po = $request->txtPOPartida ?? "";
-        $incomeRow->desc_ing = $request->txtDescIng ;
-        $incomeRow->desc_esp = $request->txtDescEsp ;
-        $incomeRow->origin_country = $request->txtPais ;
+        $incomeRow->desc_ing = $request->txtDescIng ?? "";
+        $incomeRow->desc_esp = $request->txtDescEsp ?? "";
+        $incomeRow->origin_country = $request->txtPais ?? "";
         $incomeRow->fraccion = $request->txtFraccion ;
         $incomeRow->nico = $request->txtNico ?? "";
         $incomeRow->location = $request->txtLocacion ?? "";

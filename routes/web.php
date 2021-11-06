@@ -45,6 +45,8 @@ Route::post('/delete_img_salida/','UploadFileController@deleteImgOutcome')->midd
 Route::resource('/int/entradas', 'IncomeController')->middleware(['auth','allow.only:user']);
 Route::get('/int/entradas_can_change_customer/{income}','IncomeController@can_change_customer')->middleware(['auth','allow.only:user']);
 
+Route::get('/int/entradas_get_sums/{income}','IncomeController@get_income_sums')->middleware(['auth','allow.only:user']);
+
 Route::get('/int/entradas/{income}/download_pdf','IncomeController@downloadPDF')->middleware(['auth','allow.only:user']);
 Route::get('/int/entradas/{income}/delete','IncomeController@delete')->middleware(['auth','allow.only:user']);
 Route::get('/int/entradas_xls','IncomeController@download_incomes_xls')->middleware(['auth','allow.only:user']);

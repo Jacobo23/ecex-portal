@@ -46,9 +46,9 @@
                     @endif
                 </div>
             </td>
-            <td>{{ $row->income->getIncomeNumber() }}<input type="hidden" id="txtIncomeRowId_{{ $row->id }}" name="income_row_id[]" value="{{ $row->id }}"></td>
+            <td><label id="lblIncome_{{ $row->id }}">{{ $row->income->getIncomeNumber() }}</label><input type="hidden" id="txtIncomeRowId_{{ $row->id }}" name="income_row_id[]" value="{{ $row->id }}"></td>
             <td>{{ explode(' ',$row->income->cdate)[0] }}</td>
-            <td>{{ $row->part_number()->part_number }}</td>
+            <td id="tdPN_{{ $row->id }}">{{ $row->part_number()->part_number }}</td>
             <td>
                 <input type="number" class="form-control" style="width:150px" id="txtCantidad_{{ $row->id }}" name="units[]" value="{{ $row->units }}" min="0" max="{{ $row->units }}" onchange="validarCantidad(this,{{ $row->units }})" readonly>
             </td>
