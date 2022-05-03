@@ -16,6 +16,7 @@ use App\Exports\OutcomesExport;
 use App\Exports\OutcomesCustomerExport;
 use App\Models\BundleType;
 use App\Models\LoadOrder;
+use App\Models\Bitacora;
 use PDF;
 
 class OutcomeController extends Controller
@@ -36,12 +37,14 @@ class OutcomeController extends Controller
         $rango = $request->txtRango ?? $date1 . " - " . $date2;
         $otros = $request->txtOtros ?? "";
         $can_delete = Auth::user()->canDeleteOutcome();
+        $can_hide = Auth::user()->canHideOutcome();
         
         $salidas = $this->get_Outcomes_obj_range_dates($cliente_ids, $rango, $otros);
         
         return view('intern.salidas.index', [
             'outcomes' => $salidas,
             'can_delete' => $can_delete,
+            'can_hide' => $can_hide,
             'clientes' => $clientes,
             'cliente' => $cliente,
             'rango' => $rango,
@@ -66,7 +69,8 @@ class OutcomeController extends Controller
 
     public function get_Outcomes_obj(array $cliente, string $rango, string $otros)
     {
-        $salidas = Outcome::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString());
+        //esta funcion solo es para consultas de modulo de cliente
+        $salidas = Outcome::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString())->where('hidden',false);
 
         if(count($cliente) > 0)
         {
@@ -287,8 +291,11 @@ class OutcomeController extends Controller
         $salida->user = Auth::user()->name;
         $salida->received_by = $request->txtRecibidoPor ?? "";
         $salida->plate = $request->txtPlacas ?? "";
-        $salida->leave = "2020-01-01 00:00:01";
+        //$salida->leave = "2020-01-01 00:00:01";
+        
         $salida->discount = isset($request->chkDescontar);
+        $salida->ubicacion = $request->txtUbicacion ?? "";
+        $salida->dtdespacho = isset($request->txtDiaHoraDespacho) ? str_replace("T"," ",$request->txtDiaHoraDespacho) : null;
         
         if(is_null($salida->id))
         {
@@ -412,6 +419,21 @@ class OutcomeController extends Controller
                 $oc->save();
             }
         }
+    }
+
+    public function hide(Outcome $outcome)
+    {
+        //registrar en la bitacora
+        Bitacora::registrar("Ocultar Salida",Auth::user()->name . "-Sistema",$outcome->getOutcomeNumber(false));
+        $outcome->hidden = true;
+        $outcome->save();
+    }
+    public function unhide(Outcome $outcome)
+    {
+        //registrar en la bitacora
+        Bitacora::registrar("Revelar Salida",Auth::user()->name . "-Sistema",$outcome->getOutcomeNumber(false));
+        $outcome->hidden = false;
+        $outcome->save();
     }
 
     public function can_change_customer(Outcome $outcome)

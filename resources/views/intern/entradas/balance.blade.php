@@ -77,7 +77,7 @@
                             <thead>
                                 <tr>
                                     <th scope="col">#</th>
-                                    <th scope="col">Salida</th>
+                                    <th scope="col">Salidas</th>
                                     <th scope="col">Cantidad</th>
                                     <th scope="col">descontada</th>
                                 </tr>

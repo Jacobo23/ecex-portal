@@ -123,6 +123,18 @@ class Outcome extends Model
         }
         return $res;
     }
+    public function getPiezasTotalSum()
+    {
+        $piezas_sum = OutcomeRow::where('outcome_id',$this->id)
+            ->selectRaw("SUM(units) as sum")
+            ->get();
+        $res = "";
+        foreach ($piezas_sum as $row) 
+        {
+            $res .= ($row["sum"] * 1) . "<br>";
+        }
+        return $res;
+    }
 
     public function getBultosSum()
     {
@@ -134,6 +146,18 @@ class Outcome extends Model
         foreach ($piezas_sum as $row) 
         {
             $res .= ($row["sum"] * 1) . " " . $row["umb"] . "<br>";
+        }
+        return $res;
+    }
+    public function getBultosTotalSum()
+    {
+        $piezas_sum = OutcomeRow::where('outcome_id',$this->id)
+            ->selectRaw("SUM(bundles) as sum")
+            ->get();
+        $res = "";
+        foreach ($piezas_sum as $row) 
+        {
+            $res .= ($row["sum"] * 1) .  "<br>";
         }
         return $res;
     }

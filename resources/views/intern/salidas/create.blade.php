@@ -49,7 +49,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Fecha:</label>
-            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($outcome)){{ explode(' ',$outcome->cdate)[0] }}@endif">
+            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($outcome)){{ explode(' ',$outcome->cdate)[0] }}@else{{date('Y-m-d')}}@endif">
         </div>
 
         <div class="col-lg-3 controlDiv" >
@@ -68,11 +68,12 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Transportista:</label>
-            <select class="form-select" id = "txtTransportista" name = "txtTransportista">
+            <select class="form-select" id = "txtTransportista" name = "txtTransportista" onchange="agregarTransportista()">
             <option value=0 selected></option>
             @foreach ($transportistas as $transportistaOp)
             <option value="{{ $transportistaOp->id }}" @php if(isset($outcome)){if($outcome->carrier_id == $transportistaOp->id){echo "selected";}}@endphp >{{ $transportistaOp->name }}</option>
             @endforeach
+            <option value = "-2" id="option_new_transportista" >(Crear nuevo +)</option>
             </select>
         </div>
 
@@ -100,7 +101,7 @@
             <input type="text" class="form-control" id="txtPedimento" name="txtPedimento" value="{{ $outcome->pediment ?? '' }}">       
         </div>
         
-        <div class="col-lg-3 controlDiv" >
+        <div class="col-lg-2 controlDiv" >
             <label class="form-label">Referencia:</label>
             <input type="text" class="form-control" id="txtReferencia" name="txtReferencia" value="{{ $outcome->reference ?? '' }}">       
         </div>
@@ -114,17 +115,33 @@
             <input type="text" class="form-control" id="txtRecibidoPor" name="txtRecibidoPor" value="{{ $outcome->received_by ?? '' }}">       
         </div>
 
+        <div class="col-lg-3 controlDiv" style="">
+            <label class="form-label">Ubicación:</label>
+            <input type="text" class="form-control" id="txtUbicacion" name="txtUbicacion" value="{{ $outcome->ubicacion ?? '' }}" list="listaUbicaciones">       
+        </div>
+
+        
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-7 mb-3">
+            <label class="form-label">Observaciones</label>
+            <textarea class="form-control" id="txtObservaciones" name="txtObservaciones" rows="2">{{ $outcome->observations ?? '' }}</textarea>
+        </div>
+
         <div class="col-lg-2 controlDiv" >
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="chkDescontar" id="chkDescontar" name="chkDescontar" @isset($outcome->onhold){{ ($outcome->discount)?'checked':'' }}@endisset>
+                <input class="form-check-input" type="checkbox" value="chkDescontar" id="chkDescontar" name="chkDescontar" @isset($outcome->discount){{ ($outcome->discount)?'checked':'' }}@endisset>
                 <label class="form-check-label">Descontar</label>
             </div>      
         </div>
-    </div>
 
-    <div class="mb-3">
-        <label class="form-label">Observaciones</label>
-        <textarea class="form-control" id="txtObservaciones" name="txtObservaciones" rows="2">{{ $outcome->observations ?? '' }}</textarea>
+        <div class="col-lg-3 controlDiv" style="">
+            <label class="form-label">Fecha y hora de despacho:</label>
+            <input class="form-control" id="txtDiaHoraDespacho" name="txtDiaHoraDespacho" type="datetime-local" value="@if (isset($outcome->dtdespacho)){{ str_replace(' ','T',$outcome->dtdespacho) }}@endif">
+        </div>
+
     </div>
 
     </form>
@@ -215,13 +232,15 @@
     </div>   
 
     <div class="row" style="margin-top:20px;">
-        <div class="col-lg-7 controlDiv"></div>
+        <div class="col-lg-6 controlDiv"></div>
         <input type="button" class="col-lg-2 btn btn-success" onclick="guardarSalida()" value="Registrar" style="margin-right:20px;">
 
         <div class="btn-group col-lg-2" role="group">
             <button type="button" class="btn btn-outline-primary" onclick="downloadPDF()">Imprimir</button>
             <button type="button" class="btn btn-outline-primary" id="btnTerminar" onclick="terminar()">Terminar</button>
         </div>
+
+        <button type="button" class="col-lg-1 btn btn-primary" onclick="nuevaSalida()">Nueva <i class="fas fa-plus"></i></button>
     </div>   
 
     <h5 class="separtor">Partidas</h5>
@@ -339,6 +358,42 @@
 </div>
 </div>
 </div>
+
+<datalist id="listaUbicaciones">
+<option>Yarda</option>
+<option>Patio</option>
+<option>Rampa</option>
+<option>Almacen</option>
+</datalist>
+
+
+
+<!-- MODAL Transportista PROVEEDOR-->
+<div id="supplier_carrier_mod_back" style="display:none" class="overlay" onclick="closeSCmodal()">
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="supplier_carrier_mod" style="z-index:1001;">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="supplier_carrier_modLabel" >Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeSCmodal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-lg-6 controlDiv" >
+            <label class="form-label">Nombre:</label>
+            <input type="text" class="form-control" id="txtModal" value="">  
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="agregarSC()" >Agregar</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeSCmodal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection
 @section('scripts')
 <script>
@@ -714,6 +769,85 @@ function terminar()
     //         showModal("Notificación", "Enviada: " + NumSalida);
     //         $("#btnTerminar").prop("disabled",false);
     //     });
+}
+
+
+function agregarTransportista()
+{
+    if ( $("#txtTransportista").val() == "-2")
+    {
+        $("#txtModal").val("");
+        $("#supplier_carrier_modLabel").html("Transportista");        
+        $("#supplier_carrier_mod_back").show();
+        $("#supplier_carrier_mod").show();
+    }
+}
+
+function agregarSC()
+{
+    if($("#txtModal").val().trim() == "")
+    {
+        return;
+    }
+    if($("#supplier_carrier_modLabel").html() == "Transportista")
+    {
+        $.ajax({url: "/int/catalog/carriers_add/"+$("#txtModal").val().trim(),context: document.body}).done(function(result) 
+        {
+            //location.reload();
+            $("#option_new_transportista").remove();
+            $('#txtTransportista').append($('<option>', {
+                value: result["id"],
+                text: result["carrier"]
+            }));
+            $('#txtTransportista').val(result["id"]);
+            closeSCmodal();
+        });
+    }
+}
+
+function closeSCmodal()
+{
+    $("#supplier_carrier_mod_back").hide();
+    $("#supplier_carrier_mod").hide();
+    $("#txtModal").val("");
+    $("#supplier_carrier_modLabel").val("");
+}
+
+function nuevaSalida()
+{
+    if(!confirm("Desea crear una nueva Salida? los datos no guardados serán descartados."))
+    {
+        return;
+    }
+    location.href='/int/salidas/create';
+}
+
+function descontarDateTime()
+{
+    let element = document.getElementById("txtDiaHoraDespacho");
+    
+    if($("#chkDescontar").prop('checked'))
+    {
+        $("#txtDiaHoraDespacho").prop('disabled',false);
+
+        var today = new Date();
+        var hours = today.getHours();
+        if(today.getHours() < 10)
+        {
+            hours = "0"+today.getHours();
+        }
+        var minutes = today.getMinutes();
+        if(today.getMinutes() < 10)
+        {
+            minutes = "0"+today.getMinutes();
+        }
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+'T'+hours+':'+minutes;
+        $("#txtDiaHoraDespacho").val(date);
+    }
+    else
+    {
+        $("#txtDiaHoraDespacho").prop('disabled',true);
+    }
 }
 
 $(document).ready(function(){

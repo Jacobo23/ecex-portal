@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF</title>
 <style type="text/css">
-@import url('https://fonts.googleapis.com/css2?family=Libre+Barcode+39&display=swap');
+@import url('http://fonts.cdnfonts.com/css/libre-barcode-39-text');
     .barcode
     {
         font-family: "Libre Barcode 39";
@@ -220,6 +220,12 @@ $page++;
         <td id="tdPesoBruto">{{ $outcome->getPesoBruto() }} lbs / {{ round( $outcome->getPesoBruto() * 0.453592,2, PHP_ROUND_HALF_EVEN) }} kg</td>
         <td id="tdPiezas">{!! str_replace("<br>","<br>",$outcome->getPiezasSum()) !!}</td>
         <td id="tdBultos">{!! str_replace("<br>","<br>",$outcome->getBultosSum()) !!}</td>
+    </tr>
+    <tr>
+        <td > </td>
+        <td > </td>
+        <td id="tdPiezas">Total: {!! str_replace("<br>","<br>",$outcome->getPiezasTotalSum()) !!}</td>
+        <td id="tdBultos">Total: {!! str_replace("<br>","<br>",$outcome->getBultosTotalSum()) !!}</td>
     </tr>
 </table>
 <br>

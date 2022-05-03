@@ -64,5 +64,6 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'allow.only' => \App\Http\Middleware\EnsureUserRole::class,
         'permission.for' => \App\Http\Middleware\EnsurePermission::class,
+        'add.bitacora' => \App\Http\Middleware\AddBitacora::class,
     ];
 }

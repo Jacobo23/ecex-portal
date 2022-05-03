@@ -9,6 +9,7 @@ use App\Models\Outcome;
 use App\Models\OutcomeRow;
 use App\Models\Income;
 use App\Models\InventoryBundle;
+use App\Models\ConversionFactor;
 
 
 class IncomeRow extends Model
@@ -71,6 +72,26 @@ class IncomeRow extends Model
             $inv_bundle->save();
         }
         return $inv_bundle->quantity;
+    }
+    // si no hay unidad de conversion regresa un texto vacio
+    public function converting_unit()
+    {
+        $converting_unit = ConversionFactor::Where('desc',$this->ump)->first();
+        if(!$converting_unit)
+        {
+            return "";
+        }
+        return $converting_unit->convert2;
+    }
+    // si no hay unidad de conversion regresa un texto vacio
+    public function convert_unit()
+    {
+        $converting_unit = ConversionFactor::Where('desc',$this->ump)->first();
+        if(!$converting_unit)
+        {
+            return "";
+        }
+        return $this->units * $converting_unit->factor;
     }
     
 }

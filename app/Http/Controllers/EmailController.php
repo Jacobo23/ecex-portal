@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Income;
 use App\Models\Outcome;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Mail;
 use PDF;
 
@@ -49,10 +50,25 @@ class EmailController extends Controller
             $pdf->save(public_path('/storage/entradas/'.$numero_de_entrada.'/'.$numero_de_entrada.'.pdf'));
             //borrar un archivo innecesario que podria estar presente
             Storage::delete($files_path."temp_massive.xlsx");
+            //subir adjuntos adicionales
+            if (!Storage::exists($files_path."adjuntos/")) 
+            {
+                Storage::makeDirectory($files_path."adjuntos/");
+            }
+            if(null !== $request->file('filenames'))
+            {
+                $i = 0;
+                foreach ($request->file('filenames') as $file) 
+                {
+                    $i++;
+                    Storage::put('/public/entradas/'.$numero_de_entrada.'/adjuntos/'.time().'_'.$i.'.'.$file->extension(), file_get_contents($file), 'public');
+                }
+            }
 
             //Enviar correo 
             Mail::send('emails.entrada', ['income' => $income, 'body' => $request->txtObservaciones], function ($m) use ($income, $numero_de_entrada, $files_path, $request) {
-                $m->from('do-not-reply@ecex-portal.org', 'Ecex Notification');
+                $username = Auth::user()->name;
+                $m->from('do-not-reply@ecex-portal.org', $username);
                 $emails = explode(";",$request->txtTo);
                 $emails2 = explode(";",$request->txtCc);
                 
@@ -112,10 +128,30 @@ class EmailController extends Controller
                             }
                         }
                     }
+                    //adjuntos
+                    $adjuntos_url = $files_path . "adjuntos/";
+
+                    if(Storage::exists($adjuntos_url))
+                    {
+                        $adjuntos = Storage::allFiles($adjuntos_url);
+                        foreach ($adjuntos as $adjunto) 
+                        {
+                            if (Storage::exists($adjunto))
+                            {
+                                $m->attach(public_path(Storage::url($adjunto)));
+                            }
+                        }
+                    }
                 }
             });
+            //subir adjuntos adicionales
+            if (!Storage::exists($files_path."adjuntos/")) 
+            {
+                Storage::deleteDirectory($files_path."adjuntos/");
+            }
         }
-        return redirect('/int/entradas/'.$numero_de_entrada);
+        //return redirect('/int/entradas/'.$numero_de_entrada);
+        return redirect('/');
     }
 
     public function FormatoEmailSalida(Outcome $outcome)
@@ -128,6 +164,10 @@ class EmailController extends Controller
     public function sendEmailSalida(Request $request)
     {
         $outcome = Outcome::find($request->outcomeID);
+        // Marcar salida como "enviada"
+        $outcome->sent = true;
+        $outcome->save();
+
         $numero_de_salida = $outcome->getOutcomeNumber(false);
     
         $files_path = 'public/salidas/'.$numero_de_salida.'/';
@@ -143,10 +183,26 @@ class EmailController extends Controller
 
         $pdf = PDF::loadView('intern.salidas.pdf', compact('outcome'))->setPaper('a4', 'landscape');
         $pdf->save(public_path('/storage/salidas/'.$numero_de_salida.'/'.$numero_de_salida.'.pdf'));
+
+        //subir adjuntos adicionales
+        if (!Storage::exists($files_path."adjuntos/")) 
+        {
+            Storage::makeDirectory($files_path."adjuntos/");
+        }
+        if(null !== $request->file('filenames'))
+        {
+            $i = 0;
+            foreach ($request->file('filenames') as $file) 
+            {
+                $i++;
+                Storage::put('/public/salidas/'.$numero_de_salida.'/adjuntos/'.time().'_'.$i.'.'.$file->extension(), file_get_contents($file), 'public');
+            }
+        }
         
         //Enviar correo
         Mail::send('emails.salida', ['outcome' => $outcome, 'body' => $request->txtObservaciones], function ($m) use ($outcome, $numero_de_salida, $request, $files_path) {
-            $m->from('do-not-reply@ecex-portal.org', 'Ecex Notification');
+            $username = Auth::user()->name;
+            $m->from('do-not-reply@ecex-portal.org', $username);
 
             $emails = explode(";",$request->txtTo);
             $emails2 = explode(";",$request->txtCc);
@@ -238,7 +294,27 @@ class EmailController extends Controller
                 }
             }
 
+            //adjuntos
+            $adjuntos_url = $files_path . "adjuntos/";
+
+            if(Storage::exists($adjuntos_url))
+            {
+                $adjuntos = Storage::allFiles($adjuntos_url);
+                foreach ($adjuntos as $adjunto) 
+                {
+                    if (Storage::exists($adjunto))
+                    {
+                        $m->attach(public_path(Storage::url($adjunto)));
+                    }
+                }
+            }
+
         });
+        //subir adjuntos adicionales
+        if (!Storage::exists($files_path."adjuntos/")) 
+        {
+            Storage::deleteDirectory($files_path."adjuntos/");
+        }
         return redirect('/int/salidas/'.$numero_de_salida);
         
     }

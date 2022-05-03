@@ -11,6 +11,7 @@ use App\Models\Carrier;
 use App\Models\Supplier;
 use App\Models\MeasurementUnit;
 use App\Models\BundleType;
+use App\Models\Bitacora;
 
 use App\Http\Controllers\EmailController;
 use Illuminate\Support\Facades\Session;
@@ -33,6 +34,7 @@ class IncomeController extends Controller
         $date2 = date("m/d/Y");
 
         $can_delete = Auth::user()->canDeleteIncome();
+        $can_hide = Auth::user()->canHideIncome();
         $clientes = Customer::All();
 
         $cliente = $request->txtCliente ?? 0;
@@ -40,13 +42,14 @@ class IncomeController extends Controller
 
         $rango = $request->txtRango ?? $date1 . " - " . $date2;
         $tracking = $request->txtTracking ?? "";
-        $en_inventario = isset($request->chkInventario);
+        $en_inventario = $request->txtStatus ?? "todo";
 
         $entradas = $this->get_Incomes_obj_range_dates($cliente_ids,$rango,$tracking,$en_inventario,false);
                 
         return view('intern.entradas.index', [
             'incomes' => $entradas,
             'can_delete' => $can_delete,
+            'can_hide' => $can_hide,
             'clientes' => $clientes,
             'cliente' => $cliente,
             'rango' => $rango,
@@ -64,7 +67,7 @@ class IncomeController extends Controller
         $cliente_ids = ($cliente == 0) ? $cliente = array() : array($cliente);
         $rango = $request->txtRango ?? $date1 . " - " . $date2;
         $tracking = $request->txtTracking ?? "";
-        $en_inventario = isset($request->chkInventario);
+        $en_inventario = $request->txtStatus ?? "todo";
 
         $entradas = $this->get_Incomes_obj_range_dates($cliente_ids,$rango,$tracking,$en_inventario,false);
         foreach ($entradas as $income) {
@@ -82,9 +85,6 @@ class IncomeController extends Controller
         $en_inventario = true;
 
         $entradas = $this->get_Incomes_obj($cliente,$rango,$tracking,$en_inventario,true);
-        //foreach ($entradas as $income) {
-        //    $income->income_rows;
-        //}
         
         $export = new IncomesCustomerExport($entradas);
         return Excel::download($export, 'reporte_de_entradas.xlsx');
@@ -111,7 +111,7 @@ class IncomeController extends Controller
         ]);
     }
 
-    public function get_Incomes_obj(array $cliente, string $rango, string $busqueda, bool $en_inventario, bool $enviada)
+    public function get_Incomes_obj(array $cliente, string $rango, string $busqueda, bool $en_inventario, bool $for_customer)
     {
         // '$cliente' en realidad es un array de los customer_id que vamos a filtrar NINGUNO DEBE SER CERO 0
         $entradas = Income::whereDate('cdate', '>=', now()->subDays(intval($rango))->setTime(0, 0, 0)->toDateTimeString())
@@ -153,16 +153,17 @@ class IncomeController extends Controller
         
         //discriminar las entradas con id = 0 porque no tienen inventario restante
         $entradas = $entradas->where('id', '>', 0);
+        
         // obneter solo las enviadas (para modulo cliente)
-        if($enviada)
+        if($for_customer)
         {
-            $entradas = $entradas->where('sent', '==', true);
+            $entradas = $entradas->where('sent', '==', true)->where('hidden', false);
         }
         
         return $entradas;
     }
 
-    public function get_Incomes_obj_range_dates(array $cliente, string $rango, string $busqueda, bool $en_inventario, bool $enviada)
+    public function get_Incomes_obj_range_dates(array $cliente, string $rango, string $busqueda, string $en_inventario, bool $enviada)
     {
         // '$cliente' en realidad es un array de los customer_id que vamos a filtrar NINGUNO DEBE SER CERO 0
         // lo que se recive en rango 10/08/2021 - 11/12/2021
@@ -193,7 +194,7 @@ class IncomeController extends Controller
         }
         $entradas = $entradas->orderBy('id', 'desc')->get();
 
-        if($en_inventario)
+        if($en_inventario != "todo")
         {
             foreach ($entradas as $key => $entrada) 
             {
@@ -207,10 +208,21 @@ class IncomeController extends Controller
                         break;
                     }
                 }
-                if($count == 0)
+                if($en_inventario == "en inventario")
                 {
-                    $entrada->id = 0;
+                    if($count == 0)
+                    {
+                        $entrada->id = 0;
+                    }
                 }
+                if($en_inventario == "cerrada")
+                {
+                    if($count > 0)
+                    {
+                        $entrada->id = 0;
+                    }
+                }
+                
             }
         }
         
@@ -281,6 +293,9 @@ class IncomeController extends Controller
         $entrada->invoice = $request->txtFactura ?? "";
         $entrada->tracking = $request->txtTracking ?? "";
         $entrada->po = $request->txtPO ?? "";
+        $entrada->ubicacion = $request->txtUbicacion ?? "";
+
+        
         
         $entrada->user = Auth::user()->name;
         $entrada->reviewed = isset($request->chkRev);
@@ -293,7 +308,7 @@ class IncomeController extends Controller
         {
             //asignar numero de entrada
             $entrada->year = date("Y");
-            $number = Income::where('year',$entrada->year)->max('number');
+            $number = Income::withTrashed()->where('year',$entrada->year)->max('number');
             $entrada->number = (is_null($number)) ? 1 : $number + 1;
             $entrada->sent = false;
         }
@@ -402,6 +417,9 @@ class IncomeController extends Controller
     }
     public function delete(Income $income)
     {
+        //registrar en la bitacora
+        Bitacora::registrar("Eliminar Entrada",Auth::user()->name . "-Sistema",$income->getIncomeNumber());
+
         //TO DO: falta verificar que las partidas no tengan salida.
         $partidas = $income->income_rows;
         $lista_de_salidas = "";
@@ -418,7 +436,11 @@ class IncomeController extends Controller
         {
             foreach ($partidas as $partida) 
             {
-                $partida->delete();           
+                //registrar en la bitacora
+                Bitacora::registrar("Eliminar Partida de Entrada",Auth::user()->name . "-Sistema",$income->getIncomeNumber() . " - " . $partida->id . " - " . $partida->part_number()->part_number);
+
+                //ya no se borraran las partidas al eliminar la entrada porque las entradas se eliminan por soft delete. las partidas deben seguir presentes
+                //$partida->delete();           
             }
         }
         else
@@ -428,8 +450,24 @@ class IncomeController extends Controller
         
         $income->delete();
         //borramos los archivos
-        Storage::deleteDirectory('public/entradas/'.$income->getIncomeNumber());
+        //ya no se borraran los archivos al eliminar la entrada por soft delete
+        //Storage::deleteDirectory('public/entradas/'.$income->getIncomeNumber());
             
+    }
+
+    public function hide(Income $income)
+    {
+        //registrar en la bitacora
+        Bitacora::registrar("Ocultar Entrada",Auth::user()->name . "-Sistema",$income->getIncomeNumber());
+        $income->hidden = true;
+        $income->save();
+    }
+    public function unhide(Income $income)
+    {
+        //registrar en la bitacora
+        Bitacora::registrar("Revelar Entrada",Auth::user()->name . "-Sistema",$income->getIncomeNumber());
+        $income->hidden = false;
+        $income->save();
     }
 
     public function downloadPDF(Income $income)
@@ -506,7 +544,7 @@ class IncomeController extends Controller
             $income_row->income; // <- invocamos esta propiedad para que el objeto final cuente con informacion de su entrada
         }
 
-        $pdf = PDF::loadView('intern.entradas.pdf', compact('income'))->setPaper('a4', 'landscape');
+        $pdf = PDF::loadView('intern.entradas.pdf_balance', compact('income'))->setPaper('a4', 'landscape');
         return $pdf->download('balance_'.$numero_de_entrada.'.pdf');
     }
 

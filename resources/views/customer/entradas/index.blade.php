@@ -91,7 +91,7 @@
                 @foreach ($incomes as $income)
                 <tr id="inc_row_{{ $income->id }}" @if ( $income->get_color_fila_estado() != '') class="tr_tbl table-{{ $income->get_color_fila_estado() }}" @endif>
                     <td><a href="/ext/entradas/{{ $income->id }}/download_pdf">{{ $income->getIncomeNumber() }}</a></td>
-                    <td>{{ explode(" ", $income->cdate)[0] }}</td>
+                    <td>{{ date_format(date_create(explode(" ", $income->cdate)[0]),"m/d/y") }}</td>
                     <td id="tdRevisada_{{ $income->id }}">@if ($income->reviewed) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td>{{ $income->getBultosOriginales() }} {{ $income->getTipoBultos() }}</td>
                     <td>{{ $income->getDiasTrascurridos() }}</td>

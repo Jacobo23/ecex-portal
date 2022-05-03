@@ -33,6 +33,8 @@
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Modelo</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Serie</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">SKID</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Observaciones Entrada</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Observaciones Partida</th>
         </tr>
     </thead>
     <tbody>
@@ -57,6 +59,8 @@
             <td>{{ $partida->model }}</td>
             <td>{{ $partida->serial }}</td>
             <td>{{ $partida->skids }}</td>
+            <td>{{ $partida->observations }}</td>
+            <td>{{ $partida->income->observations }}</td>
         </tr>
         @endforeach
     </tbody>

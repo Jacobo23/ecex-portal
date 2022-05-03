@@ -74,7 +74,7 @@
                 @foreach ($outcomes as $outcome)
                 <tr id="otc_row_{{ $outcome->id }}">
                     <td><a href="/ext/salidas/{{ $outcome->id }}/download_pdf">{{ $outcome->getOutcomeNumber(true) }}</a></td>
-                    <td>{{ explode(" ", $outcome->cdate)[0] }}</td>
+                    <td>{{ date_format(date_create(explode(" ", $outcome->cdate)[0]),"m/d/y") }}</td>
                     <td>{{ $outcome->customer->name }}</td>
                     <td>{{ $outcome->invoice }}</td>
                     <td>{{ $outcome->pediment }}</td>
@@ -84,16 +84,23 @@
                     <td><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_outcome_{{ $outcome->id }}')"><i class="far fa-folder-open"></i></button></td>
                     <td id="adjuntos_outcome_{{ $outcome->id }}" style="display:none">
                         @php
-                        $packinglist_path='/public/salidas/'.$outcome->getOutcomeNumber(false).'/packing_list/packing-list.pdf';
+                        $packinglist_path='/public/salidas/'.$outcome->getOutcomeNumber(false).'/packing_list/';
                         if (Storage::exists($packinglist_path)) 
                         {
                             echo "<br>";
-                            echo "<div class='img_card col-lg-12' style='padding:10px'>";
-                            echo "    <div class='img_card_top'>";
-                            echo "        <h6><b>Packing list</b></h6>"; 
-                            echo "    </div>";
-                            echo "    <p><a href='/download_pakinglist_outcome/".$outcome->getOutcomeNumber(false)."'><i class='fas fa-arrow-circle-down'></i></a><strong>Tamaño: </strong> ". round(Storage::size($packinglist_path)/1000000,2,PHP_ROUND_HALF_UP ) ." Mb</p>";
-                            echo "</div>";
+                            $packinglists = Storage::files($packinglist_path);
+                            foreach ($packinglists as $packinglist) 
+                            {
+                                $pck_file_name_array=explode('/',$packinglist);
+                                $pck_file_name=$pck_file_name_array[count($pck_file_name_array)-1];
+
+                                echo "<div class='img_card col-lg-12' style='padding:10px'>";
+                                echo "    <div class='img_card_top'>";
+                                echo "        <h6><b>".$pck_file_name."</b></h6>"; 
+                                echo "    </div>";
+                                echo "    <p><a href='/download_pakinglist_outcome/".$outcome->getOutcomeNumber(false)."/".$pck_file_name."'><i class='fas fa-arrow-circle-down'></i></a><strong>Tamaño: </strong> ". round(Storage::size($packinglist)/1000000,2,PHP_ROUND_HALF_UP ) ." Mb</p>";
+                                echo "</div>";
+                            }
                         }
                         $outcome_imgs_paths='public/salidas/'.$outcome->getOutcomeNumber(false).'/images/';
                         $outcome_imgs = Storage::files($outcome_imgs_paths);

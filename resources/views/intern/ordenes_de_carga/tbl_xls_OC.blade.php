@@ -27,6 +27,7 @@
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">PO</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:8px">Pais</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Fraccion</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Lote</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Marca</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Modelo</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Serie</th>
@@ -48,6 +49,7 @@
             <td>{{ $oc_row->income_row->po }}</td>
             <td>{{ $oc_row->income_row->origin_country }}</td>
             <td>{{ $oc_row->income_row->fraccion }}.{{ $oc_row->income_row->nico }}</td>
+            <td>{{ $oc_row->income_row->lot }}</td>
             <td>{{ $oc_row->income_row->brand }}</td>
             <td>{{ $oc_row->income_row->model }}</td>
             <td>{{ $oc_row->income_row->serial }}</td>

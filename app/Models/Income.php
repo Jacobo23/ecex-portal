@@ -10,10 +10,12 @@ use App\Models\Carrier;
 use App\Models\Supplier;
 use App\Models\InventoryBundle;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Income extends Model
 {
     use HasFactory;
+    use SoftDeletes;
     //relaciones
     public function income_rows()
     {
@@ -82,9 +84,6 @@ class Income extends Model
             $count += $inv_bundle->quantity;
         }
         return $count;
-
-        
-
     }
     public function getBultosOriginales()
     {
@@ -121,6 +120,14 @@ class Income extends Model
     public function getCantidadPartidas()
     {
         return count($this->income_rows);
+    }
+    public function getDate()
+    {
+        $date = explode(" ", $this->cdate)[0];
+        $year = explode("-", $date)[0];
+        $month = explode("-", $date)[1];
+        $day = explode("-", $date)[2];
+        return $month . "/" . $day . "/" . $year;
     }
     public function getPesoNeto()
     {
@@ -178,6 +185,18 @@ class Income extends Model
         }
         return $res;
     }
+    public function getPiezasTotalSum()
+    {
+        $piezas_sum = IncomeRow::where('income_id',$this->id)
+            ->selectRaw("SUM(units) as sum")
+            ->get();
+        $res = "";
+        foreach ($piezas_sum as $row) 
+        {
+            $res .= ($row["sum"] * 1) . "<br>";
+        }
+        return $res;
+    }
 
     public function getBultosSum()
     {
@@ -192,9 +211,30 @@ class Income extends Model
         }
         return $res;
     }
-
-
-    
+    public function getBultosTotalSum()
+    {
+        $piezas_sum = IncomeRow::where('income_id',$this->id)
+            ->selectRaw("SUM(bundles) as sum")
+            ->get();
+        $res = "";
+        foreach ($piezas_sum as $row) 
+        {
+            $res .= ($row["sum"] * 1) . "<br>";
+        }
+        return $res;
+    }
+    public function getBultosSumFromInv()
+    {
+        $bultos_sum = IncomeRow::where('income_id',$this->id)
+            ->leftJoin('inventory_bundles', 'income_rows.id', '=', 'inventory_bundles.income_row_id')
+            ->selectRaw("SUM(inventory_bundles.quantity) as sum, income_rows.umb")
+            ->groupBy("umb")
+            ->get();
+        $res = "";
+        foreach ($bultos_sum as $row) 
+        {
+            $res .= ($row["sum"] * 1) . " " . $row["umb"] . "<br>";
+        }
+        return $res;
+    }
 }
-
-

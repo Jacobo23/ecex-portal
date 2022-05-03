@@ -27,6 +27,7 @@
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Recibido por</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:25px">Observaciones</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Usuario</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Enviada</th>
             
             <th style="background-color: #fcba03; text-align:center; font-weight:bold; width:15px">Entrada</th>
             <th style="background-color: #fcba03; text-align:center; font-weight:bold; width:15px">Fecha entrada</th>
@@ -59,6 +60,7 @@
             <td>{{ $outcome->received_by }}</td>
             <td>{{ $outcome->observations }}</td>
             <td>{{ $outcome->user }}</td>
+            <td>@if($outcome->sent) Yes @endif</td>
             <td>{{ $outcome_row->income_row->income->getIncomeNumber() }}</td>
             <td>{{ explode(" ", $outcome_row->income_row->income->cdate)[0] }}</td>
             <td>{{ $outcome_row->income_row->part_number()->part_number }}</td>

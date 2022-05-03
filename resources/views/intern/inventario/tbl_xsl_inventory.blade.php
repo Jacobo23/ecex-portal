@@ -22,6 +22,9 @@
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Proveedor</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:20px">Numero_de_parte</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Piezas</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">U.M</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Conversion</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">U.M</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:8px">Bultos</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Tipo bulto</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">PesoNeto</th>
@@ -35,6 +38,8 @@
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Modelo</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Serie</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">SKID</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Observaciones Entrada</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Observaciones Partida</th>
         </tr>
     </thead>
     <tbody>
@@ -48,6 +53,11 @@
             <td>{{ $partida->income->supplier->name }}</td>
             <td>{{ $partida->part_number()->part_number }}</td>
             <td>{{ $partida->units }}</td>
+            <td>{{ $partida->ump }}</td>
+            
+            <td>{{ $partida->convert_unit() }}</td>
+            <td>{{ $partida->converting_unit() }}</td>
+
             <td>{{ $partida->getBultos() }}</td>
             <td>{{ $partida->umb }}</td>
             <td>{{ $partida->net_weight }}</td>
@@ -61,6 +71,8 @@
             <td>{{ $partida->model }}</td>
             <td>{{ $partida->serial }}</td>
             <td>{{ $partida->skids }}</td>
+            <td>{{ $partida->observations }}</td>
+            <td>{{ $partida->income->observations }}</td>
         </tr>
         @endforeach
     </tbody>

@@ -51,6 +51,15 @@ class User extends Authenticatable
         return str_contains(Auth::user()->permits, 'del_outcome');
     }
 
+    public function canHideIncome()
+    {
+        return str_contains(Auth::user()->permits, 'hide_income');
+    }
+    public function canHideOutcome()
+    {
+        return str_contains(Auth::user()->permits, 'hide_outcome');
+    }
+
     public function canDeletePartNumber()
     {
         return str_contains(Auth::user()->permits, 'del_part_number');

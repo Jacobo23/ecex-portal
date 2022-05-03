@@ -32,6 +32,8 @@ Route::get('/download_pakinglist/{entrada}','UploadFileController@downloadPackin
 Route::post('/delete_pakinglist/','UploadFileController@deletePacking')->middleware(['auth','allow.only:user']);
 Route::post('/upload_img_entrada/','UploadFileController@uploadImgEntrada')->middleware(['auth','allow.only:user']);
 Route::post('/delete_img_entrada/','UploadFileController@deleteImgEntrada')->middleware(['auth','allow.only:user']);
+Route::get('/upload_adj_entrada/','UploadFileController@uploadAdjEntrada')->middleware(['auth','allow.only:user']);
+
   //outcomes
 Route::post('upload_pakinglist_outcome/','UploadFileController@uploadPakinglistOutcome')->middleware(['auth','allow.only:user']);
 Route::post('/delete_pakinglist_outcome/','UploadFileController@deletePackingOutcome')->middleware(['auth','allow.only:user']);
@@ -48,11 +50,16 @@ Route::get('/int/entradas_can_change_customer/{income}','IncomeController@can_ch
 Route::get('/int/entradas_get_sums/{income}','IncomeController@get_income_sums')->middleware(['auth','allow.only:user']);
 
 Route::get('/int/entradas/{income}/download_pdf','IncomeController@downloadPDF')->middleware(['auth','allow.only:user']);
-Route::get('/int/entradas/{income}/delete','IncomeController@delete')->middleware(['auth','allow.only:user']);
+Route::get('/int/entradas/{income}/delete','IncomeController@delete')->middleware(['auth','allow.only:user','add.bitacora:Eliminar Entrada']);
 Route::get('/int/entradas_xls','IncomeController@download_incomes_xls')->middleware(['auth','allow.only:user']);
+Route::get('/int/entradas/{income}/hide','IncomeController@hide')->middleware(['auth','allow.only:user','add.bitacora:Ocultar Entrada']);
+Route::get('/int/entradas/{income}/unhide','IncomeController@unhide')->middleware(['auth','allow.only:user','add.bitacora:Revelar Entrada']);
+
+
 
 //Income rows internal
 Route::resource('/income_row', 'IncomeRowController')->middleware('auth')->middleware(['auth','allow.only:user']);
+Route::get('/income_row_del/{income_row}', 'IncomeRowController@delete')->middleware(['auth','allow.only:user']);
 Route::get('/income_row_has_outcomes/{income_row}', 'IncomeRowController@hasOutcomes')->middleware(['auth','allow.only:user']);
 Route::get('/income_row_massive/{income_number}', 'IncomeRowController@masiva')->middleware(['auth','allow.only:user']);
 Route::post('/income_row_massive_load', 'IncomeRowController@upload_masiva')->middleware(['auth','allow.only:user']);
@@ -61,15 +68,20 @@ Route::post('/income_row_massive_store_row', 'IncomeRowController@store_massive_
 Route::post('/income_row_massive_clear_rows/{income}', 'IncomeRowController@clear_income_rows')->middleware(['auth','allow.only:user']);
 //Part Numbers
 Route::resource('/part_number', 'PartNumberController')->middleware(['auth','allow.only:user']);
-Route::get('/part_number/{partNumber}/{customer}/get','PartNumberController@getInfo')->middleware(['auth','allow.only:user']);
-Route::get('/part_number/{partNumber}/{customer}/{numEntrada}/edit','PartNumberController@edit')->middleware(['auth','allow.only:user']);
+//Route::get('/part_number/{partNumber}/{customer}/get','PartNumberController@getInfo')->where('partNumber', '[\w\s\-_\/]+')->middleware(['auth','allow.only:user']);
+Route::post('/part_number/info/{customer}/get','PartNumberController@getInfo')->middleware(['auth','allow.only:user']);
+//Route::get('/part_number/{partNumber}/{customer}/{numEntrada}/edit','PartNumberController@edit')->middleware(['auth','allow.only:user']);
+Route::post('/part_number/info/{customer}/{numEntrada}/edit','PartNumberController@edit')->middleware(['auth','allow.only:user']);
 Route::get('/part_number/{partNumber_id}/edit_existing','PartNumberController@edit_existing')->middleware(['auth','allow.only:user']);
+Route::get('/part_number/{partNumber_id}/{numEntrada}/edit_existing','PartNumberController@edit_existing_update_mode')->middleware(['auth','allow.only:user']);
 //Outcomes internal
 Route::resource('/int/salidas', 'OutcomeController')->middleware('auth')->middleware(['auth','allow.only:user']);
-Route::get('/int/salidas/{outcome}/delete','OutcomeController@delete')->middleware(['auth','allow.only:user']);
+Route::get('/int/salidas/{outcome}/delete','OutcomeController@delete')->middleware(['auth','allow.only:user','add.bitacora:Eliminar Salida']);
 Route::get('/int/salidas_xls','OutcomeController@download_outcomes_xls')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas_can_change_customer/{outcome}','OutcomeController@can_change_customer')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas/{outcome}/download_pdf','OutcomeController@downloadPDF')->middleware(['auth','allow.only:user']);
+Route::get('/int/salidas/{outcome}/hide','OutcomeController@hide')->middleware(['auth','allow.only:user','add.bitacora:Ocultar Salida']);
+Route::get('/int/salidas/{outcome}/unhide','OutcomeController@unhide')->middleware(['auth','allow.only:user','add.bitacora:Revelar Salida']);
 
 //Outcome Rows internal
 Route::resource('/outcome_row', 'OutcomeRowController')->middleware(['auth','allow.only:user']);
@@ -128,4 +140,8 @@ Route::post('/sendemail_done/salida','EmailController@sendEmailSalida');
 
 Route::get('/int/balance','IncomeController@getBalance')->middleware(['auth','allow.only:user']);
 Route::get('/int/balance_pdf/{income}','IncomeController@getBalancePDF')->middleware(['auth','allow.only:user']);
+
+Route::get('phpmyinfo', function () {
+    phpinfo(); 
+})->name('phpmyinfo');
 require __DIR__.'/auth.php';

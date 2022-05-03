@@ -44,7 +44,7 @@
 
         <div class="col-lg-3 controlDiv" >
             <label class="form-label">Fecha:</label>
-            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@endif">
+            <input type="date" class="form-control" id="txtFecha" name="txtFecha" value="@if (isset($income)){{ explode(' ',$income->cdate)[0] }}@else{{date('Y-m-d')}}@endif">
         </div>
 
         <div class="col-lg-3 controlDiv" >
@@ -127,13 +127,38 @@
             <label class="form-label">Actualizado por:</label>
             <input type="text" class="form-control" id="txtActualizadoPor" name="txtActualizadoPor" value="{{ $income->reviewed_by ?? '' }}">       
         </div>
-        <div class="col-lg-2 controlDiv" >
+
+        <div class="col-lg-3 controlDiv" >
+            <label class="form-label">Clasificación:</label>
+            <select class="form-select" id = "txtClasificacion" name = "txtClasificacion">
+                <option value=0></option>
+                <option value="Materia prima" @php if(isset($income)){if($income->type == "Materia prima" ){echo "selected";}}@endphp >Materia prima</option>
+                <option value="Equipo" @php if(isset($income)){if($income->type == "Equipo" ){echo "selected";}}@endphp >Equipo</option>
+            </select>
+        </div>
+
+        <div class="col-lg-3 controlDiv" style="">
+            <label class="form-label">Ubicación:</label>
+            <input type="text" class="form-control" id="txtUbicacion" name="txtUbicacion" value="{{ $income->ubicacion ?? '' }}" list="listaUbicaciones">       
+        </div>
+
+        <div class="col-lg-3 controlDiv" >
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="chkRev" id="chkRev" name="chkRev" @isset($income->reviewed){{ ($income->reviewed)?'checked':'' }}@endisset>
-                <label class="form-check-label">revisado</label>
+                <label class="form-check-label">Revisado</label>
             </div>      
         </div>
-        <div class="col-lg-2 controlDiv" >
+        
+    </div>
+
+    <div class="row">
+
+        <div class="mb-3 col-lg-9">
+            <label class="form-label">Observaciones</label>
+            <textarea class="form-control" id="txtObservaciones" name="txtObservaciones" rows="2">{{ $income->observations ?? '' }}</textarea>
+        </div>
+
+        <div class="col-lg-1 controlDiv" >
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" value="chkUrgente" id="chkUrgente" name="chkUrgente" @isset($income->urgent){{ ($income->urgent)?'checked':'' }}@endisset>
                 <label class="form-check-label">Urgente</label>
@@ -146,20 +171,6 @@
             </div>      
         </div>
 
-        <div class="col-lg-3 controlDiv" >
-            <label class="form-label">Clasificación:</label>
-            <select class="form-select" id = "txtClasificacion" name = "txtClasificacion">
-                <option value=0></option>
-                <option value="Materia prima" @php if(isset($income)){if($income->type == "Materia prima" ){echo "selected";}}@endphp >Materia prima</option>
-                <option value="Equipo" @php if(isset($income)){if($income->type == "Equipo" ){echo "selected";}}@endphp >Equipo</option>
-            </select>
-        </div>
-        
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Observaciones</label>
-        <textarea class="form-control" id="txtObservaciones" name="txtObservaciones" rows="2">{{ $income->observations ?? '' }}</textarea>
     </div>
 
     </form>
@@ -244,13 +255,15 @@
     </div>   
 
     <div class="row" style="margin-top:20px;">
-        <div class="col-lg-7 controlDiv"></div>
+        <div class="col-lg-6 controlDiv"></div>
         <input type="button" class="col-lg-2 btn btn-success" onclick="guardarEntrada()" value="Registrar" style="margin-right:20px;">
 
         <div class="btn-group col-lg-2" role="group">
             <button type="button" class="btn btn-outline-primary" onclick="downloadPDF()">Imprimir</button>
             <button type="button" class="btn btn-outline-primary" id="btnTerminar" onclick="terminar()">Terminar</button>
         </div>
+        <button type="button" class="col-lg-1 btn btn-primary" onclick="nuevaEntrada()">Nueva <i class="fas fa-plus"></i></button>
+        
     </div>   
 
     <h5 class="separtor">Partidas</h5>
@@ -292,15 +305,35 @@
             <label class="form-label">Numero de parte:</label>
             <input type="text" class="form-control" id="txtNumeroDeParte" name="txtNumeroDeParte" value="" onfocusout="getPartNumberInfo()">   
             <input type="hidden" id="txtNumeroDeParteID" name="txtNumeroDeParteID">
-            <input type="hidden" id="txtNumeroDePartePesoU" name="txtNumeroDePartePesoU">
+            <!-- <input type="hidden" id="txtNumeroDePartePesoU" name="txtNumeroDePartePesoU"> -->
             <input type="hidden" id="incomeID" name="incomeID" value="{{ $income->id ?? '' }}"> 
             <input type="hidden" id="incomeRowID" name="incomeRowID" value=""> 
         </div>
-        <div class="col-lg-4 controlDiv" >
+        <div class="col-lg-2 controlDiv" >
+            <label class="form-label">Peso unitario:</label>
+            <input type="number" class="form-control" id="txtNumeroDePartePesoU" name="txtNumeroDePartePesoU" value="" min=0 readonly>       
+        </div>
+        <div class="col-lg-2 controlDiv" >
+            <label class="form-label">Actualizado:</label>
+            <p id="lblActualizado"></p>      
+        </div>
+
+        @if (Auth::user()->canEditPartNumber())
+        <div class="col-lg-2 controlDiv" >
+            <input type="button" class="btn btn-light" onclick="actualizarNP()" value="Actualizar número de parte" style="position:relative; top:30px; color:#38b581;">
+        </div>
+        @endif
+
+
+    </div>
+    <div class="row">
+        
+
+        <div class="col-lg-6 controlDiv" >
             <label class="form-label">Descripción Inglés:</label>
             <input type="text" class="form-control" id="txtDescIng" name="txtDescIng" value="">       
         </div>
-        <div class="col-lg-4 controlDiv" >
+        <div class="col-lg-6 controlDiv" >
             <label class="form-label">Descripción Español:</label>
             <input type="text" class="form-control" id="txtDescEsp" name="txtDescEsp" value="">       
         </div>
@@ -476,8 +509,18 @@
   </div>
 </div>
 
+<form id="frmEditNp" action="" method="post">
+    @csrf
+    <input type="hidden" id="txtNP_post" name="partNumber">
+</form>
 
 
+<datalist id="listaUbicaciones">
+<option>Yarda</option>
+<option>Patio</option>
+<option>Rampa</option>
+<option>Almacen</option>
+</datalist>
 
 <datalist id="listaPaises">
 <option value='AF'>AFGANISTAN</option>
@@ -809,8 +852,8 @@ function closeSCmodal()
 {
     $("#supplier_carrier_mod_back").hide();
     $("#supplier_carrier_mod").hide();
-    $("#txtModal").value("");
-    $("#supplier_carrier_modLabel").value("");
+    $("#txtModal").val("");
+    $("#supplier_carrier_modLabel").val("");
 }
 
 function tipoBultoChange()
@@ -967,33 +1010,94 @@ function getPartNumberInfo()
         showModal("Alerta!","Primero guarde la entrada.");
         return;
     }
-
-    if($('#txtNumeroDeParte').prop('readonly'))
-    {
-        return;
-    }
+    //este if se movera para adentro de la funcion ajax de mas abajo para permitir que aunque la partira ya este guardada podamos obtener informacion sobre si el numero de parte ya ha sido actualizado
+    // if($('#txtNumeroDeParte').prop('readonly'))
+    // {
+    //     return;
+    // }
     
     let numeroDeParte = $("#txtNumeroDeParte").val();
     let cliente = $("#txtCliente").val();
-    $.ajax({url: "/part_number/"+numeroDeParte+"/"+cliente+"/get",context: document.body}).done(function(result) 
-        {
-            if(result.part_number == null)
-            {
-                if(confirm("El número de parte no existe, desea crearlo?"))
+
+    if(numeroDeParte.length < 2)
+    {
+        return;
+    }
+
+
+    // $.ajax({url: "/part_number/"+numeroDeParte+"/"+cliente+"/get",context: document.body}).done(function(result) 
+    //     {
+    //         if(result.part_number == null)
+    //         {
+    //             if(confirm("El número de parte no existe, desea crearlo?"))
+    //             {
+    //                 //window.open('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit', '_blank').focus();
+    //                 location.replace('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit');
+    //             }
+    //             else
+    //             {
+    //                 $('#txtNumeroDeParte').val("");
+    //                 $('#txtNumeroDeParte').focus();
+    //             }
+    //             return;
+    //         }
+    //         fillPartidaFields(result);
+    //         $("#incomeRowID").val("");
+    //     });
+
+    let urlpn = '/part_number/info/' + cliente + '/get';
+    let token = $("[name='_token']").val();
+    let encodedpn = '_token='+token+'&partNumber=' + numeroDeParte;
+
+    //alert(encodedpn);
+
+    $.ajax({
+        method: 'POST',
+        url: urlpn,
+        data: encodedpn, 
+        success: function(result) {
+                //este es el if que se comento en los comentarios de mas arriba
+                if($('#txtNumeroDeParte').prop('readonly'))
                 {
-                    //window.open('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit', '_blank').focus();
-                    location.replace('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit');
+                    if(result.part_number == null)
+                    {
+                        //este nunca deberia pasar pero porsi acaso
+                        return;
+                    }
+                    if(result.created_at != result.updated_at)
+                    {
+                        $("#lblActualizado").html("Si <i class='fas fa-check-circle'></i>");
+                    }
+                    else
+                    {
+                        $("#lblActualizado").html("No <i class='far fa-times-circle'></i>");
+                    }
+
+                    return;
                 }
-                else
+
+                if(result.part_number == null)
                 {
-                    $('#txtNumeroDeParte').val("");
-                    $('#txtNumeroDeParte').focus();
+                    if(confirm("El número de parte no existe, desea crearlo?"))
+                    {
+                        //window.open('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit', '_blank').focus();
+                        //location.replace('/part_number/' + numeroDeParte + '/' + cliente + '/' + NumEntrada + '/edit');
+                        
+                        $("#txtNP_post").val(numeroDeParte);
+                        $("#frmEditNp").attr("action",'/part_number/info/' + cliente + '/' + NumEntrada + '/edit');
+                        $("#frmEditNp").submit();
+                    }
+                    else
+                    {
+                        $('#txtNumeroDeParte').val("");
+                        $('#txtNumeroDeParte').focus();
+                    }
+                    return;
                 }
-                return;
-            }
-            fillPartidaFields(result);
-            $("#incomeRowID").val("");
-        });
+                fillPartidaFields(result);
+                $("#incomeRowID").val("");
+            },
+    });
 }
 
 function fillPartidaFields(data)
@@ -1031,6 +1135,17 @@ function fillPartidaFields(data)
     $("#txtSerie").val(data.serial);
     $("#txtRegimen").val(data.regime);
     $("#txtObservacionesPartida").val("");
+    if(data.created_at != data.updated_at)
+    {
+        $("#lblActualizado").html("Si <i class='fas fa-check-circle'></i>");
+    }
+    else
+    {
+        $("#lblActualizado").html("No <i class='far fa-times-circle'></i>");
+    }
+    
+    
+
     if(data.fraccion_especial != "")
     {
         $("#fraccionAlert").show();
@@ -1040,6 +1155,14 @@ function fillPartidaFields(data)
     {
         $("#fraccionAlert").removeAttr("style").hide();
     }
+
+    //revisar si tiene alerta de proveedor (supplier warning)
+    let txtProveedor = $("#txtProveedor").val();
+    if(data.warning == txtProveedor)
+    {
+        showModal("Alterta","No se puede recibir este numero de parte con el proveedor seleccionado");
+    }
+
     $('#txtNumeroDeParte').prop('readonly', false);
 }
 
@@ -1077,6 +1200,28 @@ function createPartida()
     $("#fraccionAlert").removeAttr("style").hide();
     $("#fraccionAlert").html("");
     $('#txtNumeroDeParte').prop('readonly', false);
+    $("#lblActualizado").html("");
+}
+
+function actualizarNP()
+{
+    let npid = $("#txtNumeroDeParteID").val();
+    let NumEntrada = $("#txtNumEntrada").val();
+    if(NumEntrada.length != 9)
+    {
+        showModal("Alerta!","Primero guarde la entrada.");
+        return;
+    }
+    if(isNaN(npid))
+    {
+        return;
+    }
+    if(npid == "" || npid == "0")
+    {
+        return;
+    }
+    location.href = "/part_number/"+npid+"/"+NumEntrada+"/edit_existing";
+    
 }
 
 function goPartida(id)
@@ -1126,6 +1271,8 @@ function goPartida(id)
             {
                 $("#fraccionAlert").removeAttr("style").hide();
             }
+            $("#txtNumeroDeParte").focus();
+
         });
 
 }
@@ -1174,6 +1321,7 @@ function guardarPartida()
 
     //$("#formIncomeRow").submit();
     
+    
     $.ajax({
         method: 'POST',
         url: $("#formIncomeRow").attr("action"),
@@ -1211,33 +1359,32 @@ function eliminarPartida()
                 showModal("Alerta!","Esta partida ya cuenta con salida(s): " + response + ".<br>Verifíque con su equipo.");
                 return;
             }
-            $.ajax(
+            
+            
+            
+            $.ajax({url: "/income_row_del/" + id_income_row,context: document.body}).done(function(response) 
             {
-                url: "/income_row/"+id_income_row,
-                type: 'DELETE',
-                data: {
-                    "_token": token,
-                },
-                success: function (){
-                    showModal("Notificación","Partida Eliminada");
-                    actualizarSumario();
-                    let index_ultima_partida = 1;
-                    $(".btnIncomeRow").each(function(){
-                        
-                        $(this).html(index_ultima_partida);
-                        if($(this).attr("id").split("_")[1] == id_income_row)
-                        {
-                            $(this).remove();
-                        }
-                        else
-                        {
-                            index_ultima_partida++;
-                        }
-                        // se corre la siguiente funcion para resetear todos los controles
-                        createPartida();
-                    });
-                }
+                showModal("Notificación","Partida Eliminada");
+                actualizarSumario();
+                let index_ultima_partida = 1;
+                $(".btnIncomeRow").each(function(){
+                    
+                    $(this).html(index_ultima_partida);
+                    if($(this).attr("id").split("_")[1] == id_income_row)
+                    {
+                        $(this).remove();
+                    }
+                    else
+                    {
+                        index_ultima_partida++;
+                    }
+                    // se corre la siguiente funcion para resetear todos los controles
+                    createPartida();
+                });
             });
+            
+            
+            
         });
     }
 }
@@ -1287,7 +1434,7 @@ function terminar()
     let enviada = "";
     @if (isset($income))
     @if ($income->sent)
-    enviada = "Esta partida ya ha sido enviada ";
+    enviada = "Esta Entrada ya ha sido enviada ";
     @endif
     @endif
 
@@ -1305,6 +1452,15 @@ function terminar()
             $("#btnTerminar").prop("disabled",false);
         });
     */
+}
+
+function nuevaEntrada()
+{
+    if(!confirm("Desea crear una nueva Entrada? los datos no guardados serán descartados."))
+    {
+        return;
+    }
+    location.href='/int/entradas/create';
 }
 
 function actualizarSumario()

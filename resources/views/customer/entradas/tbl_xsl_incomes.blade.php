@@ -16,8 +16,11 @@
         <tr>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Entrada</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Fecha</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Dias</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Cliente</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Revisada</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Impo/Expo</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">on-hold</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Materia/Equipo</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:20px">Transportista</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Referencia</th>
@@ -35,9 +38,12 @@
         @foreach ($incomes as $income)
         <tr>
             <td>{{ $income->getIncomeNumber() }}</td>
-            <td>{{ explode(" ", $income->cdate)[0] }}</td>
+            <td>{{ $income->getDate() }}</td>
+            <td>{{ $income->getDiasTrascurridos() }}</td>
             <td>{{ $income->customer->name }}</td>
+            <td>@if($income->reviewed) Yes @endif</td>
             <td>{{ $income->impoExpo }}</td>
+            <td>@if($income->onhold) Yes @endif</td>
             <td>{{ $income->type }}</td>
             <td>{{ $income->carrier->name }}</td>
             <td>{{ $income->reference }}</td>

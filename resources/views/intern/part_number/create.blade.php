@@ -92,7 +92,7 @@
 </div>
 
 <div class="mb-3">
-    <label class="form-label">Observaciones de fracción</label>
+    <label class="form-label">Observaciones de fracción...{{ $from_income ?? '' }}...</label>
     <textarea class="form-control" id="txtObservacionesFraccion" name="txtObservacionesFraccion" rows="2">@if (isset($part_number_obj)){{ $part_number_obj->fraccion_especial }}@endif</textarea>
 </div>
 

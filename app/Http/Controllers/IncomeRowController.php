@@ -184,10 +184,16 @@ class IncomeRowController extends Controller
      * @param  \App\Models\IncomeRow  $incomeRow
      * @return \Illuminate\Http\Response
      */
-    public function destroy(IncomeRow $incomeRow)
+     //por alguna razon este metodo ya no funciona porque el method DELETE no es reconocido
+    //public function destroy(IncomeRow $incomeRow)
+    //{
+        //no hay necesidad de eliminar id de inventory_bundles porque se hace en cascada automatica
+        //$incomeRow->delete();
+    //}
+    public function delete(IncomeRow $income_row)
     {
         //no hay necesidad de eliminar id de inventory_bundles porque se hace en cascada automatica
-        $incomeRow->delete();
+        $income_row->delete();
     }
 
     public function hasOutcomes(IncomeRow $income_row)
@@ -459,6 +465,7 @@ class IncomeRowController extends Controller
         ]);
 
     }
+    
 
 }
 

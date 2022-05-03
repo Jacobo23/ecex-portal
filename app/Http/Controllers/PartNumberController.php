@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Customer;
 use App\Models\MeasurementUnit;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\Bitacora;
 use Illuminate\Support\Facades\Session;
 
 class PartNumberController extends Controller
@@ -85,16 +85,23 @@ class PartNumberController extends Controller
      */
     public function store(Request $request)
     {
+        $accion = "Update Part_number";
         $part_number = PartNumber::where('part_number',$request->txtNumeroDeParte)->where('customer_id',$request->txtCliente)->first();
-        if(strlen($request->from_Incomes) > 0 && $part_number)
-        {
-            Session::flash('part_number', $part_number);
-            return redirect('/int/entradas/'.$request->from_Incomes);
-        }
+        //este pedazo de codigo no permitiria que se actualicen los numeros de parte si han sido registrados desde una entrada
+        //se comentara para permitir que el usuario edite numeros de parte aunque lo haga dese las entradas con el modal de numeros de parte
+        // if(strlen($request->from_Incomes) > 0 && $part_number)
+        // {
+        //     Session::flash('part_number', $part_number);
+        //     return redirect('/int/entradas/'.$request->from_Incomes);
+        // }
         if(!$part_number)
         {
             $part_number = new PartNumber;
+            $accion = "Create Part_number";
         }
+
+        //registrar en la bitacora
+        Bitacora::registrar($accion, Auth::user()->name ,strtoupper($request->txtNumeroDeParte) . " [fraccion:" . $part_number->fraccion . "=>" . $request->txtFraccion . "]" . " [pesoU:" . $part_number->unit_weight . "=>" . $request->txtPesoUnitario . "]");
         
         $part_number->part_number = strtoupper($request->txtNumeroDeParte);
         $part_number->customer_id = $request->txtCliente;
@@ -133,9 +140,13 @@ class PartNumberController extends Controller
     {
         return "operacion no permitida";//PartNumber::where("part_number",$partNumber)->first();
     }
-    public function getInfo(string $partNumber, string $customer)
+    // public function getInfo(string $partNumber, string $customer)
+    // {
+    //     return PartNumber::where("part_number",$partNumber)->where("customer_id",$customer)->first();
+    // }
+    public function getInfo(Request $request, string $customer)
     {
-        return PartNumber::where("part_number",$partNumber)->where("customer_id",$customer)->first();
+        return PartNumber::where("part_number",$request->partNumber)->where("customer_id",$customer)->first();
     }
     
 
@@ -145,7 +156,22 @@ class PartNumberController extends Controller
      * @param  \App\Models\PartNumber  $partNumber
      * @return \Illuminate\Http\Response
      */
-    public function edit(string $partNumber, string $customer, string $numEntrada)
+    // public function edit(string $partNumber, string $customer, string $numEntrada)
+    // {
+    //     //NO USAR ESTE METODO PARA UPDATES
+    //     //para update se deben usar las funciones in-line del formulario correspondiente.   ( edit_existing() )
+
+    //     $clientes = Customer::All();
+    //     $ums = MeasurementUnit::All();
+    //     return view('intern.part_number.create', [
+    //         'part_number' => $partNumber,
+    //         'clientes' => $clientes,
+    //         'cliente' => $customer,
+    //         'unidades_de_medida' => $ums,
+    //         'from_income' => $numEntrada,
+    //     ]);
+    // }
+    public function edit(Request $request, string $customer, string $numEntrada)
     {
         //NO USAR ESTE METODO PARA UPDATES
         //para update se deben usar las funciones in-line del formulario correspondiente.   ( edit_existing() )
@@ -153,13 +179,14 @@ class PartNumberController extends Controller
         $clientes = Customer::All();
         $ums = MeasurementUnit::All();
         return view('intern.part_number.create', [
-            'part_number' => $partNumber,
+            'part_number' => $request->partNumber,
             'clientes' => $clientes,
             'cliente' => $customer,
             'unidades_de_medida' => $ums,
             'from_income' => $numEntrada,
         ]);
     }
+
     public function edit_existing(string $partNumber_id)
     {
         $clientes = Customer::All();
@@ -173,6 +200,22 @@ class PartNumberController extends Controller
             'cliente' => $part_number->customer_id,
             'unidades_de_medida' => $ums,
             'from_income' => "",
+        ]);
+    }
+
+    public function edit_existing_update_mode(string $partNumber_id, string $numEntrada)
+    {
+        $clientes = Customer::All();
+        $ums = MeasurementUnit::All();
+        $part_number = PartNumber::find($partNumber_id);
+
+        return view('intern.part_number.create', [
+            'part_number_obj' => $part_number,
+            'part_number' => $part_number->part_number,
+            'clientes' => $clientes,
+            'cliente' => $part_number->customer_id,
+            'unidades_de_medida' => $ums,
+            'from_income' => $numEntrada,
         ]);
     }
 

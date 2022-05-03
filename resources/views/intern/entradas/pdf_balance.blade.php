@@ -154,7 +154,7 @@ $page = 1;
     <tr style="">
       <td style="text-align:center">{{ utf8_encode($income_row->part_number()->part_number) }}</td>
       <td style="text-align:center">{{ utf8_encode($income_row->units * 1) }}  {{ utf8_encode($income_row->ump) }}</td>
-      <td style="text-align:center">{{ utf8_encode($income_row->bundles) }} {{ utf8_encode($income_row->umb) }}</td>
+      <td style="text-align:center">{{ utf8_encode($income_row->getBultos()) }} {{ utf8_encode($income_row->umb) }}</td>
       <td style="text-align:center">{{ utf8_encode($income_row->net_weight * 1) }} Lbs / {{ utf8_encode(round($income_row->net_weight *  0.453592,2,PHP_ROUND_HALF_UP ))}} Kg</td>
       <td style="text-align:center">{{ utf8_encode($income_row->gross_weight * 1) }} Lbs / {{ utf8_encode(round($income_row->gross_weight *  0.453592,2,PHP_ROUND_HALF_UP ))}} Kg</td>
       <td style="text-align:center">{{ utf8_encode($income_row->origin_country) }}</td>
@@ -226,7 +226,7 @@ $page++;
   </tbody>
 </table>
 <table class="arial" width="1000px" style="font-size: small">
-    <tr>
+<tr>
         <td><strong> Peso Neto </strong></td>
         <td><strong> Peso Bruto </strong></td>
         <td><strong> Piezas UM </strong></td>

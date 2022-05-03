@@ -29,7 +29,7 @@
 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
 <div class="p-6 bg-white border-b border-gray-200">
 
-        <form id="formEmail" action="/sendemail_done/entrada" method="post">
+        <form id="formEmail" action="/sendemail_done/entrada" method="post" enctype="multipart/form-data">
         @csrf
         <div class="row">
             <input type="hidden" name="incomeID" id="incomeID" value="{{ $income->id }}">
@@ -61,6 +61,11 @@
                 <input class="form-check-input" type="checkbox" id="chkImgs" name="chkImgs" checked>
                 <label class="form-check-label" for="chkImgs">Enviar imagenes</label>
             </div>
+
+            <div class="col-lg-2 controlDiv" >
+                <input type="file" name="filenames[]" id="txtAdjuntos" multiple>
+            </div>
+
         </div>
         <br>
 

@@ -27,6 +27,12 @@
 .controlDiv
 {
     display: inline-block;
+    margin-bottom: 5px;
+}
+.controlDiv > label
+{
+    position: relative;
+    top:8px;
 }
 .controlDiv .form-check
 {

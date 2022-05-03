@@ -42,7 +42,7 @@
             </div>
             <div class="col-lg-3 controlDiv" >
                 <label class="form-label">Rango:</label>
-                <input class="form-select" type="text" name="txtRango" id="txtRango" />
+                <input class="form-select" type="text" name="txtRango" id="txtRango" value="{{ $rango }}"/>
             </div>
 
             
@@ -50,10 +50,16 @@
                 <label class="form-label">Tracking:</label>
                 <input type="text" class="form-control" id="txtTracking" name="txtTracking" value="{{ $tracking }}" placeholder="Tracking">       
             </div>
-            <div class="col-lg-2 controlDiv form-check form-switch" style="position:relative;top:40px;">
-                <input class="form-check-input" type="checkbox" id="chkInventario" name="chkInventario" {{ ($en_inventario) ? "checked" : "" }}>
-                <label class="form-check-label" for="chkInventario">Inventario <small><i class="far fa-clock" style="color:red"></i></small></label>
+
+            <div class="col-lg-2 controlDiv" >
+                <label class="form-label">Status</label>
+                <select class="form-select" id = "txtStatus" name = "txtStatus">
+                    <option value="todo" @if ( $en_inventario == 'todo') selected @endif>Todo</option>
+                    <option value="en inventario" @if ( $en_inventario == 'en inventario') selected @endif>En inventario</option>
+                    <option value="cerrada" @if ( $en_inventario == 'cerrada') selected @endif>Cerradas</option>
+                </select>
             </div>
+
 
             <div class="col-lg-1 controlDiv" style="position:relative;top:30px;">
                 <button type="submit" class="btn btn-primary">Buscar</button>     
@@ -89,8 +95,8 @@
                     <th scope="col">Dias</th>
                     <th scope="col">Cliente</th>
                     <th scope="col">Proveedor</th>
-                    <th scope="col">Tracking</th>
                     <th scope="col">PO</th>
+                    <th scope="col">Tracking</th>
                     <th scope="col">Bultos</th>
                     <th scope="col">Materia/Equipo</th>
                     <th scope="col"><input type="checkbox" class="form-check-input" id="chkEnviada" onclick="filtrarEnviadas()"> Enviada</th>
@@ -100,6 +106,7 @@
                     <th scope="col">Balance</th>
                     <th scope="col">Folder</th>
                     <th scope="col" style="display:none">adjuntos</th>
+                    <th scope="col">Ocultar</th>
                     @if ($can_delete) <th scope="col">Eliminar</th> @endif
                 </tr>
             </thead>
@@ -107,7 +114,7 @@
                 @foreach ($incomes as $income)
                 <tr id="inc_row_{{ $income->id }}" class="tr_tbl @if ( $income->get_color_fila_estado() != '') table-{{ $income->get_color_fila_estado() }} @endif ">
                     <td><a href="/int/entradas/{{ $income->getIncomeNumber() }}">{{ $income->getIncomeNumber() }}</a></td>
-                    <td>{{ explode(" ", $income->cdate)[0] }}</td>
+                    <td>{{ date_format(date_create(explode(" ", $income->cdate)[0]),"m/d/y") }}</td>
                     <td>{{ $income->getDiasTrascurridos() }}</td>
                     <td>{{ $income->customer->name }}</td>
                     <td>{{ $income->supplier->name }}</td>
@@ -154,6 +161,21 @@
                         }
                         @endphp
                     </td>
+
+                    @if ($income->hidden) 
+                        @if($can_hide) 
+                            <td><button onclick="revelarEntrada({{ $income->id }},'{{ $income->getIncomeNumber() }}')">Oculta, Mostrar <i class="far fa-eye"></i></button></td> 
+                        @else
+                            <td>Oculta <i class="fas fa-eye-slash"></i></td> 
+                        @endif
+                    @else
+                        @if($can_hide) 
+                            <td><button onclick="ocultarEntrada({{ $income->id }},'{{ $income->getIncomeNumber() }}')">Visible, Ocultar <i class="fas fa-eye-slash"></i></button></td>
+                        @else
+                            <td>visible <i class="far fa-eye"></i></td> 
+                        @endif
+                    @endif
+
                     @if ($can_delete) <td><button onclick="eliminarEntrada({{ $income->id }},'{{ $income->getIncomeNumber() }}')"><i class="fas fa-times" style="color:red"></i></button></td> @endif
                 </tr>
                 @endforeach
@@ -187,14 +209,56 @@ function eliminarEntrada(id,num_entrada)
             
         });
 }
+function ocultarEntrada(id,num_entrada)
+{
+    if(!confirm("¿Desea ocultar la entrada '"+num_entrada+"' para el cliente?"))
+    {
+        return;
+    }
+    $.ajax({url: "/int/entradas/"+id+"/hide",context: document.body}).done(function(result) 
+        {
+            if(result != "")
+            {
+                showModal("Notificación",result);
+            }
+            else
+            {
+                showModal("Notificación","Entrada '" + num_entrada + "' oculta para el cliente");
+                location.href = "/int/entradas/";
+            }
+            
+        });
+}
+function revelarEntrada(id,num_entrada)
+{
+    if(!confirm("¿Desea revelar la entrada '"+num_entrada+"' para el cliente?"))
+    {
+        return;
+    }
+    $.ajax({url: "/int/entradas/"+id+"/unhide",context: document.body}).done(function(result) 
+        {
+            if(result != "")
+            {
+                showModal("Notificación",result);
+            }
+            else
+            {
+                showModal("Notificación","Entrada '" + num_entrada + "' visible para el cliente");
+                location.href = "/int/entradas/";
+            }
+            
+        });
+}
+
+
 
 function descargarXLS()
 {
-    let path = "/int/entradas_xls?txtCliente="+$("#txtCliente").val()+"&txtRango="+$("#txtRango").val()+"&txtTracking="+$("#txtTracking").val();
-    if($('#chkInventario').prop('checked'))
-    {
-        path += "&chkInventario=true";
-    }
+    let path = "/int/entradas_xls?txtCliente="+$("#txtCliente").val()+"&txtRango="+$("#txtRango").val()+"&txtTracking="+$("#txtTracking").val()+"&txtStatus="+$("#txtStatus").val();
+    // if($('#chkInventario').prop('checked'))
+    // {
+    //     path += "&chkInventario=true";
+    // }
     location.href = path;   
 }
 
@@ -324,16 +388,10 @@ $(document).ready(function(){
   });
   showFolderIcon();
 
-  const date1 = new Date();
-  const date2 = new Date();
-  date1.setDate(date1.getDate() - 30);
-
   const picker = new Litepicker({ 
     element: document.getElementById('txtRango'),
     singleMode: false,
     format: 'MM/DD/YYYY',
-    startDate: date1,
-    endDate: date2,
     numberOfMonths: 2,
     numberOfColumns: 2,
     scrollToDate: false,

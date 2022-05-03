@@ -28,7 +28,7 @@ class InventoryController extends Controller
             ['cdate', '>=', now()->subDays($days_range)->setTime(0, 0, 0)->toDateTimeString()],
         ])->pluck('id');
 
-        $available_rows = IncomeRow::whereIn('income_rows.income_id', $incomes_ids )->get();
+        $available_rows = IncomeRow::whereIn('income_rows.income_id', $incomes_ids )->orderBy("income_id")->get();
         //obtener salidas para las income_rows seleccionadas
         foreach ($available_rows as $available_row) 
         {
@@ -100,7 +100,7 @@ class InventoryController extends Controller
 
         $incomes_ids = Income::where('customer_id', $customer)->where('cdate', '>=', now()->subDays($days_range)->setTime(0, 0, 0)->toDateTimeString())->pluck('id');
 
-        $available_rows = IncomeRow::whereIn('income_rows.income_id', $incomes_ids )->get();
+        $available_rows = IncomeRow::whereIn('income_rows.income_id', $incomes_ids )->orderBy("income_id")->get();
         //obtener salidas para las income_rows seleccionadas
         foreach ($available_rows as $available_row) 
         {
@@ -143,7 +143,7 @@ class InventoryController extends Controller
         //ya tenemos la lista de entradas que se van a consultar
         //ahora debemos buscar sus partidas descontando sus salidas
 
-        $available_rows = IncomeRow::whereIn('income_rows.income_id', $incomes_ids )->get();
+        $available_rows = IncomeRow::whereIn('income_rows.income_id', $incomes_ids )->orderBy("income_id")->get();
         //obtener salidas para las income_rows seleccionadas
         foreach ($available_rows as $available_row) 
         {
