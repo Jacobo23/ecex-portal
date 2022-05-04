@@ -97,7 +97,7 @@
             <td id="f{{ $loop->index }}_imex">{{ $excel_row->imex }}</td>
             <td >@if ($excel_row->validation_msg != "")<button class="btn " onclick="showModal('Precauciones' , '{{ $excel_row->validation_msg }}')"><i class="far fa-eye"></i></button>@endif</td>
             <td id="f{{ $loop->index }}_income_id" style="display:none">{{ $excel_row->income_id }}</td>
-            <td id="f{{ $loop->index }}_part_number_id" style="display:none">@if (!is_null($excel_row->part_number)){{ $excel_row->part_number->id }}@else 0 @endif</td>
+            <td id="f{{ $loop->index }}_part_number_id" style="display:none">@if (!is_null($excel_row->part_number_id)){{ $excel_row->part_number_id }}@else 0 @endif</td>
         </tr>
         @endforeach
     @endif
@@ -181,60 +181,67 @@ function guardar()
                 }
                 else
                 {
-                    for (let i = 0; i < row_count; i++) 
+                    //En lugar de mandar un request por cada row vamos a mandar no solo
+                    // for (let i = 0; i < row_count; i++) 
+                    // {
+                    //     $.ajax(
+                    //         {
+                    //             url: "/income_row_massive_store_row",
+                    //             type: 'POST',
+                    //             data: {
+                    //                 "_token": token,
+                    //                 "desc_ing": $("#f"+i+"_desc_ing").html(), 
+                    //                 "desc_esp": $("#f"+i+"_desc_esp").html(), 
+                    //                 "origin_country": $("#f"+i+"_origin_country").html(), 
+                    //                 "units": $("#f"+i+"_units").html(), 
+                    //                 "um": $("#f"+i+"_um").html(), 
+                    //                 "bundles": $("#f"+i+"_bundles").html(), 
+                    //                 "bundle_type": $("#f"+i+"_bundle_type").html(), 
+                    //                 "net_weight": $("#f"+i+"_net_weight").html(), 
+                    //                 "gross_weight": $("#f"+i+"_gross_weight").html(), 
+                    //                 "fraccion": $("#f"+i+"_fraccion").html(), 
+                    //                 "nico": $("#f"+i+"_nico").html(), 
+                    //                 "po": $("#f"+i+"_po").html(), 
+                    //                 "brand": $("#f"+i+"_brand").html(), 
+                    //                 "model": $("#f"+i+"_model").html(), 
+                    //                 "serial": $("#f"+i+"_serial").html(), 
+                    //                 "location": $("#f"+i+"_location").html(), 
+                    //                 "regime": $("#f"+i+"_regime").html(), 
+                    //                 "lot": $("#f"+i+"_lot").html(), 
+                    //                 "skids": $("#f"+i+"_skids").html(), 
+                    //                 "imex": $("#f"+i+"_imex").html(), 
+                    //                 "income_id": $("#f"+i+"_income_id").html(), 
+                    //                 "part_number_id": $("#f"+i+"_part_number_id").html(), 
+                    //                 "part_number_name": $("#f"+i+"_part_number_name").html(), 
+                    //             },
+                    //             success: function (response){
+                    //                 let resp_id = Number(response);
+                    //                 if(Number.isInteger(resp_id))
+                    //                 {
+                    //                     successful_rows++;
+                    //                 }
+                    //             }
+                    //         }).done(function(data){
+                    //                 //console.log( data );                                 
+                    //                 //es la utima fila?
+                    //                 if(i == row_count-1)
+                    //                 {
+                    //                     let color = "red";
+                    //                     if(row_count == successful_rows)
+                    //                     {
+                    //                         color = "green";
+                    //                     }
+                    //                     showModal("Notificación", "Se cargaron <strong style='color:"+color+"'>"+ successful_rows +"</strong> de <strong style='color:"+color+"'>"+row_count+"</strong> partidas.");
+                    //                     location.href = "/int/entradas/{{$income_number}}";
+                    //                 }
+                    //             });;
+                    // }
+
+                    $.ajax({url: "/income_row_massive_store_all/"+txtIncome_id,context: document.body}).done(function(response) 
                     {
-                        $.ajax(
-                            {
-                                url: "/income_row_massive_store_row",
-                                type: 'POST',
-                                data: {
-                                    "_token": token,
-                                    "desc_ing": $("#f"+i+"_desc_ing").html(), 
-                                    "desc_esp": $("#f"+i+"_desc_esp").html(), 
-                                    "origin_country": $("#f"+i+"_origin_country").html(), 
-                                    "units": $("#f"+i+"_units").html(), 
-                                    "um": $("#f"+i+"_um").html(), 
-                                    "bundles": $("#f"+i+"_bundles").html(), 
-                                    "bundle_type": $("#f"+i+"_bundle_type").html(), 
-                                    "net_weight": $("#f"+i+"_net_weight").html(), 
-                                    "gross_weight": $("#f"+i+"_gross_weight").html(), 
-                                    "fraccion": $("#f"+i+"_fraccion").html(), 
-                                    "nico": $("#f"+i+"_nico").html(), 
-                                    "po": $("#f"+i+"_po").html(), 
-                                    "brand": $("#f"+i+"_brand").html(), 
-                                    "model": $("#f"+i+"_model").html(), 
-                                    "serial": $("#f"+i+"_serial").html(), 
-                                    "location": $("#f"+i+"_location").html(), 
-                                    "regime": $("#f"+i+"_regime").html(), 
-                                    "lot": $("#f"+i+"_lot").html(), 
-                                    "skids": $("#f"+i+"_skids").html(), 
-                                    "imex": $("#f"+i+"_imex").html(), 
-                                    "income_id": $("#f"+i+"_income_id").html(), 
-                                    "part_number_id": $("#f"+i+"_part_number_id").html(), 
-                                    "part_number_name": $("#f"+i+"_part_number_name").html(), 
-                                },
-                                success: function (response){
-                                    let resp_id = Number(response);
-                                    if(Number.isInteger(resp_id))
-                                    {
-                                        successful_rows++;
-                                    }
-                                }
-                            }).done(function(data){
-                                    //console.log( data );                                 
-                                    //es la utima fila?
-                                    if(i == row_count-1)
-                                    {
-                                        let color = "red";
-                                        if(row_count == successful_rows)
-                                        {
-                                            color = "green";
-                                        }
-                                        showModal("Notificación", "Se cargaron <strong style='color:"+color+"'>"+ successful_rows +"</strong> de <strong style='color:"+color+"'>"+row_count+"</strong> partidas.");
-                                        location.href = "/int/entradas/{{$income_number}}";
-                                    }
-                                });;
-                    }
+                        location.href = "/int/entradas/{{$income_number}}";
+                    });
+
                 }
                 
             }
