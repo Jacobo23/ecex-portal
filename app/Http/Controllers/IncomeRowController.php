@@ -13,6 +13,7 @@ use App\Imports\MassiveIncomeImport;
 
 use App\Models\BundleType;
 use App\Models\MeasurementUnit;
+use App\Models\MassiveRow;
 
 
 
@@ -230,7 +231,8 @@ class IncomeRowController extends Controller
                     $first_iteration = false;
                     continue;
                 }
-                $obj_row = new MassiveData;
+                //$obj_row = new MassiveData;
+                $obj_row = new MassiveRow;
                 
                 $obj_row->desc_ing = trim($row[1]);
                 $obj_row->desc_esp = trim($row[2]);
@@ -322,12 +324,13 @@ class IncomeRowController extends Controller
                 if($part_number)
                 {
                     $obj_row->part_number_name = $part_number->part_number;
-                    $obj_row->part_number = $part_number;
+                    $obj_row->part_number_id = $part_number->id;
                 }
                 else
                 {
                     $obj_row->part_number_name = trim($row[0]);
-                    $obj_row->part_number = $part_number;
+                    //$obj_row->part_number = $part_number;
+                    $obj_row->part_number_id = "0";
 
                     if($validation == "")
                     {
@@ -345,7 +348,7 @@ class IncomeRowController extends Controller
                 $obj_row->validation = $validation;   
                 $obj_row->validation_msg = $validation_msg; 
                 
-
+                $obj_row->save();
                 array_push($obj_data,$obj_row);
             }
             Storage::delete($path);
@@ -367,7 +370,6 @@ class IncomeRowController extends Controller
 
     public function upload_masiva(Request $request)
     {
-
         Storage::put('/public/entradas/'.$request->fileNumEntrada.'/temp_massive.xlsx', file_get_contents($request->file('file')));
         return redirect('/income_row_massive/'.$request->fileNumEntrada);   
     }
@@ -376,10 +378,18 @@ class IncomeRowController extends Controller
     {
         return Storage::download('public/entradas/pantilla_masiva.xlsx');
     }
-
-    public function store_massive_row(Request $request)
+    public function store_massive_rows(Income $income)
     {
-        //
+        $massive_rows = MassiveRow::where('income_id',$income->id)->get();
+        foreach ($massive_rows as $massive_row) {
+            $this->store_massive_row($massive_row);
+            $massive_row->delete();
+        }
+    }
+    public function store_massive_row(MassiveRow $request)
+    {
+        // esta funcion solia ser llamada por un metodo ajax y le pasaba un objeto(Request $request) para una sola massive_income_row 05/04/2022
+        // esta funcion es modificada para guardar una sola massive_income_row pasando como argumento un MassiveRow para ser llamado por un metodo de esta (this) clase
         $income_row = new IncomeRow;
         $income_row->desc_ing = $request->desc_ing;
         $income_row->desc_esp = $request->desc_esp;
@@ -404,7 +414,7 @@ class IncomeRowController extends Controller
         $income_row->income_id = $request->income_id;
         $income_row->part_number_id = $request->part_number_id;
         //si el numero de parte no existe hay que crearlo
-        if($request->part_number_id == 0)
+        if($request->part_number_id == 0 || $request->part_number_id == "0" || $request->part_number_id == "")
         {
             $cliente = $income_row->income->customer_id;
             $aux_part_number = PartNumber::where('part_number',$request->part_number_name)->where('customer_id',$cliente)->first();
@@ -428,18 +438,15 @@ class IncomeRowController extends Controller
                 $aux_part_number->fraccion_especial = "";
                 $aux_part_number->regime = $income_row->regime ?? "";
                 $aux_part_number->warning = 0;
-
                 $aux_part_number->save();
             }
             $income_row->part_number_id  = $aux_part_number->id;
         }
-        
         //guardamos
         if($income_row->save())
         {
             return $income_row->id;
         }
-
     }
 
     public function clear_income_rows(Income $income)
@@ -456,7 +463,8 @@ class IncomeRowController extends Controller
                 'msg' => "Esta entrada ya cuenta con partidas y alguna(s) de 'estas partidas ya cuentan con salida.<br>No se pudieron eliminar las partidas anteriores por causa de las siguientes salidas:<br>".$disscounting_outcomes."<br><strong>Se abortó la operación</strong>",
             ]);
         }
-        foreach ($income_rows as $income_row) {
+        foreach ($income_rows as $income_row) 
+        {
             $income_row->delete();
         }
         return response()->json([

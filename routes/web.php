@@ -64,7 +64,8 @@ Route::get('/income_row_has_outcomes/{income_row}', 'IncomeRowController@hasOutc
 Route::get('/income_row_massive/{income_number}', 'IncomeRowController@masiva')->middleware(['auth','allow.only:user']);
 Route::post('/income_row_massive_load', 'IncomeRowController@upload_masiva')->middleware(['auth','allow.only:user']);
 Route::get('/download_massive_template','IncomeRowController@download_massive_template');
-Route::post('/income_row_massive_store_row', 'IncomeRowController@store_massive_row')->middleware(['auth','allow.only:user']);
+//Route::post('/income_row_massive_store_row', 'IncomeRowController@store_massive_row')->middleware(['auth','allow.only:user']);
+Route::get('/income_row_massive_store_all/{income}', 'IncomeRowController@store_massive_rows')->middleware(['auth','allow.only:user']);
 Route::post('/income_row_massive_clear_rows/{income}', 'IncomeRowController@clear_income_rows')->middleware(['auth','allow.only:user']);
 //Part Numbers
 Route::resource('/part_number', 'PartNumberController')->middleware(['auth','allow.only:user']);
