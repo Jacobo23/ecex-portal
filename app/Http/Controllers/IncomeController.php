@@ -20,6 +20,8 @@ use PDF;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\IncomesExport;
 use App\Exports\IncomesCustomerExport;
+use App\Models\PartNumber;
+use App\Models\InventoryBundle;
 
 class IncomeController extends Controller
 {
@@ -561,4 +563,134 @@ class IncomeController extends Controller
             'bultos' => $bultos,
         ]);
     }
+
+    public function nueva_pre_entrada()
+    {
+        $clientes = Customer::All();
+        $transportistas = Carrier::orderBy('name')->get();
+        $proveedores = Supplier::orderBy('name')->get();
+        return view('intern.entradas.pre_entrada', [
+            'clientes' => $clientes,
+            'transportistas' => $transportistas,
+            'proveedores' => $proveedores,
+        ]);
+    }
+
+    public function imprimir(Request $request)
+    {
+        $entrada = new Income;
+
+        $entrada->cdate = $request->txtFecha;
+        $entrada->customer_id = $request->txtCliente;
+        $entrada->carrier_id = $request->txtTransportista;
+        $entrada->supplier_id = $request->txtProveedor;
+        $entrada->reference = "";
+        $entrada->trailer = "";
+        $entrada->seal = "";
+        $entrada->observations = $request->txtObservaciones ?? "";
+        $entrada->impoExpo =  "";
+        $entrada->invoice = "";
+        $entrada->tracking = "";
+        $entrada->po = "";
+        $entrada->ubicacion = "";
+
+        $entrada->user = $request->txtUsuario ?? "";
+        $entrada->reviewed = false;
+        $entrada->reviewed_by = $request->txtUsuario ?? "";
+        $entrada->closed = false;
+        $entrada->urgent = false;
+        $entrada->onhold = false;
+        $entrada->type = "";
+
+        //asignar numero de entrada
+        $entrada->year = date("Y");
+        $number = Income::withTrashed()->where('year',$entrada->year)->max('number');
+        $entrada->number = (is_null($number)) ? 1 : $number + 1;
+        $entrada->sent = false;
+
+        $entrada->save();
+        $numero_de_entrada = $entrada->year.str_pad($entrada->number,5,"0",STR_PAD_LEFT);
+
+        Storage::put('/public/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf', file_get_contents($request->file('file')));
+
+        //agregar partida de REVISION PENDIENTE
+
+        $incomeRow = new IncomeRow;
+        $incomeRow->income_id = $entrada->id;
+
+        //buscamos el numero de parte "REVISION PENDIENTE" si no lo tiene hay que crearlo
+
+        $part_number = PartNumber::where('part_number','REVISION PENDIENTE')->first();
+
+        if(!$part_number)
+        {
+            $part_number = new PartNumber;
+            $part_number->part_number = 'REVISION PENDIENTE';
+            $part_number->customer_id = $entrada->customer_id;
+            $part_number->um = 'Pieza';
+            $part_number->unit_weight = 1.0;
+            $part_number->desc_ing = 'REVISION PENDIENTE';
+            $part_number->desc_esp = 'REVISION PENDIENTE';
+            $part_number->origin_country = 'MX';
+            $part_number->fraccion = '99999999';
+            $part_number->nico = '99';
+            $part_number->brand = '';
+            $part_number->model = '';
+            $part_number->serial = '';
+            $part_number->imex = '';
+            $part_number->fraccion_especial = '';
+            $part_number->regime = '';
+            $part_number->warning = '';
+            $part_number->save();
+        }
+
+        $incomeRow->part_number_id = $part_number->id ;
+        $incomeRow->units = 1 ;
+        $incomeRow->bundles = $request->txtBultos ;
+        $incomeRow->umb = "Atados" ;
+        $incomeRow->ump = "Pieza" ;
+        $incomeRow->net_weight = 1.0 ;
+        $incomeRow->gross_weight = 1.0 ;
+        $incomeRow->po = "";
+        $incomeRow->desc_ing = "";
+        $incomeRow->desc_esp = "";
+        $incomeRow->origin_country = $part_number->origin_country;
+        $incomeRow->fraccion = $part_number->fraccion ;
+        $incomeRow->nico = $part_number->nico;
+        $incomeRow->location = "";
+        $incomeRow->observations = "";
+        $incomeRow->brand =  "";
+        $incomeRow->model = "";
+        $incomeRow->serial = "";
+        $incomeRow->lot = "";
+        $incomeRow->imex = "";
+        $incomeRow->regime = "";
+        $incomeRow->skids = "";
+
+        $incomeRow->save();
+
+        if(!is_null($incomeRow->id))
+        {
+            //registrar bultos en inventario
+            $inv_bundle = new InventoryBundle;
+            $inv_bundle->income_row_id = $incomeRow->id;
+            $inv_bundle->quantity = $incomeRow->bundles;
+            $inv_bundle->save();
+        }
+        else
+        {
+            return "La partida no se pudo guardar, verifique los datos.";
+        }
+
+        //Imprimir etiquetas
+        // 1 inch = 72 point
+        //dimensiones:
+        //  1.25 x 3.5 pugadas
+        //  90   x 252 points
+        $customPaper = array(0,0,90.00,252.00);
+        $pdf = PDF::loadView('intern.entradas.etiquetas', compact('entrada'))->setPaper($customPaper, 'landscape');
+        return $pdf->stream();
+    }
+
+    
 }

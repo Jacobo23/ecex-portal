@@ -21,6 +21,7 @@
                         <h4 class="separtor">Entradas</h4>
                         <a class="selectMenu" href="/int/entradas/">Lista <i class="fas fa-list"></i></a>
                         <a class="selectMenu " href="/int/entradas/create">Crear <i class="fas fa-plus"></i></a>
+                        <a class="selectMenu " href="/int/preentrada/create">Pre-Entrada <i class="fa-solid fa-asterisk"></i></a>
                     </div>
                     <div class="col-lg-6">
                         <h4 class="separtor">Salidas</h4>
@@ -31,7 +32,6 @@
                         <h4 class="separtor">otros</h4>
                         <a class="selectMenu " href="int/ordenes_de_carga">Ordenes de carga<i class="fas fa-shopping-cart"></i></a>
                         <a class="selectMenu" href="/int/inventory">Inventario <i class="fas fa-th-list"></i></a>
-
                         <!--<a class="selectMenu " href="/int/cajas/">Cajas <i class="fas fa-trailer"></i></a> -->
                     </div>
                     <div class="col-lg-6">

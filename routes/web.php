@@ -54,6 +54,10 @@ Route::get('/int/entradas/{income}/delete','IncomeController@delete')->middlewar
 Route::get('/int/entradas_xls','IncomeController@download_incomes_xls')->middleware(['auth','allow.only:user']);
 Route::get('/int/entradas/{income}/hide','IncomeController@hide')->middleware(['auth','allow.only:user','add.bitacora:Ocultar Entrada']);
 Route::get('/int/entradas/{income}/unhide','IncomeController@unhide')->middleware(['auth','allow.only:user','add.bitacora:Revelar Entrada']);
+//Incomes pre-entrada
+Route::get('/int/preentrada/create','IncomeController@nueva_pre_entrada')->middleware(['auth','allow.only:user']);
+Route::post('/int/preentrada/imprimir','IncomeController@imprimir')->middleware(['auth','allow.only:user']);
+
 
 
 
