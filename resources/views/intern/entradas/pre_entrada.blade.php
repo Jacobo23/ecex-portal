@@ -21,10 +21,6 @@
                 @csrf
 
             <div class="row">
-                <div class="col-lg-3 controlDiv" >
-                    <label class="form-label">Numero de Entrada:</label>
-                    <input type="text" class="form-control" id="txtNumEntrada" name="txtNumEntrada" readonly style="text-align:center;">       
-                </div>
 
                 <div class="col-lg-3 controlDiv" >
                     <label class="form-label">Fecha:</label>
@@ -44,6 +40,11 @@
                 <div class="col-lg-3 controlDiv" >
                     <label class="form-label">Bultos:</label>
                     <input type="number" class="form-control" id="txtBultos" name="txtBultos">       
+                </div>
+
+                <div class="col-lg-3 controlDiv" >
+                    <label class="form-label">Locación:</label>
+                    <input type="text" class="form-control" id="txtLocacion" name="txtLocacion" value="">       
                 </div>
 
             </div>
@@ -75,8 +76,10 @@
                     <input type="text" class="form-control" id="txtUsuario" name="txtUsuario" value="">       
                 </div>
 
+                
+
                 <div class="col-lg-3 controlDiv" >
-                    <label class="form-label">Archivo:</label>
+                    <label class="form-label">Packinglist:</label>
                     <input type="file" class="form-control" id="txtArchivo" name="file" accept="application/pdf">       
                 </div>
 

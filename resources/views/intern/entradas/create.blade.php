@@ -48,7 +48,7 @@
         </div>
 
         <div class="col-lg-3 controlDiv" >
-            <label class="form-label">Impo/Expo:{{ $income->impoExpo ?? '' }}</label>
+            <label class="form-label">Impo/Expo:</label>
             <select class="form-select" id = "txtImpoExpo" name = "txtImpoExpo">
                 <option value=0></option>
                 <option value="Impo" @php if(isset($income)){if($income->impoExpo == "Impo" ){echo "selected";}}@endphp >Impo</option>
@@ -941,11 +941,11 @@ function guardarEntrada()
         showModal("Alerta!", "Llene el campo fecha.");
         return;
     }
-    if($("#txtImpoExpo").val() == 0)
-    {
-        showModal("Alerta!", "Llene el campo Impo/Expo.");
-        return;
-    }
+    // if($("#txtImpoExpo").val() == 0)
+    // {
+    //     showModal("Alerta!", "Llene el campo Impo/Expo.");
+    //     return;
+    // }
     if($("#txtCliente").val() == 0)
     {
         showModal("Alerta!", "Llene el campo Cliente.");

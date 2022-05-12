@@ -48,7 +48,7 @@
     
     .fecha
     {
-        font-size: 15px;
+        font-size: 13px;
     }
 
 
@@ -63,7 +63,7 @@
     @endphp
     @for ($i = 1; $i <= $bultos; $i++)
     <label class="bold numEntrada">{{ $numEntrada }}</label>
-    <label><small class="bar barcode">*{{ $numEntrada }}{{ $i }}*</small> &nbsp;<small class="bultos bold">{{ $i }}/{{ $bultos }}</small>&nbsp;&nbsp;<small class="fecha">{{ $fecha }}</small></label>
+    <label><small class="bar barcode">*{{ $numEntrada }}{{ $i }}*</small> &nbsp;<small class="bultos bold">{{ $i }}/{{ $bultos }}</small>&nbsp;<small class="fecha">{{ $fecha }}</small></label>
     @if ($i < $bultos)
     <div class="page_break"></div>
     @endif

@@ -204,10 +204,28 @@ class IncomeController extends Controller
                 $count = 0;
                 foreach ($partidas as $partida) 
                 {
-                    $count += ($partida->units - $partida->get_discounted_units());
+                    if($en_inventario == "Revision Pendiente")
+                    {
+                        if($partida->part_number()->part_number == "REVISION PENDIENTE")
+                        {
+                            $count = 1;
+                        }
+                    }
+                    else
+                    {
+                        $count += ($partida->units - $partida->get_discounted_units());
+                    }
+                    
                     if($count > 0)
                     {
                         break;
+                    }
+                }
+                if($en_inventario == "Revision Pendiente")
+                {
+                    if($count == 0)
+                    {
+                        $entrada->id = 0;
                     }
                 }
                 if($en_inventario == "en inventario")
@@ -224,7 +242,6 @@ class IncomeController extends Controller
                         $entrada->id = 0;
                     }
                 }
-                
             }
         }
         
@@ -592,7 +609,7 @@ class IncomeController extends Controller
         $entrada->invoice = "";
         $entrada->tracking = "";
         $entrada->po = "";
-        $entrada->ubicacion = "";
+        $entrada->ubicacion = $request->txtUsuario ?? "";
 
         $entrada->user = $request->txtUsuario ?? "";
         $entrada->reviewed = false;
@@ -611,7 +628,10 @@ class IncomeController extends Controller
         $entrada->save();
         $numero_de_entrada = $entrada->year.str_pad($entrada->number,5,"0",STR_PAD_LEFT);
 
-        Storage::put('/public/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf', file_get_contents($request->file('file')));
+        if($_FILES['file']['name'] != "") 
+        {
+            Storage::put('/public/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf', file_get_contents($request->file('file')));
+        }
 
         //agregar partida de REVISION PENDIENTE
 
@@ -657,7 +677,7 @@ class IncomeController extends Controller
         $incomeRow->origin_country = $part_number->origin_country;
         $incomeRow->fraccion = $part_number->fraccion ;
         $incomeRow->nico = $part_number->nico;
-        $incomeRow->location = "";
+        $incomeRow->location = $request->txtUsuario ?? "";
         $incomeRow->observations = "";
         $incomeRow->brand =  "";
         $incomeRow->model = "";

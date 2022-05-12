@@ -55,6 +55,7 @@
                 <label class="form-label">Status</label>
                 <select class="form-select" id = "txtStatus" name = "txtStatus">
                     <option value="todo" @if ( $en_inventario == 'todo') selected @endif>Todo</option>
+                    <option value="Revision Pendiente" @if ( $en_inventario == 'Revision Pendiente') selected @endif>Revision Pendiente</option>
                     <option value="en inventario" @if ( $en_inventario == 'en inventario') selected @endif>En inventario</option>
                     <option value="cerrada" @if ( $en_inventario == 'cerrada') selected @endif>Cerradas</option>
                 </select>
