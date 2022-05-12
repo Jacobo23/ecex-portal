@@ -85,6 +85,22 @@
                 </div>
 
                 <div class="col-lg-3 controlDiv" >
+                    <label class="form-label">Tracking:</label>
+                    <input type="text" class="form-control" id="txtTracking" name="txtTracking" value="">       
+                </div>
+
+                <div class="col-lg-3 controlDiv" >
+                    <label class="form-label">PO:</label>
+                    <input type="text" class="form-control" id="txtPO" name="txtPO" value="">       
+                </div>
+
+                
+
+            </div>
+
+            <div class="row">
+
+            <div class="col-lg-3 controlDiv" >
                     <label class="form-label">Usuario:</label>
                     <input type="text" class="form-control" id="txtUsuario" name="txtUsuario" value="">       
                 </div>
@@ -96,10 +112,12 @@
                     <input type="file" class="form-control" id="txtArchivo" name="file" accept="application/pdf">       
                 </div>
 
-            </div>
+                <div class="col-lg-3 controlDiv" >
+                    <label class="form-label">Imagenes:</label>
+                    <input type="file" class="form-control" id="txtImagenes" name="imagenes[]" accept="image/*" multiple>       
+                </div>
 
-            <div class="row">
-                <div class="mb-3 col-lg-6">
+                <div class="mb-3 col-lg-3">
                     <label class="form-label">Observaciones</label>
                     <textarea class="form-control" id="txtObservaciones" name="txtObservaciones" rows="2"></textarea>
                 </div>

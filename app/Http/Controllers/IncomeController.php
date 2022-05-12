@@ -583,7 +583,7 @@ class IncomeController extends Controller
 
     public function nueva_pre_entrada()
     {
-        $clientes = Customer::All();
+        $clientes = Customer::orderBy('name')->get();
         $transportistas = Carrier::orderBy('name')->get();
         $proveedores = Supplier::orderBy('name')->get();
         return view('intern.entradas.pre_entrada', [
@@ -597,6 +597,9 @@ class IncomeController extends Controller
     {
         $entrada = new Income;
 
+        
+
+
         $entrada->cdate = $request->txtFecha;
         $entrada->customer_id = $request->txtCliente;
         $entrada->carrier_id = $request->txtTransportista;
@@ -607,8 +610,8 @@ class IncomeController extends Controller
         $entrada->observations = $request->txtObservaciones ?? "";
         $entrada->impoExpo =  "";
         $entrada->invoice = "";
-        $entrada->tracking = "";
-        $entrada->po = "";
+        $entrada->tracking = $request->txtTracking ?? "";
+        $entrada->po = $request->txtPO ?? "";
         $entrada->ubicacion = $request->txtLocacion ?? "";
 
         $entrada->user = $request->txtUsuario ?? "";
@@ -628,13 +631,24 @@ class IncomeController extends Controller
         $entrada->save();
         $numero_de_entrada = $entrada->year.str_pad($entrada->number,5,"0",STR_PAD_LEFT);
 
+        //subir packinglist
         if($_FILES['file']['name'] != "") 
         {
             Storage::put('/public/entradas/'.$numero_de_entrada.'/packing_list/packing-list.pdf', file_get_contents($request->file('file')));
         }
+        //subir imagenes
+        if(null !== $request->file('imagenes'))
+        {
+            $i = 0;
+            foreach ($request->file('imagenes') as $file) 
+            {
+                $i++;
+                Storage::put('/public/entradas/'.$numero_de_entrada.'/images/'.time().'_'.$i.'.'.$file->extension(), file_get_contents($file), 'public');
+            }
+        }
+        
 
         //agregar partida de REVISION PENDIENTE
-
         $incomeRow = new IncomeRow;
         $incomeRow->income_id = $entrada->id;
 
@@ -671,13 +685,13 @@ class IncomeController extends Controller
         $incomeRow->ump = "Pieza" ;
         $incomeRow->net_weight = 1.0 ;
         $incomeRow->gross_weight = 1.0 ;
-        $incomeRow->po = "";
+        $incomeRow->po = $request->txtPO ?? "";
         $incomeRow->desc_ing = "";
         $incomeRow->desc_esp = "";
         $incomeRow->origin_country = $part_number->origin_country;
         $incomeRow->fraccion = $part_number->fraccion ;
         $incomeRow->nico = $part_number->nico;
-        $incomeRow->location = $request->txtUsuario ?? "";
+        $incomeRow->location = $request->txtLocacion ?? "";
         $incomeRow->observations = "";
         $incomeRow->brand =  "";
         $incomeRow->model = "";
