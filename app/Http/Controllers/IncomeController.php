@@ -709,6 +709,8 @@ class IncomeController extends Controller
         //  90   x 252 points
         $customPaper = array(0,0,90.00,252.00);
         $pdf = PDF::loadView('intern.entradas.etiquetas', compact('entrada'))->setPaper($customPaper, 'landscape');
+
+        header("location: /int/preentrada/create");
         return $pdf->stream();
     }
 

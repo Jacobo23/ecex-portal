@@ -148,6 +148,10 @@
 
 function nueva()
 {
+    if($("#txtFecha").val() == "" || $("#txtCliente").val() == "" || $("#txtBultos").val() == "" || $("#txtTransportista").val() == "" || $("#txtProveedor").val() == "")
+    {
+        return;
+    }
     window.open("/int/preentrada/create", '_blank');
 }
 
