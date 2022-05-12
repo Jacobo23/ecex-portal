@@ -609,7 +609,7 @@ class IncomeController extends Controller
         $entrada->invoice = "";
         $entrada->tracking = "";
         $entrada->po = "";
-        $entrada->ubicacion = $request->txtUsuario ?? "";
+        $entrada->ubicacion = $request->txtLocacion ?? "";
 
         $entrada->user = $request->txtUsuario ?? "";
         $entrada->reviewed = false;
