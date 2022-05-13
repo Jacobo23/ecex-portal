@@ -727,5 +727,21 @@ class IncomeController extends Controller
         return $pdf->stream();
     }
 
+    public function imprimir_etiquetas(string $incomeid)
+    {
+        $entrada =  Income::find($incomeid);
+        //Imprimir etiquetas
+        // 1 inch = 72 point
+        //dimensiones:
+        //  1.25 x 3.5 pugadas
+        //  90   x 252 points
+        $customPaper = array(0,0,90.00,252.00);
+        $pdf = PDF::loadView('intern.entradas.etiquetas', compact('entrada'))->setPaper($customPaper, 'landscape');
+
+        return $pdf->stream();
+    }
+
+    
+
     
 }

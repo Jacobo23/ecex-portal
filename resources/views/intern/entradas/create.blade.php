@@ -442,6 +442,8 @@
 
     <div class="row" style="margin-top:20px;">
         <div class="col-lg-9 controlDiv"></div>
+        <input id="btnRevisionP" type="button" class="col-lg-3 btn btn-info " style="margin-right:20px; display:none" value="Guardar & Imprimir etiquetas" onclick="GuardarRevisionPendiente()">
+
         <input type="button" class="col-lg-1 btn btn-success " style="margin-right:20px;" value="Guardar" onclick="guardarPartida()">
         <input type="button" class="col-lg-1 btn btn-danger " value="Eliminar" onclick="eliminarPartida()">
     </div>  
@@ -1164,6 +1166,20 @@ function fillPartidaFields(data)
     }
 
     $('#txtNumeroDeParte').prop('readonly', false);
+
+    if($("#txtNumeroDeParte").val() == "REVISION PENDIENTE")
+    {
+        $("#txtCantidad").val("1");
+        $("#txtUM").val("Pieza");
+        $("#txtUMB").val("Atados");
+        $("#txtUMBPeso").val("1");
+        $("#txtPesoNeto").val("1");
+        $("#txtPesoBruto").val("1");
+        $("#txtBultos").val("1");
+        $("#txtBultos").focus();
+        $("#btnRevisionP").show();
+        
+    }
 }
 
 function createPartida()
@@ -1479,6 +1495,12 @@ function actualizarSumario()
         });
 
     
+}
+
+function GuardarRevisionPendiente()
+{
+    guardarPartida();
+    location.href = "/int/preentrada_etiqueta/" + $("#incomeID").val();
 }
 
 $(document).ready(function(){
