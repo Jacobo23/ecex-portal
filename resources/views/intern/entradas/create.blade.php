@@ -441,10 +441,9 @@
     <h5 class="separtor"></h5>
 
     <div class="row" style="margin-top:20px;">
-        <div class="col-lg-9 controlDiv"></div>
-        <input id="btnRevisionP" type="button" class="col-lg-3 btn btn-info " style="margin-right:20px; display:none" value="Guardar & Imprimir etiquetas" onclick="GuardarRevisionPendiente()">
-
-        <input type="button" class="col-lg-1 btn btn-success " style="margin-right:20px;" value="Guardar" onclick="guardarPartida()">
+        <button type="button" class="col-lg-2 btn btn-light" style="margin-right:20px" onclick="GuardarRevisionPendiente()">Imprimir etiquetas <i class="fa-solid fa-print"></i></button>
+        <div class="col-lg-6 controlDiv"></div>
+        <input type="button" class="col-lg-2 btn btn-success " style="margin-right:20px;" value="Guardar" onclick="guardarPartida()">
         <input type="button" class="col-lg-1 btn btn-danger " value="Eliminar" onclick="eliminarPartida()">
     </div>  
 
@@ -1177,7 +1176,6 @@ function fillPartidaFields(data)
         $("#txtPesoBruto").val("1");
         $("#txtBultos").val("1");
         $("#txtBultos").focus();
-        $("#btnRevisionP").show();
         
     }
 }

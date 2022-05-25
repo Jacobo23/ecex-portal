@@ -157,7 +157,7 @@
                             echo "    <div class='img_card_top'>";
                             echo "        <h6><b>".$img_file_name."</b></h6>"; 
                             echo "    </div>";
-                            echo "    <img src='".asset($img_file_url)."'>";
+                            echo "    <img src_aux='".asset($img_file_url)."'>";
                             echo "</div>";
                         }
                         @endphp
@@ -266,7 +266,7 @@ function descargarXLS()
 function showAdjuntos(content_row)
 {
     var html = $("#"+content_row).html();   
-    showModal("Adjuntos",html);
+    showModal("Adjuntos",html.replace(/src_aux/g, "src"));
 }
 
 function filtrarEnviadas()

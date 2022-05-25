@@ -597,9 +597,6 @@ class IncomeController extends Controller
     {
         $entrada = new Income;
 
-        
-
-
         $entrada->cdate = $request->txtFecha;
         $entrada->customer_id = $request->txtCliente;
         $entrada->carrier_id = $request->txtTransportista;
@@ -718,12 +715,15 @@ class IncomeController extends Controller
 
         //Imprimir etiquetas
         // 1 inch = 72 point
-        //dimensiones:
-        //  1.25 x 3.5 pugadas
-        //  90   x 252 points
-        $customPaper = array(0,0,90.00,252.00);
-        $pdf = PDF::loadView('intern.entradas.etiquetas', compact('entrada'))->setPaper($customPaper, 'landscape');
 
+        
+        // //dimensiones:
+        // //  1.25 x 3.5 pugadas
+        // //  90   x 252 points
+        // $customPaper = array(0,0,90.00,252.00);
+        // $pdf = PDF::loadView('intern.entradas.etiquetas', compact('entrada'))->setPaper($customPaper, 'landscape');
+
+        
         return $pdf->stream();
     }
 
@@ -732,11 +732,19 @@ class IncomeController extends Controller
         $entrada =  Income::find($incomeid);
         //Imprimir etiquetas
         // 1 inch = 72 point
+
+        // //dimensiones:
+        // //  1.25 x 3.5 pugadas
+        // //  90   x 252 points
+        // $customPaper = array(0,0,90.00,252.00);
+        // $pdf = PDF::loadView('intern.entradas.etiquetas', compact('entrada'))->setPaper($customPaper, 'landscape');
+
         //dimensiones:
-        //  1.25 x 3.5 pugadas
-        //  90   x 252 points
-        $customPaper = array(0,0,90.00,252.00);
-        $pdf = PDF::loadView('intern.entradas.etiquetas', compact('entrada'))->setPaper($customPaper, 'landscape');
+        //  2.25 x 4 pugadas
+        //  162   x 288 points
+        $customPaper = array(0,0,162.00,288.00);
+        $pdf = PDF::loadView('intern.entradas.etiquetas2x4', compact('entrada'))->setPaper($customPaper, 'landscape');
+
 
         return $pdf->stream();
     }
