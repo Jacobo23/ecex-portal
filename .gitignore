@@ -13,3 +13,5 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 /storage/framework/*
+/storage/app/public/entradas/*
+/storage/app/public/salidas/*
