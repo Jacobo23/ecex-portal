@@ -17,8 +17,8 @@ class CreateCustomersTable extends Migration
             $table->id();
             $table->string('name');
             $table->integer('capacity');
-            $table->string('emails',512);
-            $table->string('emails_add',512);
+            $table->string('emails',1024);
+            $table->string('emails_add',1024);
         });
     }
 

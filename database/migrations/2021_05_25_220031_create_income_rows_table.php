@@ -30,7 +30,7 @@ class CreateIncomeRowsTable extends Migration
             $table->string('fraccion')->default("");
             $table->string('nico')->default("");
             $table->string('location')->default("");
-            $table->string('observations',512)->default("");
+            $table->string('observations',1024)->default("");
             $table->string('regime')->default("");
             $table->string('brand')->default("");
             $table->string('model')->default("");
