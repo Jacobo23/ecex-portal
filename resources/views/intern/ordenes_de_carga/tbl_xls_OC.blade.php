@@ -14,20 +14,22 @@
 <table>
     <thead>
         <tr>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Entrada</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Proveedor</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Numero de parte</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Cantidad</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:20px">Um. piezas</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Bultos*</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Tipo bulto</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Peso neto</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:25px">Descripcion Ing</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:25px">Descripcion Esp</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">PO</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:8px">Pais</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Fraccion-nico</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Lote</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Entrada</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Proveedor</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Numero de parte</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Cantidad</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Um. piezas</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Conversion</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">U.M</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Bultos*</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Tipo bulto</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Peso neto</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Descripcion Ing</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Descripcion Esp</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">PO</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Pais</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Fraccion-nico</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Lote</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Marca</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Modelo</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Serie</th>
@@ -41,6 +43,10 @@
             <td>{{ $oc_row->income_row->part_number()->part_number }}</td>
             <td>{{ $oc_row->units }}</td>
             <td>{{ $oc_row->income_row->ump }}</td>
+
+            <td>{{ $oc_row->convert_unit() }}</td>
+            <td>{{ $oc_row->converting_unit() }}</td>
+
             <td>{{ $oc_row->income_row->bundles }}</td>
             <td>{{ $oc_row->income_row->umb }}</td>
             <td>{{ $oc_row->get_peso_neto() }}</td>

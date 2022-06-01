@@ -14,25 +14,25 @@
 <table>
     <thead>
         <tr>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Entrada</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Fecha</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Dias</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Cliente</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Impo/Expo</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">on-hold</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Materia/Equipo</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:20px">Transportista</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Referencia</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:8px">Caja</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Sello</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Proveedor</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Factura</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Tracking</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">PO</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Usuario</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Revisada</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Revisada por</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Enviada</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Entrada</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Fecha</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Dias</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Cliente</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Impo/Expo</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">on-hold</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Materia/Equipo</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Transportista</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Referencia</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Caja</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Sello</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Proveedor</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Factura</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Tracking</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">PO</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Usuario</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Revisada</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Revisada por</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Enviada</th>
             <th style="background-color: #fcba03; font-weight:bold">Número de parte</th>
             <th style="background-color: #fcba03; font-weight:bold">Cantidad de piezas</th>
             <th style="background-color: #fcba03; font-weight:bold">UM. Piezas</th>

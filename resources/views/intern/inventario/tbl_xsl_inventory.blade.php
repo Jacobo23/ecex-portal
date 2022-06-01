@@ -14,32 +14,32 @@
 <table>
     <thead>
         <tr>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Entrada</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Fecha</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Cliente</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Materia/Equipo</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">On hold</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Proveedor</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:20px">Numero_de_parte</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Piezas</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">U.M</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">Conversion</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">U.M</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:8px">Bultos</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Tipo bulto</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:10px">PesoNeto</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Locación</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:25px">Descripcion Ing</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:25px">Descripcion Esp</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">PO</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:8px">Pais</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; width:15px">Fraccion</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Marca</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Modelo</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Serie</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">SKID</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Observaciones Entrada</th>
-            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center; ">Observaciones Partida</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Entrada</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Fecha</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Cliente</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Materia/Equipo</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">On hold</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Proveedor</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Numero_de_parte</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Piezas</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">U.M</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Conversion</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">U.M</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Bultos</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Tipo bulto</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">PesoNeto</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Locación</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Descripcion Ing</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Descripcion Esp</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">PO</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Pais</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Fraccion</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Marca</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Modelo</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Serie</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">SKID</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Observaciones Entrada</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Observaciones Partida</th>
         </tr>
     </thead>
     <tbody>

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\OutcomeRow;
 use App\Models\Customer;
 use App\Models\Carrier;
+use App\Models\ConversionFactor;
+
 
 class Outcome extends Model
 {
@@ -118,8 +120,10 @@ class Outcome extends Model
             ->get();
         $res = "";
         foreach ($piezas_sum as $row) 
-        {
-            $res .= ($row["sum"] * 1) . " " . $row["ump"] . ($row["sum"] > 1 ? "(s)" : "") . "<br>";
+        {            
+            $sum = ($row["sum"] * 1);
+            $res .= $sum . " " . $row["ump"] . ($row["sum"] > 1 ? "(s)" : "") . " / " .
+                    $this->convert_unit($row["ump"],$sum) . " " . $this->converting_unit($row["ump"]) . "<br>";
         }
         return $res;
     }
@@ -160,5 +164,25 @@ class Outcome extends Model
             $res .= ($row["sum"] * 1) .  "<br>";
         }
         return $res;
+    }
+    // si no hay unidad de conversion regresa un texto vacio
+    public function converting_unit($ump)
+    {
+        $converting_unit = ConversionFactor::Where('desc',$ump)->first();
+        if(!$converting_unit)
+        {
+            return "";
+        }
+        return $converting_unit->convert2;
+    }
+    // si no hay unidad de conversion regresa un texto vacio
+    public function convert_unit($ump, $units)
+    {
+        $converting_unit = ConversionFactor::Where('desc',$ump)->first();
+        if(!$converting_unit)
+        {
+            return "";
+        }
+        return round($units * $converting_unit->factor,2);
     }
 }
