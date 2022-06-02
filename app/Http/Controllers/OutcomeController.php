@@ -305,12 +305,43 @@ class OutcomeController extends Controller
             $salida->number = (is_null($number)) ? 1 : $number + 1;
         }
         $salida->save();
+        //
+        $this->validate_outcome_number($salida);
+        //
         $numero_de_salida = $salida->year.str_pad($salida->number,5,"0",STR_PAD_LEFT);
 
         return response()->json([
             'numero_de_salida' => $numero_de_salida,
             'id_salida' => $salida->id,
         ]);
+    }
+
+    public function validate_outcome_number(Outcome $salida)
+    {
+        sleep(1); // esperamos un segundo
+        $dupOutcomes = Outcome::where('year', $salida->year)->where('number', $salida->number)->get();
+        if(count($dupOutcomes) > 1)
+        {
+            $minId = $dupOutcomes[0]->id;
+            foreach ($dupOutcomes as $dupOut) 
+            {
+                //buscamos el menor id en la lista de entradas duplicadas.
+                if($dupOut->id < $minId)
+                {
+                    $minId = $dupOut->id;
+                }
+            }
+            // la entrada con el menor id es la que enrealidad se debe quedar con el numero de entrada duplicado
+            // si la entrada actual no tiene el menor id, hay que asignarle un nuevo numero de entrada y repetir el proceso
+            if($minId < $salida->id)
+            {
+                $new_number = Outcome::withTrashed()->where('year',$salida->year)->max('number');
+                $salida->number = (is_null($new_number)) ? 1 : $new_number + 1;
+                $salida->save();
+                // volvemos a iniciar la validacion, esta funcion es recursiva
+                $this->validate_outcome_number($salida);
+            }
+        }        
     }
 
     /**

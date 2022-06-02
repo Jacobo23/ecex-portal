@@ -313,8 +313,6 @@ class IncomeController extends Controller
         $entrada->tracking = $request->txtTracking ?? "";
         $entrada->po = $request->txtPO ?? "";
         $entrada->ubicacion = $request->txtUbicacion ?? "";
-
-        
         
         $entrada->user = Auth::user()->name;
         $entrada->reviewed = isset($request->chkRev);
@@ -332,12 +330,45 @@ class IncomeController extends Controller
             $entrada->sent = false;
         }
         $entrada->save();
+        //ESTA FUNCION BUSCA EVITAR QUE 2 ENTRADAS TOMEN EL MISMO NUMERO EN CASO SE HABER SIDO ENVIADAS JUSTO AL MISMO TIEMPO
+        $this->validate_income_number($entrada);
+        //
         $numero_de_entrada = $entrada->year.str_pad($entrada->number,5,"0",STR_PAD_LEFT);
 
         return response()->json([
             'numero_de_entrada' => $numero_de_entrada,
             'id_entrada' => $entrada->id,
         ]);
+    }
+
+    public function validate_income_number(Income $entrada)
+    {
+        //esta funcion edita in objeto Income y modificando su numero de entrada por uno correcto, si mas de una entrada poseen el mismo numero de entrada 
+        //si la entrada en cuestion no esta duplicada o esta duplicada pero posee el id mas pequeño dentro de la lista de duplicadas, la entrada original conservara su numero de entrada
+        sleep(1); // esperamos un segundo
+        $dupIncomes = Income::where('year', $entrada->year)->where('number', $entrada->number)->get();
+        if(count($dupIncomes) > 1)
+        {
+            $minId = $dupIncomes[0]->id;
+            foreach ($dupIncomes as $dupInc) 
+            {
+                //buscamos el menor id en la lista de entradas duplicadas.
+                if($dupInc->id < $minId)
+                {
+                    $minId = $dupInc->id;
+                }
+            }
+            // la entrada con el menor id es la que enrealidad se debe quedar con el numero de entrada duplicado
+            // si la entrada actual no tiene el menor id, hay que asignarle un nuevo numero de entrada y repetir el proceso
+            if($minId < $entrada->id)
+            {
+                $new_number = Income::withTrashed()->where('year',$entrada->year)->max('number');
+                $entrada->number = (is_null($new_number)) ? 1 : $new_number + 1;
+                $entrada->save();
+                // volvemos a iniciar la validacion, esta funcion es recursiva
+                $this->validate_income_number($entrada);
+            }
+        }        
     }
 
     public function can_change_customer(Income $income)
