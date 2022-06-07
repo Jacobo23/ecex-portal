@@ -256,7 +256,7 @@
 
     <div class="row" style="margin-top:20px;">
         <div class="col-lg-6 controlDiv"></div>
-        <input type="button" class="col-lg-2 btn btn-success" onclick="guardarEntrada()" value="Registrar" style="margin-right:20px;">
+        <input id="btnRegistrar" type="button" class="col-lg-2 btn btn-success" onclick="guardarEntrada()" value="Registrar" style="margin-right:20px;">
 
         <div class="btn-group col-lg-2" role="group">
             <button type="button" class="btn btn-outline-primary" onclick="downloadPDF()">Imprimir</button>
@@ -965,6 +965,7 @@ function guardarEntrada()
     //fin validaciones
 
     //document.getElementById("encabezadoForm").submit();
+    $("#btnRegistrar").attr("disabled", true);
     $.ajax({
         method: 'POST',
         url: $("#encabezadoForm").attr("action"),
@@ -975,9 +976,11 @@ function guardarEntrada()
                 showModal("Notificación","Registrado con exito: '"+response["numero_de_entrada"]+"'");
                 $("#txtNumEntrada").val(response["numero_de_entrada"]);
                 $("#incomeID").val(response["id_entrada"]);    
+                $("#btnRegistrar").attr("disabled", false);
             } else
             {
                 showModal("Notificación","Error: "+response+".");
+                $("#btnRegistrar").attr("disabled", false);
             }
         },
     });
