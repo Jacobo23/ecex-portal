@@ -313,6 +313,7 @@ class IncomeController extends Controller
         $entrada->tracking = $request->txtTracking ?? "";
         $entrada->po = $request->txtPO ?? "";
         $entrada->ubicacion = $request->txtUbicacion ?? "";
+        $entrada->test = $request->txtTest ?? "";
         
         $entrada->user = Auth::user()->name;
         $entrada->reviewed = isset($request->chkRev);

@@ -33,6 +33,8 @@
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Revisada</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Revisada por</th>
             <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">Enviada</th>
+            <th style="background-color: #ba1600; color:#ffffff; font-weight:bold; text-align:center;">test</th>
+
             <th style="background-color: #fcba03; font-weight:bold">Número de parte</th>
             <th style="background-color: #fcba03; font-weight:bold">Cantidad de piezas</th>
             <th style="background-color: #fcba03; font-weight:bold">UM. Piezas</th>
@@ -76,6 +78,7 @@
             <td>@if($income->reviewed) Yes @endif</td>
             <td>{{ $income->reviewed_by }}</td>
             <td>@if($income->sent) Yes @endif</td>
+            <td>{{ $income->test }}</td>
 
             <td>{{ $income_row->part_number()->part_number }}</td>
             <td>{{ $income_row->units }}</td>
