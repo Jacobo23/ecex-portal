@@ -141,10 +141,6 @@
             <label class="form-label">Ubicación:</label>
             <input type="text" class="form-control" id="txtUbicacion" name="txtUbicacion" value="{{ $income->ubicacion ?? '' }}" list="listaUbicaciones">       
         </div>
-        <div class="col-lg-3 controlDiv" style="">
-            <label class="form-label">test:</label>
-            <input type="text" class="form-control" id="txtTest" name="txtTest" value="{{ $income->test ?? '' }}">       
-        </div>
 
         <div class="col-lg-3 controlDiv" >
             <div class="form-check">
