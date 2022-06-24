@@ -88,6 +88,8 @@ Route::get('/int/salidas_can_change_customer/{outcome}','OutcomeController@can_c
 Route::get('/int/salidas/{outcome}/download_pdf','OutcomeController@downloadPDF')->middleware(['auth','allow.only:user']);
 Route::get('/int/salidas/{outcome}/hide','OutcomeController@hide')->middleware(['auth','allow.only:user','add.bitacora:Ocultar Salida']);
 Route::get('/int/salidas/{outcome}/unhide','OutcomeController@unhide')->middleware(['auth','allow.only:user','add.bitacora:Revelar Salida']);
+Route::get('/int/archivo/{outcome}','OutcomeController@ver_archivo')->middleware(['auth','allow.only:user']);
+
 
 //Outcome Rows internal
 Route::resource('/outcome_row', 'OutcomeRowController')->middleware(['auth','allow.only:user']);
@@ -126,6 +128,8 @@ Route::get('/ext/entradas/{income}/download_pdf','IncomeController@downloadPDFCu
 Route::get('/ext/salidas', 'OutcomeController@index_customer')->middleware(['auth','allow.only:customer']);
 Route::get('/ext/salidas_xls','OutcomeController@download_outcomes_xls_customer')->middleware(['auth','allow.only:customer']);
 Route::get('/ext/salidas/{outcome}/download_pdf','OutcomeController@downloadPDFCustomer')->middleware(['auth','allow.only:customer']);
+Route::get('/ext/archivo/{outcome}','OutcomeController@ver_archivo_ctm')->middleware(['auth','allow.only:customer']);
+
 
 //INVENTARIO
 Route::get('/ext/inventario','InventoryController@index_customer')->middleware(['auth','allow.only:customer']);

@@ -512,4 +512,162 @@ class OutcomeController extends Controller
     {
         return $outcome->getIncomes();
     }
+
+    public function ver_archivo(Outcome $outcome)
+    {
+        //ARCHIVOS SALIDA
+        $imagenes_salida_arr = [];
+        $pdfs_salida_arr = [];
+
+        $path_imagenes = '/public/salidas/'.$outcome->getOutcomeNumber(false).'/images/';
+        $path_pdf_salida = '/public/salidas/'.$outcome->getOutcomeNumber(false).'/packing_list/';
+
+        $imagenes_salida = Storage::allFiles($path_imagenes);
+        $pdfs_salida = Storage::allFiles($path_pdf_salida);
+
+        foreach ($imagenes_salida as $imagen_salida) 
+        {
+            $aux = explode('/',$imagen_salida);
+            $name = $aux[count($aux)-1];
+            array_push($imagenes_salida_arr,  $name . " = " . $imagen_salida);
+        }
+
+        foreach ($pdfs_salida as $pdf_salida) 
+        {
+            $aux = explode('/',$pdf_salida);
+            $name = $aux[count($aux)-1];
+            array_push($pdfs_salida_arr,  $name . " = " . $pdf_salida);
+        }
+
+        //ARCHIVOS ENTRADAS
+
+        $entradas = $outcome->getIncomesObj();
+
+
+        $imagenes_entradas_arr = [];
+        $pdfs_entradas_arr = [];
+
+        foreach ($entradas as $entrada) 
+        {
+            $income_number = $entrada->getIncomeNumber();
+            $path_imagenes = '/public/entradas/'.$income_number.'/images/';
+            $path_pdf_entrada = '/public/entradas/'.$income_number.'/packing_list/';
+
+            $imagenes_entrada = Storage::allFiles($path_imagenes);
+            $pdfs_entrada = Storage::allFiles($path_pdf_entrada);
+
+            foreach ($imagenes_entrada as $imagen_entrada) 
+            {
+                $aux = explode('/',$imagen_entrada);
+                $name = $aux[count($aux)-1];
+                array_push($imagenes_entradas_arr,   $income_number . "-" . $name . " = " . $imagen_entrada);
+            }
+
+            foreach ($pdfs_entrada as $pdf_entrada) 
+            {
+                $aux = explode('/',$pdf_entrada);
+                $name = $aux[count($aux)-1];
+                array_push($pdfs_entradas_arr,  $income_number . "-" . $name . " = " . $pdf_entrada);
+            }
+        }
+
+        return view('intern.salidas.archivos', [
+            'outcome' => $outcome,
+            'entradas' => $entradas,
+            'imagenes_salida' => $imagenes_salida_arr,
+            'pdfs_salida' => $pdfs_salida_arr,
+            'imagenes_entradas' => $imagenes_entradas_arr,
+            'pdfs_entradas' => $pdfs_entradas_arr,
+        ]);
+
+
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        
+    }
+
+    public function ver_archivo_ctm(Outcome $outcome)
+    {
+        //ARCHIVOS SALIDA
+        $imagenes_salida_arr = [];
+        $pdfs_salida_arr = [];
+
+        $path_imagenes = '/public/salidas/'.$outcome->getOutcomeNumber(false).'/images/';
+        $path_pdf_salida = '/public/salidas/'.$outcome->getOutcomeNumber(false).'/packing_list/';
+
+        $imagenes_salida = Storage::allFiles($path_imagenes);
+        $pdfs_salida = Storage::allFiles($path_pdf_salida);
+
+        foreach ($imagenes_salida as $imagen_salida) 
+        {
+            $aux = explode('/',$imagen_salida);
+            $name = $aux[count($aux)-1];
+            array_push($imagenes_salida_arr,  $name . " = " . $imagen_salida);
+        }
+
+        foreach ($pdfs_salida as $pdf_salida) 
+        {
+            $aux = explode('/',$pdf_salida);
+            $name = $aux[count($aux)-1];
+            array_push($pdfs_salida_arr,  $name . " = " . $pdf_salida);
+        }
+
+        //ARCHIVOS ENTRADAS
+
+        $entradas = $outcome->getIncomesObj();
+
+
+        $imagenes_entradas_arr = [];
+        $pdfs_entradas_arr = [];
+
+        foreach ($entradas as $entrada) 
+        {
+            $income_number = $entrada->getIncomeNumber();
+            $path_imagenes = '/public/entradas/'.$income_number.'/images/';
+            $path_pdf_entrada = '/public/entradas/'.$income_number.'/packing_list/';
+
+            $imagenes_entrada = Storage::allFiles($path_imagenes);
+            $pdfs_entrada = Storage::allFiles($path_pdf_entrada);
+
+            foreach ($imagenes_entrada as $imagen_entrada) 
+            {
+                $aux = explode('/',$imagen_entrada);
+                $name = $aux[count($aux)-1];
+                array_push($imagenes_entradas_arr,   $income_number . "-" . $name . " = " . $imagen_entrada);
+            }
+
+            foreach ($pdfs_entrada as $pdf_entrada) 
+            {
+                $aux = explode('/',$pdf_entrada);
+                $name = $aux[count($aux)-1];
+                array_push($pdfs_entradas_arr,  $income_number . "-" . $name . " = " . $pdf_entrada);
+            }
+        }
+
+        return view('customer.salidas.archivos', [
+            'outcome' => $outcome,
+            'entradas' => $entradas,
+            'imagenes_salida' => $imagenes_salida_arr,
+            'pdfs_salida' => $pdfs_salida_arr,
+            'imagenes_entradas' => $imagenes_entradas_arr,
+            'pdfs_entradas' => $pdfs_entradas_arr,
+        ]);
+
+
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        
+    }
 }

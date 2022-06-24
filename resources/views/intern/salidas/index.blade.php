@@ -80,7 +80,7 @@
                     <th scope="col">Bultos</th>
                     <th scope="col">Tipo-bulto</th>
                     <th scope="col">Folder</th>
-                    <th scope="col">Ocultar</th>
+                    <th scope="col">Archivo</th>
                     @if ($can_delete) <th scope="col">Eliminar</th> @endif
                 </tr>
             </thead>
@@ -136,7 +136,10 @@
                         }
                         @endphp
                     </td>
-                    @if ($outcome->hidden) 
+                    <td>
+                        <button type="button" class="btn btn-light" onclick="showArchivos({{ $outcome->id }})('adjuntos_outcome_{{ $outcome->id }}')"><i class="fa-solid fa-folder-tree"></i></button>
+                    </td>
+                    <!-- @if ($outcome->hidden) 
                         @if($can_hide) 
                             <td><button onclick="revelarSalida({{ $outcome->id }},'{{ $outcome->getOutcomeNumber(false) }}')">Oculta, Mostrar <i class="far fa-eye"></i></button></td> 
                         @else
@@ -148,7 +151,7 @@
                         @else
                             <td>visible <i class="far fa-eye"></i></td> 
                         @endif
-                    @endif
+                    @endif -->
                     @if ($can_delete) <td><button onclick="eliminarSalida({{ $outcome->id }},'{{ $outcome->getOutcomeNumber(false) }}')"><i class="fas fa-times" style="color:red"></i></button></td> @endif
                 </tr>
                 @endforeach
@@ -238,6 +241,12 @@ function revelarSalida(id,num_salida)
             }
         });
 }
+
+function showArchivos(outcome_id)
+{
+    location.href = "/int/archivo/" + outcome_id;
+}
+
 
 $(document).ready(function(){
   showFolderIcon();

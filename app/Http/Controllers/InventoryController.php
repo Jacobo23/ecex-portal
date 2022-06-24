@@ -141,7 +141,7 @@ class InventoryController extends Controller
         $incomes_ids = $incomes_ids->pluck('id');
 
         //ya tenemos la lista de entradas que se van a consultar
-        //ahora debemos buscar sus partidas descontando sus salidas
+        //ahora debemos buscar sus partidas descontando sus salidas        
 
         $available_rows = IncomeRow::whereIn('income_rows.income_id', $incomes_ids )->orderBy("income_id")->get();
         //obtener salidas para las income_rows seleccionadas
@@ -161,6 +161,7 @@ class InventoryController extends Controller
                 $inv_bundle->quantity = $available_row->bundles;
                 $inv_bundle->save();
             }
+
             $available_row->bundles = $inv_bundle->quantity;
             //
             $available_row->income; // <- invocamos esta propiedad para que el objeto final cuente con informacion de su entrada

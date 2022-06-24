@@ -68,6 +68,7 @@
                     <th scope="col">Bultos</th>
                     <th scope="col">Tipo-bulto</th>
                     <th scope="col">Folder</th>
+                    <th scope="col">Archivo</th>
                 </tr>
             </thead>
             <tbody>
@@ -122,6 +123,9 @@
                         }
                         @endphp
                     </td>
+                    <td>
+                        <button type="button" class="btn btn-light" onclick="showArchivos({{ $outcome->id }})('adjuntos_outcome_{{ $outcome->id }}')"><i class="fa-solid fa-folder-tree"></i></button>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -145,6 +149,11 @@ function showAdjuntos(content_row)
 {
     var html = $("#"+content_row).html();   
     showModal("Adjuntos",html);
+}
+
+function showArchivos(outcome_id)
+{
+    location.href = "/ext/archivo/" + outcome_id;
 }
 
 </script>

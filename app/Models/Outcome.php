@@ -39,6 +39,19 @@ class Outcome extends Model
         return $uniques;
     }
 
+    public function getIncomesObj()
+    {
+        $partidas_salida = $this->outcome_rows;
+        $entrada = [];
+        foreach ($partidas_salida as $partida_salida) 
+        {
+            array_push($entrada, $partida_salida->income_row->income->id);
+        }
+       return Income::whereIn('id', $entrada)->get();
+    }
+
+
+
     public function getOutcomeNumber($regime)
     {
         $posfix = "";
