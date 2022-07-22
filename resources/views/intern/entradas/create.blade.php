@@ -135,6 +135,7 @@
                 <option value="Materia prima" @php if(isset($income)){if($income->type == "Materia prima" ){echo "selected";}}@endphp >Materia prima</option>
                 <option value="Equipo" @php if(isset($income)){if($income->type == "Equipo" ){echo "selected";}}@endphp >Equipo</option>
                 <option value="Producto terminado" @php if(isset($income)){if($income->type == "Producto terminado" ){echo "selected";}}@endphp >Producto terminado</option>
+                <option value="Caja vacia" @php if(isset($income)){if($income->type == "Caja vacia" ){echo "selected";}}@endphp >Caja vacia</option>
             </select>
         </div>
 
