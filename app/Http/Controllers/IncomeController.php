@@ -146,7 +146,7 @@ class IncomeController extends Controller
                         break;
                     }
                 }
-                if($count == 0)
+                if($count <= 0)
                 {
                     $entrada->id = 0;
                 }
