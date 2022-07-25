@@ -45,7 +45,8 @@ class LoadOrderController extends Controller
     public function get_load_orders_obj(array $clientes)
     {
         //$load_orders =  LoadOrder::All();
-        $load_orders =  LoadOrder::limit(2)->orderBy('id','desc')->get();
+        //$load_orders =  LoadOrder::limit(100)->orderBy('id','desc')->get();
+        $load_orders =  LoadOrder::whereDate('cdate', '>=', now()->subDays(intval(15))->setTime(0, 0, 0)->toDateTimeString())->get();
         
         if(count($clientes) > 0)
         {
