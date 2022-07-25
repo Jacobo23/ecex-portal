@@ -230,7 +230,7 @@ $page++;
 </table>
 <br>
 	 <footer style="text-align:center; font-size: small">
-   Recibido por: {{ $outcome->received_by }} - page: {{ $page }} of {{ $pages }}
+   Recibido por: {{ $outcome->received_by }} - Usuario: {{ $outcome->user }} - page: {{ $page }} of {{ $pages }}
     </footer>
 </body>
 </html>

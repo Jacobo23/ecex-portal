@@ -44,7 +44,9 @@ class LoadOrderController extends Controller
 
     public function get_load_orders_obj(array $clientes)
     {
-        $load_orders =  LoadOrder::All();
+        //$load_orders =  LoadOrder::All();
+        $load_orders =  LoadOrder::limit(2)->orderBy('id','desc')->get();
+        
         if(count($clientes) > 0)
         {
             $load_orders = $load_orders->whereIn('customer_id', $clientes);
