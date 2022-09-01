@@ -83,8 +83,8 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            Fecha: {{ date("m/d/Y",strtotime($outcome->cdate)) }}
+                        <td style=" font-size: 13px; " >
+                            Fecha: {{ date("m/d/Y",strtotime($outcome->cdate)) }} @if ($outcome->dtdespacho) {{ explode(" ",$outcome->dtdespacho)[1] }} @endif
                         </td>
                     </tr>
                     <tr>
