@@ -83,6 +83,7 @@
                     <th scope="col">Impo/Expo</th>
                     <th scope="col">Materia/Equipo</th>
                     <th scope="col">Adjuntos</th>
+                    <th scope="col">txt</th>
                     <th scope="col"><input type="checkbox" class="form-check-input" id="chkUrgente" onclick="filtrarUrgentes()"> Urgente</th>
                     <th scope="col"><input type="checkbox" class="form-check-input" id="chkOnhold" onclick="filtrarOnhold()"> On-hold</th>
                 </tr>
@@ -135,6 +136,7 @@
                         }
                         @endphp
                     </td>
+                    <td><a class="btn " href="/entradas_txt_report/{{ $income->id }}"><i class="fa-solid fa-file-csv"></i></a></td>
                     <td id="tdUrgente_{{ $income->id }}">@if ($income->urgent) <i class="fas fa-check-square" style="color:red"></i> @endif</td>
                     <td id="tdOnhold_{{ $income->id }}">@if ($income->onhold) @if ($can_quit_onhold) <button id="btn_onhold_{{ $income->id }}" class="btn btn-primary" onclick="quitarOnhold({{ $income->id }})">on hold</button> @else on hold @endif @endif</td>
                 </tr>

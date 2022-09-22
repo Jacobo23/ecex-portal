@@ -215,6 +215,22 @@ class Income extends Model
         }
         return $res;
     }
+
+    public function getBultosSum_array()
+    {
+        //este metodo es una copia alterada de getBultosSum(), solo que este metodo regresa un array
+        $piezas_sum = IncomeRow::where('income_id',$this->id)
+            ->selectRaw("SUM(bundles) as sum, umb")
+            ->groupBy("umb")
+            ->get();
+        $res = array();
+        foreach ($piezas_sum as $row) 
+        {
+            array_push($res, array( 'sum' => ($row["sum"] * 1), 'umb' => $row["umb"]));  
+        }
+        return $res;
+    }
+
     public function getBultosTotalSum()
     {
         $piezas_sum = IncomeRow::where('income_id',$this->id)

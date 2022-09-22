@@ -107,7 +107,8 @@
                     <th scope="col">Balance</th>
                     <th scope="col">Folder</th>
                     <th scope="col" style="display:none">adjuntos</th>
-                    <th scope="col">Ocultar</th>
+                    <th scope="col">txt</th>
+                    <!--<th scope="col">Ocultar</th>-->
                     @if ($can_delete) <th scope="col">Eliminar</th> @endif
                 </tr>
             </thead>
@@ -162,7 +163,9 @@
                         }
                         @endphp
                     </td>
+                    <td><a class="btn " href="/entradas_txt_report/{{ $income->id }}"><i class="fa-solid fa-file-csv"></i></a></td>
 
+                    @if (false)
                     @if ($income->hidden) 
                         @if($can_hide) 
                             <td><button onclick="revelarEntrada({{ $income->id }},'{{ $income->getIncomeNumber() }}')">Oculta, Mostrar <i class="far fa-eye"></i></button></td> 
@@ -175,6 +178,7 @@
                         @else
                             <td>visible <i class="far fa-eye"></i></td> 
                         @endif
+                    @endif
                     @endif
 
                     @if ($can_delete) <td><button onclick="eliminarEntrada({{ $income->id }},'{{ $income->getIncomeNumber() }}')"><i class="fas fa-times" style="color:red"></i></button></td> @endif

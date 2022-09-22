@@ -58,6 +58,8 @@ Route::get('/int/entradas/{income}/unhide','IncomeController@unhide')->middlewar
 Route::get('/int/preentrada/create','IncomeController@nueva_pre_entrada')->middleware(['auth','allow.only:user']);
 Route::post('/int/preentrada/imprimir','IncomeController@imprimir')->middleware(['auth','allow.only:user']);
 Route::get('/int/preentrada_etiqueta/{incomeid}','IncomeController@imprimir_etiquetas')->middleware(['auth','allow.only:user']);
+Route::get('/entradas_txt_report/{income}','IncomeController@getIncomeTXT')->middleware('auth');
+
 
 
 

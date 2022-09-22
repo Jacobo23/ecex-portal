@@ -22,6 +22,7 @@ use App\Exports\IncomesExport;
 use App\Exports\IncomesCustomerExport;
 use App\Models\PartNumber;
 use App\Models\InventoryBundle;
+use Illuminate\Support\Facades\Response;
 
 class IncomeController extends Controller
 {
@@ -778,6 +779,98 @@ class IncomeController extends Controller
 
 
         return $pdf->stream();
+    }
+
+    public function getIncomeTXT(Income $income)
+    {
+        /*  PASOS
+        1. obtener partidas de la entrada
+        2. obtener el desgloce de los bultos
+        3. ordenar partidas segun los tipos de bulto
+        4. llenar un string con la info
+        5. regresar un objecto descargable
+        */
+
+        /* Estructura
+
+            Numero_de_parte , cantidad , suma (bundles) , Ingles de UMB (?) , umb , Y , , , N
+
+        */
+
+        // 1
+        $income_rows = $income->income_rows;
+        // 2
+        $bultos_organzados = $income->getBultosSum_array(); // <- este metodo ya nos da el desgloce organizado de los bultos
+        // 3 & 4
+
+        $contenidos = "";
+        foreach ($bultos_organzados as $bulto) 
+        {
+            $bulto_actual = $bulto['umb'];
+            $bulto_repetido = false;
+            foreach ($income_rows as $row) 
+            {
+               // para tener el codigo mas leible y organisadito vamos a separar los campos en variables (en lugar de tener una sola linea de codigo con muchas concatenaciones)
+                $numero_de_parte = $row->part_number()->part_number;
+                $cantidad = $row->units;
+                $ingles_de_umb = "PACKAGE";
+
+                //buscar cual te los bultos le corresponde a esta partida
+
+                $umb = "";
+                $suma_bultos = "";
+
+                if($row->umb == $bulto_actual)
+                {
+                    // tenemos la variable $bulto_repetido = false para evitar algo como lo sigiente:
+                    // Numero de parte , Cantidad , Bultos , UMB
+                    // parte1          , 12       , 2      , Rollos  <- ESTA PARTIDA TIENE UN BULTO
+                    // parte2          , 23       , 2      , Rollos  <- ESTA PARTIDA TIENE UN BULTO TAMBIEN REALMENTE
+
+                    // donde los bultos correspondientes serian 1 rollo y 1 rollo (2 en total)
+                    //solo queremos que la cantidad agrupada de bultos aparezca en el primer renglon por cada tipo de bulto, sin repetirse en cada numero de parte
+                    
+                    // buscamos algo como lo siguiente:
+                    // Numero de parte , Cantidad , Bultos , UMB
+                    // parte1          , 12       , 2      ,  Rollos
+                    // parte2          , 23       , [NULL], [NULL]
+
+                    if(!$bulto_repetido)
+                    {
+                        $umb = $bulto['umb'];
+                        $suma_bultos = $bulto['sum'];
+                        $bulto_repetido = true;
+                    }
+                    else
+                    {
+                        $umb = "";
+                        $suma_bultos = "";
+                    }
+                }
+                else
+                {
+                    //si la partida actual no es de la misma umb que estamos imprimiendo nos la vamos a saltar para imprimirla cuando le corresponda
+                    continue;
+                }
+                // 4
+                $contenidos .= $numero_de_parte . "," . $cantidad . "," . $suma_bultos . "," . $ingles_de_umb . "," . $umb . ",Y,,,N\n";
+            }
+        }
+        //5
+
+        $fileName = "layout_imp.txt";
+        // headers para hacer que sea descargable
+        $headers = [
+        'Content-type' => 'text/plain', 
+        'Content-Disposition' => sprintf('attachment; filename="%s"', $fileName),
+        ];
+
+        // le damos respesta 200 para afirmar que fue exitoso
+        return Response::make($contenidos, 200, $headers);
+
+
+
+
     }
 
     
