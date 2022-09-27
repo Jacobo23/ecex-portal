@@ -315,7 +315,8 @@ class EmailController extends Controller
         {
             Storage::deleteDirectory($files_path."adjuntos/");
         }
-        return redirect('/int/salidas/'.$numero_de_salida);
+        //return redirect('/int/salidas/'.$numero_de_salida);
+        return redirect('/');
         
     }
 
