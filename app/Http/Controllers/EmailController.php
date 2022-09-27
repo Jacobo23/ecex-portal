@@ -68,7 +68,7 @@ class EmailController extends Controller
             //Enviar correo 
             Mail::send('emails.entrada', ['income' => $income, 'body' => $request->txtObservaciones], function ($m) use ($income, $numero_de_entrada, $files_path, $request) {
                 $username = Auth::user()->name;
-                $m->from('do-not-reply@ecex-portal.com', $username);
+                $m->from('no-reply@grupoaduanalecex.com.mx', $username);
                 $emails = explode(";",$request->txtTo);
                 $emails2 = explode(";",$request->txtCc);
                 
@@ -202,7 +202,7 @@ class EmailController extends Controller
         //Enviar correo
         Mail::send('emails.salida', ['outcome' => $outcome, 'body' => $request->txtObservaciones], function ($m) use ($outcome, $numero_de_salida, $request, $files_path) {
             $username = Auth::user()->name;
-            $m->from('do-not-reply@ecex-portal.com', $username);
+            $m->from('no-reply@grupoaduanalecex.com.mx', $username);
 
             $emails = explode(";",$request->txtTo);
             $emails2 = explode(";",$request->txtCc);
@@ -325,7 +325,7 @@ class EmailController extends Controller
         $emails = explode(';', $income->customer->emails);
         $numero_de_entrada = $income->getIncomeNumber();
         Mail::send('emails.onhold', ['income' => $income], function ($m) use ($income, $numero_de_entrada, $emails) {
-            $m->from('do-not-reply@ecex-portal.com', 'Ecex Notification');
+            $m->from('no-reply@grupoaduanalecex.com.mx', 'Ecex Notification');
             foreach ($emails as $email) 
             {
                 $email = trim($email," ");
