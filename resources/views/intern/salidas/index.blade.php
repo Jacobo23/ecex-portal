@@ -80,6 +80,7 @@
                     <th scope="col">Bultos</th>
                     <th scope="col">Tipo-bulto</th>
                     <th scope="col">Enviada</th>
+                    <th scope="col">Descontada</th>
                     <th scope="col">Folder</th>
                     <th scope="col">Archivo</th>
                     @if ($can_delete) <th scope="col">Eliminar</th> @endif
@@ -97,6 +98,7 @@
                     <td>{{ $outcome->getBultos() }}</td>
                     <td>{{ $outcome->getTipoBultos() }}</td>
                     <td id="tdEnviada_{{ $outcome->id }}">@if ($outcome->sent) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
+                    <td id="tdDescontada_{{ $outcome->id }}">@if ($outcome->discount) <i class="fas fa-check-square" style="color:green"></i> @endif</td>
                     <td id="adjuntos_btn_{{ $outcome->id }}" ><button type="button" class="btn btn-light" onclick="showAdjuntos('adjuntos_outcome_{{ $outcome->id }}')"><i class="far fa-folder-open"></i></button></td>
                     <td id="adjuntos_outcome_{{ $outcome->id }}" class="td_adjuntos" style="display:none">
                         @php
