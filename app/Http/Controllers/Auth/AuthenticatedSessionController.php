@@ -18,6 +18,7 @@ class AuthenticatedSessionController extends Controller
     public function create()
     {
         return view('auth.login');
+        //return "HOLA MUNDO PAGINA 1";
     }
 
     /**

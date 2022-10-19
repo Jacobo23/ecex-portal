@@ -70,6 +70,7 @@
                     <th scope="col">Entrada #</th>
                     <th scope="col">Fecha</th>
                     <th scope="col">Referencia</th>
+                    <th scope="col">Tracking</th>
                     <th scope="col">Materia/Equipo</th>
                     <th scope="col">Numero de parte</th>
                     <th scope="col">Piezas</th>
@@ -91,6 +92,7 @@
                     <td>{{ $partida->income->getIncomeNumber() }}</td>
                     <td>{{ explode(" ", $partida->income->cdate)[0] }}</td>
                     <td>{{ $partida->income->reference }}</td>
+                    <td>{{ $partida->income->tracking }}</td>
                     <td>{{ $partida->income->type }}</td>
                     <td>{{ $partida->part_number()->part_number }}</td>
                     <td>{{ $partida->units }}</td>

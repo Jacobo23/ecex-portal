@@ -813,7 +813,9 @@ class IncomeController extends Controller
                // para tener el codigo mas leible y organisadito vamos a separar los campos en variables (en lugar de tener una sola linea de codigo con muchas concatenaciones)
                 $numero_de_parte = $row->part_number()->part_number;
                 $cantidad = $row->units;
-                $ingles_de_umb = "PACKAGE";
+                //$ingles_de_umb = "";
+                
+                
 
                 //buscar cual te los bultos le corresponde a esta partida
 
@@ -840,11 +842,13 @@ class IncomeController extends Controller
                         $umb = $bulto['umb'];
                         $suma_bultos = $bulto['sum'];
                         $bulto_repetido = true;
+                        $ingles_de_umb=$income->bulto_ingles($row['income_id']);
                     }
                     else
                     {
                         $umb = "";
                         $suma_bultos = "";
+                        $ingles_de_umb="";
                     }
                 }
                 else
@@ -853,12 +857,15 @@ class IncomeController extends Controller
                     continue;
                 }
                 // 4
-                $contenidos .= $numero_de_parte . "," . $cantidad . "," . $suma_bultos . "," . $ingles_de_umb . "," . $umb . ",Y,,,N\n";
+                $contenidos .= $numero_de_parte . "," . $cantidad . "," . $suma_bultos . "," . $ingles_de_umb . "," . $umb . ",Y,,,N,,,,,,\n";
             }
         }
         //5
 
-        $fileName = "layout_imp.txt";
+        //$fileName = "layout_imp.txt";
+        //Se le asigna el número de entrada al archivo TXT
+        $numentrada = $income->year.str_pad($income->number,5,"0",STR_PAD_LEFT);
+        $fileName = $numentrada.".txt";
         // headers para hacer que sea descargable
         $headers = [
         'Content-type' => 'text/plain', 

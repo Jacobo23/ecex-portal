@@ -277,4 +277,19 @@ class Income extends Model
         }
         return round($units * $converting_unit->factor,2);
     }
+
+    public function bulto_ingles($income_id_usar)
+    {
+        $ResultUMB_Ingles=IncomeRow::where('income_rows.income_id','=',$income_id_usar) 
+                    ->join('bundle_types','bundle_types.desc','=','income_rows.umb')                  	
+                    ->select('income_rows.id','income_id','bundle_types.ingles as umb_ingles','umb')
+                    ->get();
+
+                  foreach($ResultUMB_Ingles as $RI)
+                  {
+                    $UMB_english=$RI['umb_ingles'];
+                    break;                    
+                  }
+                    return $UMB_english;
+    }
 }
