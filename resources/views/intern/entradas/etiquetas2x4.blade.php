@@ -12,7 +12,7 @@
         margin: 0px; 
     }
     .page_break { page-break-before: always; }
-    .barcode
+    .barcode_deshabilitado
     {
         font-family: "Libre Barcode 39";
     }
@@ -39,9 +39,11 @@
     }
     .bar
     {
+        font-family: "Libre Barcode 39";
         font-size: 50px;
         position:relative;
-        top: -30px;
+        /*position: fixed;*/
+        top: -30px;        
     }
     .bultos
     {
@@ -78,22 +80,22 @@
 
     <!-- si se trata de una Revision Pendiente vamos a imprimir una etiqueta extra al principio con la leyenda "REVISION PENDIENTE" -->
     @if (!$entrada->reviewed)
-    <br>
-    <br>
-    <label class="revPendiente">REVISION PENDIENTE</label>
-    <div class="page_break"></div>
+        <br>
+        <br>
+        <label class="revPendiente">REVISION PENDIENTE</label>
+        <div class="page_break"></div>
     @endif
 
     @for ($i = 1; $i <= $bultos; $i++)
-    <label class="bold numEntrada">{{ $numEntrada }}</label>
-    <br>
-    <label class="bultos bold">{{ $i }}/{{ $bultos }}</label>
-    <label class="fecha">{{ $fecha }}</label>
+        <label class="bold numEntrada">{{ $numEntrada }}</label>
+        
+        <label class="bultos bold">{{ $i }}/{{ $bultos }}</label>
+        <label class="fecha">{{ $fecha }}</label>
 
-    <label class="bar barcode">*{{ $numEntrada }}{{ $i }}*</label>
-    @if ($i < $bultos)
-    <div class="page_break"></div>
-    @endif
+        <label class="bar">*{{ $numEntrada }}{{ $i }}*</label>
+        @if ($i < $bultos)
+            <div class="page_break"></div>
+        @endif
     @endfor
 </body>
 </html>
