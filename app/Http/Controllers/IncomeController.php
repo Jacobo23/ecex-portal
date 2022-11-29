@@ -857,7 +857,7 @@ class IncomeController extends Controller
                     continue;
                 }
                 // 4
-                $contenidos .= $numero_de_parte . "," . $cantidad . "," . $suma_bultos . "," . $ingles_de_umb . "," . $umb . ",Y,,,N,,,,,,\n";
+                $contenidos .= $numero_de_parte . "," . $cantidad . "," . $suma_bultos . "," . $ingles_de_umb . "," . $umb . ",Y,,,,N,,,,,,\n";
             }
         }
         //5
