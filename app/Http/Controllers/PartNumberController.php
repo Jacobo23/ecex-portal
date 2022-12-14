@@ -146,7 +146,10 @@ class PartNumberController extends Controller
     // }
     public function getInfo(Request $request, string $customer)
     {
-        return PartNumber::where("part_number",$request->partNumber)->where("customer_id",$customer)->first();
+        //return PartNumber::where("part_number",$request->partNumber)->where("customer_id",$customer)->first();
+        $infoPN=PartNumber::where("part_number",$request->partNumber)->where([["customer_id",$customer],["status",'1']])->first();
+        
+        return $infoPN;
     }
     
 
